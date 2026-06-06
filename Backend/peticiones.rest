@@ -1,0 +1,90 @@
+# Peticiones REST para crear un nuevo paciente
+POST http://localhost:3000/api/pacientes
+content-type: application/json
+
+{
+    "TipoDocumento": "CC",
+    "Documento": "123456789",
+    "Nombre": "Philip",
+    "Apellido": "Dev",
+    "Correo": "philipe-dev@email.com",
+    "Telefono": "1234567890"
+}
+
+####
+# Paciente #2
+POST http://localhost:3000/api/pacientes
+content-type: application/json
+
+{
+    "TipoDocumento": "CC",
+    "Documento": "12345",
+    "Nombre": "Philiik",
+    "Apellido": "Dev",
+    "Correo": "phil-dev@email.com",
+    "Telefono": "12345670"
+}
+
+###
+# MEDICO
+POST http://localhost:3000/api/medicos
+content-type: application/json
+
+{
+    "Registromedico": "123456",
+    "Nombre": "Luisa"
+}
+
+###
+# MEDICO 2
+POST http://localhost:3000/api/medicos
+content-type: application/json
+
+{
+    "Registromedico": "1256",
+    "Nombre": "Julian"
+}
+
+###
+# LISTAR medicos
+# @name lista_de_medicos
+GET http://localhost:3000/api/medicos
+
+###
+# LISTAR pacientes
+# @name lista_de_pacientes
+GET http://localhost:3000/api/pacientes
+
+
+###
+# CITA
+# @name crear_cita
+POST http://localhost:3000/api/citas
+content-type: application/json
+
+{
+    "medico": "{{lista_de_medicos.response.body.datos.[0]._id}}",
+    "fecha": "2024-07-01",
+    "motivo": "Consulta general"
+}
+
+###
+# ASIGNAR CITA
+PATCH http://localhost:3000/api/citas/asignar
+content-type: application/json
+
+{
+    "citaId": "{{crear_cita.response.body.datos._id}}",
+    "pacienteId": "{{lista_de_pacientes.response.body.datos.[0]._id}}"
+}
+
+###
+# LISTAR CITAS
+GET http://localhost:3000/api/citas 
+
+
+###
+# eliminar cita
+DELETE http://localhost:3000/api/citas/6a249b531f0a234e5e7a4a6f
+
+
