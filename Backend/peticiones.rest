@@ -5,9 +5,9 @@ content-type: application/json
 {
     "TipoDocumento": "CC",
     "Documento": "123456789",
-    "Nombre": "Philip",
+    "Nombre": "Yesid,
     "Apellido": "Dev",
-    "Correo": "philipe-dev@email.com",
+    "Correo": "Yesid@email.com",
     "Telefono": "1234567890"
 }
 
@@ -19,9 +19,9 @@ content-type: application/json
 {
     "TipoDocumento": "CC",
     "Documento": "12345",
-    "Nombre": "Philiik",
+    "Nombre": "Cristian",
     "Apellido": "Dev",
-    "Correo": "phil-dev@email.com",
+    "Correo": "cristian@email.com",
     "Telefono": "12345670"
 }
 
