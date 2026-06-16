@@ -5,7 +5,7 @@ content-type: application/json
 {
     "TipoDocumento": "CC",
     "Documento": "123456789",
-    "Nombre": "Yesid,
+    "Nombre": "Yesid",
     "Apellido": "Dev",
     "Correo": "Yesid@email.com",
     "Telefono": "1234567890"
