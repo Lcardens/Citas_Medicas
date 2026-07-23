@@ -20,12 +20,6 @@ const pacienteSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // Apellido: {
-    //   type: String,
-    //   required: true,
-    //   trim: true,
-    // },
-
     Correo: {
       type: String,
       required: true,
@@ -38,50 +32,6 @@ const pacienteSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
-    // Direccion: {
-    //   type: String,
-    //   trim: true,
-    // },
-
-    // Genero: {
-    //   type: String,
-    //   enum: ["Masculino", "Femenino", "Otro"],
-    // },
-
-    // FechaNacimiento: {
-    //   type: Date,
-    // },
-
-    // TipoSangre: {
-    //   type: String,
-    //   enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    // },
-
-    // Alergias: [{ type: String }],
-
-    // Enfermedades: [
-    //   {
-    //     type: String,
-    //   },
-    // ],
-
-    // ContactoEmergencia: {
-    //   nombre: String,
-    //   telefono: String,
-    //   parentesco: String,
-    // },
-
-    // EPS: {
-    //   type: String,
-    //   required: true,
-    //   trim: true,
-    // },
-
-    // TipoAfiliacion: {
-    //   type: String,
-    //   enum: ["Contributivo", "Subsidiado", "Particular"],
-    // },
   },
   {
     timestamps: true,

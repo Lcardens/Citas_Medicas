@@ -1,22 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const { proteger, autorizar } = require("../middleware/auth");
 const {
   crearCita,
   asignarCita,
   listarCitas,
   eliminarCita,
+  obtenerCitasPorMedico,
+  obtenerCitasDisponiblesPorMedico,
 } = require("../controllers/citaController");
 
-// Ruta para crear un nueva cita
-router.post("/", crearCita);
-
-// Ruta para asignar una cita a un paciente
-router.patch("/asignar", asignarCita);
-
-// Ruta para listar todas las citas
+router.post("/", proteger, crearCita);
+router.patch("/asignar", proteger, autorizar("admin"), asignarCita);
 router.get("/", listarCitas);
-
-// Ruta para eliminar una cita
-router.delete("/:id", eliminarCita);
+router.delete("/:id", proteger, autorizar("admin"), eliminarCita);
+router.get("/medico/:medicoId", proteger, obtenerCitasPorMedico);
+router.get(
+  "/medico/:medicoId/disponibles",
+  proteger,
+  obtenerCitasDisponiblesPorMedico,
+);
 
 module.exports = router;

@@ -1,0 +1,289 @@
+<div style="font-family: sans-serif; max-width: 900px; margin: 20px auto; padding: 20px">
+  <!-- CABECERA -->
+  <header
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #0d6efd;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+    "
+  >
+    <h2 style="margin: 0">Sistema Médico</h2>
+    <div>
+      <span
+        >Usuario: <strong>{{ authService.obtenerRol() }}</strong></span
+      >
+      <button
+        (click)="cerrarSesion()"
+        style="
+          margin-left: 15px;
+          background: #dc3545;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        "
+      >
+        Cerrar Sesión
+      </button>
+    </div>
+  </header>
+
+  <br />
+
+  <!-- OPCIONES PARA ADMINISTRADOR -->
+  <div *ngIf="authService.obtenerRol() === 'admin'">
+    <!-- NAVEGACIÓN -->
+    <nav style="margin-bottom: 20px">
+      <button
+        (click)="seccionActiva = 'citas'; cargarCitas()"
+        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
+      >
+        📅 Ver Citas
+      </button>
+      <button
+        (click)="seccionActiva = 'pacientes'; cargarPacientes()"
+        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
+      >
+        👥 Ver Pacientes
+      </button>
+      <button
+        (click)="seccionActiva = 'medicos'; cargarMedicos()"
+        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
+      >
+        👨‍⚕️ Ver Médicos
+      </button>
+      <button
+        (click)="seccionActiva = 'crearUsuario'"
+        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
+      >
+        ➕ Crear Usuario
+      </button>
+      <button (click)="seccionActiva = 'asignarCita'" style="padding: 8px 12px; cursor: pointer">
+        🔗 Asignar Cita
+      </button>
+    </nav>
+
+    <hr />
+
+    <p
+      *ngIf="mensaje"
+      style="padding: 10px; background-color: #f0f0f0; border-radius: 4px; font-weight: bold"
+    >
+      {{ mensaje }}
+    </p>
+
+    <!-- SECCIÓN 1: VER CITAS -->
+    <div *ngIf="seccionActiva === 'citas'">
+      <h3>Lista de Citas</h3>
+      <button (click)="cargarCitas()">🔄 Actualizar Lista</button>
+      <br /><br />
+
+      <p *ngIf="cargando">Cargando datos...</p>
+
+      <table
+        *ngIf="!cargando"
+        border="1"
+        cellpadding="8"
+        cellspacing="0"
+        style="width: 100%; border-collapse: collapse"
+      >
+        <thead>
+          <tr style="background-color: #f2f2f2">
+            <th>ID Cita</th>
+            <th>Fecha / Detalle</th>
+            <th>Estado</th>
+            <th>Paciente ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cita of citas">
+            <td>{{ cita._id }}</td>
+            <td>{{ cita.fecha || cita.descripcion || 'Sin fecha' }}</td>
+            <td>{{ cita.estado || 'Pendiente' }}</td>
+            <td>{{ cita.pacienteId || cita.paciente || 'Sin asignar' }}</td>
+          </tr>
+          <tr *ngIf="citas.length === 0">
+            <td colspan="4" style="text-align: center">No hay citas para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 2: VER PACIENTES -->
+    <div *ngIf="seccionActiva === 'pacientes'">
+      <h3>Lista de Pacientes</h3>
+      <button (click)="cargarPacientes()">🔄 Actualizar Lista</button>
+      <br /><br />
+
+      <p *ngIf="cargando">Cargando datos...</p>
+
+      <table
+        *ngIf="!cargando"
+        border="1"
+        cellpadding="8"
+        cellspacing="0"
+        style="width: 100%; border-collapse: collapse"
+      >
+        <thead>
+          <tr style="background-color: #f2f2f2">
+            <th>ID Paciente</th>
+            <th>Nombre</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of pacientes">
+            <td>{{ p._id }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.email }}</td>
+          </tr>
+          <tr *ngIf="pacientes.length === 0">
+            <td colspan="3" style="text-align: center">No hay pacientes registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 3: VER MÉDICOS -->
+    <div *ngIf="seccionActiva === 'medicos'">
+      <h3>Lista de Médicos</h3>
+      <button (click)="cargarMedicos()">🔄 Actualizar Lista</button>
+      <br /><br />
+
+      <p *ngIf="cargando">Cargando datos...</p>
+
+      <table
+        *ngIf="!cargando"
+        border="1"
+        cellpadding="8"
+        cellspacing="0"
+        style="width: 100%; border-collapse: collapse"
+      >
+        <thead>
+          <tr style="background-color: #f2f2f2">
+            <th>ID Médico</th>
+            <th>Nombre</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of medicos">
+            <td>{{ m._id }}</td>
+            <td>{{ m.nombre }}</td>
+            <td>{{ m.email }}</td>
+          </tr>
+          <tr *ngIf="medicos.length === 0">
+            <td colspan="3" style="text-align: center">No hay médicos registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 4: CREAR USUARIO -->
+    <div *ngIf="seccionActiva === 'crearUsuario'">
+      <h3>Crear Nuevo Usuario</h3>
+      <form (ngSubmit)="crearUsuario()" style="max-width: 400px">
+        <div style="margin-bottom: 10px">
+          <label>Nombre:</label><br />
+          <input
+            type="text"
+            [(ngModel)]="nuevoUsuario.nombre"
+            name="nombre"
+            required
+            style="width: 100%; padding: 8px"
+          />
+        </div>
+        <div style="margin-bottom: 10px">
+          <label>Email:</label><br />
+          <input
+            type="email"
+            [(ngModel)]="nuevoUsuario.email"
+            name="email"
+            required
+            style="width: 100%; padding: 8px"
+          />
+        </div>
+        <div style="margin-bottom: 10px">
+          <label>Contraseña:</label><br />
+          <input
+            type="password"
+            [(ngModel)]="nuevoUsuario.password"
+            name="password"
+            required
+            style="width: 100%; padding: 8px"
+          />
+        </div>
+        <div style="margin-bottom: 10px">
+          <label>Rol:</label><br />
+          <select [(ngModel)]="nuevoUsuario.rol" name="rol" style="width: 100%; padding: 8px">
+            <option value="paciente">Paciente</option>
+            <option value="medico">Médico</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          style="
+            padding: 8px 16px;
+            background-color: #198754;
+            color: white;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Guardar Usuario
+        </button>
+      </form>
+    </div>
+
+    <!-- SECCIÓN 5: ASIGNAR CITA -->
+    <div *ngIf="seccionActiva === 'asignarCita'">
+      <h3>Asignar Cita a Paciente</h3>
+      <form (ngSubmit)="asignarCita()" style="max-width: 400px">
+        <div style="margin-bottom: 10px">
+          <label>ID Cita:</label><br />
+          <input
+            type="text"
+            [(ngModel)]="citaId"
+            name="citaId"
+            required
+            style="width: 100%; padding: 8px"
+          />
+        </div>
+        <div style="margin-bottom: 10px">
+          <label>ID Paciente:</label><br />
+          <input
+            type="text"
+            [(ngModel)]="pacienteId"
+            name="pacienteId"
+            required
+            style="width: 100%; padding: 8px"
+          />
+        </div>
+        <button
+          type="submit"
+          style="
+            padding: 8px 16px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Asignar Cita
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- VISTA PACIENTE -->
+  <div *ngIf="authService.obtenerRol() !== 'admin'">
+    <h3>Bienvenido Paciente</h3>
+    <p>Aquí puedes consultar la información de tus citas de salud.</p>
+  </div>
+</div>

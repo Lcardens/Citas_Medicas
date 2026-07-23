@@ -1,3 +1,53 @@
+
+### 1. Crear Usuario Normal
+POST http://localhost:3000/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Juan Pérez",
+  "email": "j@email.com",
+  "password": "Password123",
+  "rol": "usuario"
+}
+
+### 2. Crear Usuario Administrador
+POST http://localhost:3000/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Dra. Maria Admin",
+  "email": "admin@email.com",
+  "password": "Password123",
+  "rol": "admin"
+}
+
+### 3. Login como Usuario Normal
+# @name loginUsuario
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "juan@email.com",
+  "password": "Password123"
+}
+
+### Guardar Token del Usuario Normal
+@tokenUsuario = {{loginUsuario.response.body.token}}
+
+
+### 4. Login como Administrador
+# @name loginAdmin
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@email.com",
+  "password": "Password123"
+}
+
+### Guardar Token del Admin
+@tokenAdmin = {{loginAdmin.response.body.token}}
+
 # Peticiones REST para crear un nuevo paciente
 POST http://localhost:3000/api/pacientes
 content-type: application/json
@@ -11,14 +61,30 @@ content-type: application/json
     "Telefono": "1234567890"
 }
 
+######
+# Paciente #1
+POST http://localhost:3000/api/pacientes
+content-type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "TipoDocumento": "CC",
+    "Documento": "123465",
+    "Nombre": "Cristian",
+    "Apellido": "Dev",
+    "Correo": "cristianM@email.com",
+    "Telefono": "1234570"
+}
+
 ####
 # Paciente #2
 POST http://localhost:3000/api/pacientes
 content-type: application/json
+Authorization: Bearer {{tokenAdmin}}
 
 {
     "TipoDocumento": "CC",
-    "Documento": "12345",
+    "Documento": "123225",
     "Nombre": "Cristian",
     "Apellido": "Dev",
     "Correo": "cristian@email.com",
@@ -29,10 +95,11 @@ content-type: application/json
 # MEDICO
 POST http://localhost:3000/api/medicos
 content-type: application/json
+Authorization: Bearer {{tokenAdmin}}
 
 {
-    "Registromedico": "123456",
-    "Nombre": "Luisa"
+    "Registromedico": "14796",
+    "Nombre": "Yesid"
 }
 
 ###
@@ -41,8 +108,8 @@ POST http://localhost:3000/api/medicos
 content-type: application/json
 
 {
-    "Registromedico": "1256",
-    "Nombre": "Julian"
+    "Registromedico": "1246",
+    "Nombre": "Cristian"
 }
 
 ###
@@ -61,6 +128,7 @@ GET http://localhost:3000/api/pacientes
 # @name crear_cita
 POST http://localhost:3000/api/citas
 content-type: application/json
+Authorization: Bearer {{tokenAdmin}}
 
 {
     "medico": "{{lista_de_medicos.response.body.datos.[0]._id}}",
@@ -72,16 +140,20 @@ content-type: application/json
 # ASIGNAR CITA
 PATCH http://localhost:3000/api/citas/asignar
 content-type: application/json
+Authorization: Bearer {{tokenAdmin}}
 
 {
-    "citaId": "{{crear_cita.response.body.datos._id}}",
-    "pacienteId": "{{lista_de_pacientes.response.body.datos.[0]._id}}"
+    "medicoId": "{{lista_de_medicos.response.body.datos.[2]._id}}",
+    "pacienteId": "{{lista_de_pacientes.response.body.datos.[2]._id}}"
 }
 
 ###
 # LISTAR CITAS
 GET http://localhost:3000/api/citas 
 
+###
+GET http://localhost:3000/api/citas/medico/6a61942ee088ebe08ed48bd6/disponibles
+Authorization: Bearer {{tokenAdmin}}
 
 ###
 # eliminar cita

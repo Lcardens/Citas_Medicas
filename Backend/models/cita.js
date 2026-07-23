@@ -2,44 +2,31 @@ const mongoose = require("mongoose");
 
 const citaSchema = new mongoose.Schema(
   {
-    paciente: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Paciente",
-      required: false,
-    },
-
     medico: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Medico",
       required: true,
     },
-
+    paciente: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     fecha: {
-      type: Date,
+      type: String,
       required: true,
     },
-
     motivo: {
       type: String,
-      required: true,
-      trim: true,
+      default: "Consulta Médica",
     },
-
     estado: {
       type: String,
-      enum: ["Pendiente", "Confirmada", "Cancelada", "Completada"],
-      default: "Pendiente",
-    },
-
-    observaciones: {
-      type: String,
-      trim: true,
+      enum: ["Disponible", "Confirmada", "Cancelada"],
+      default: "Disponible",
     },
   },
-
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-module.exports = mongoose.model("Cita", citaSchema);
+module.exports = mongoose.models.Cita || mongoose.model("Cita", citaSchema);
