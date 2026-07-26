@@ -1,1 +1,95 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================
+   1. CONFIGURACIÓN GENERAL Y FUENTE
+   ========================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family:
+    'Poppins',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background-color: #f4f6f9; /* Fondo gris claro muy suave */
+  color: #333333;
+}
+
+/* ==========================================
+   2. REGLAS PARA TABLAS Y CONTENEDORES
+   ========================================== */
+/* Redondear contenedores y tarjetas */
+.card,
+.table-responsive {
+  border-radius: 12px !important;
+}
+
+/* Sombras suaves para dar elevación */
+.shadow-sm {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Estilos de las tablas */
+.table {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table thead th {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* ==========================================
+   3. BOTONES Y ACCIONES
+   ========================================== */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ==========================================
+   4. PERSONALIZACIÓN DE BARRAS DE DESPLAZAMIENTO
+   ========================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ==========================================
+   5. EFECTO HOVER PARA TARJETAS DE INICIO
+   ========================================== */
+.card-hover {
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}

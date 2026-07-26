@@ -3,11 +3,12 @@ const jwt = require("jsonwebtoken");
 
 // Función auxiliar para generar el Token JWT
 const generarToken = (usuario) => {
-  return jwt.sign(
-    { id: usuario._id, rol: usuario.rol }, // Payload con el ID y el ROL
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "8h" },
-  );
+  const secret = process.env.JWT_SECRET || "dev_jwt_secret";
+  const expiresIn = process.env.JWT_EXPIRES_IN || "8h";
+
+  return jwt.sign({ id: usuario._id, rol: usuario.rol }, secret, {
+    expiresIn,
+  });
 };
 
 // 1. POST /api/auth/registro

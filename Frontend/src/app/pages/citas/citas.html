@@ -1,289 +1,144 @@
-<div style="font-family: sans-serif; max-width: 900px; margin: 20px auto; padding: 20px">
-  <!-- CABECERA -->
-  <header
-    style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #0d6efd;
-      color: white;
-      padding: 15px;
-      border-radius: 5px;
-    "
-  >
-    <h2 style="margin: 0">Sistema Médico</h2>
-    <div>
-      <span
-        >Usuario: <strong>{{ authService.obtenerRol() }}</strong></span
-      >
-      <button
-        (click)="cerrarSesion()"
-        style="
-          margin-left: 15px;
-          background: #dc3545;
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-        "
-      >
-        Cerrar Sesión
-      </button>
-    </div>
-  </header>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Citas Médicas</h2>
+    <button class="btn btn-primary" (click)="abrirModal()">+ Agendar Cita</button>
+  </div>
 
-  <br />
-
-  <!-- OPCIONES PARA ADMINISTRADOR -->
-  <div *ngIf="authService.obtenerRol() === 'admin'">
-    <!-- NAVEGACIÓN -->
-    <nav style="margin-bottom: 20px">
-      <button
-        (click)="seccionActiva = 'citas'; cargarCitas()"
-        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
-      >
-        📅 Ver Citas
-      </button>
-      <button
-        (click)="seccionActiva = 'pacientes'; cargarPacientes()"
-        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
-      >
-        👥 Ver Pacientes
-      </button>
-      <button
-        (click)="seccionActiva = 'medicos'; cargarMedicos()"
-        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
-      >
-        👨‍⚕️ Ver Médicos
-      </button>
-      <button
-        (click)="seccionActiva = 'crearUsuario'"
-        style="padding: 8px 12px; margin-right: 5px; cursor: pointer"
-      >
-        ➕ Crear Usuario
-      </button>
-      <button (click)="seccionActiva = 'asignarCita'" style="padding: 8px 12px; cursor: pointer">
-        🔗 Asignar Cita
-      </button>
-    </nav>
-
-    <hr />
-
-    <p
-      *ngIf="mensaje"
-      style="padding: 10px; background-color: #f0f0f0; border-radius: 4px; font-weight: bold"
-    >
-      {{ mensaje }}
-    </p>
-
-    <!-- SECCIÓN 1: VER CITAS -->
-    <div *ngIf="seccionActiva === 'citas'">
-      <h3>Lista de Citas</h3>
-      <button (click)="cargarCitas()">🔄 Actualizar Lista</button>
-      <br /><br />
-
-      <p *ngIf="cargando">Cargando datos...</p>
-
-      <table
-        *ngIf="!cargando"
-        border="1"
-        cellpadding="8"
-        cellspacing="0"
-        style="width: 100%; border-collapse: collapse"
-      >
-        <thead>
-          <tr style="background-color: #f2f2f2">
-            <th>ID Cita</th>
-            <th>Fecha / Detalle</th>
-            <th>Estado</th>
-            <th>Paciente ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let cita of citas">
-            <td>{{ cita._id }}</td>
-            <td>{{ cita.fecha || cita.descripcion || 'Sin fecha' }}</td>
-            <td>{{ cita.estado || 'Pendiente' }}</td>
-            <td>{{ cita.pacienteId || cita.paciente || 'Sin asignar' }}</td>
-          </tr>
-          <tr *ngIf="citas.length === 0">
-            <td colspan="4" style="text-align: center">No hay citas para mostrar.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SECCIÓN 2: VER PACIENTES -->
-    <div *ngIf="seccionActiva === 'pacientes'">
-      <h3>Lista de Pacientes</h3>
-      <button (click)="cargarPacientes()">🔄 Actualizar Lista</button>
-      <br /><br />
-
-      <p *ngIf="cargando">Cargando datos...</p>
-
-      <table
-        *ngIf="!cargando"
-        border="1"
-        cellpadding="8"
-        cellspacing="0"
-        style="width: 100%; border-collapse: collapse"
-      >
-        <thead>
-          <tr style="background-color: #f2f2f2">
-            <th>ID Paciente</th>
-            <th>Nombre</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of pacientes">
-            <td>{{ p._id }}</td>
-            <td>{{ p.nombre }}</td>
-            <td>{{ p.email }}</td>
-          </tr>
-          <tr *ngIf="pacientes.length === 0">
-            <td colspan="3" style="text-align: center">No hay pacientes registrados.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SECCIÓN 3: VER MÉDICOS -->
-    <div *ngIf="seccionActiva === 'medicos'">
-      <h3>Lista de Médicos</h3>
-      <button (click)="cargarMedicos()">🔄 Actualizar Lista</button>
-      <br /><br />
-
-      <p *ngIf="cargando">Cargando datos...</p>
-
-      <table
-        *ngIf="!cargando"
-        border="1"
-        cellpadding="8"
-        cellspacing="0"
-        style="width: 100%; border-collapse: collapse"
-      >
-        <thead>
-          <tr style="background-color: #f2f2f2">
-            <th>ID Médico</th>
-            <th>Nombre</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let m of medicos">
-            <td>{{ m._id }}</td>
-            <td>{{ m.nombre }}</td>
-            <td>{{ m.email }}</td>
-          </tr>
-          <tr *ngIf="medicos.length === 0">
-            <td colspan="3" style="text-align: center">No hay médicos registrados.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SECCIÓN 4: CREAR USUARIO -->
-    <div *ngIf="seccionActiva === 'crearUsuario'">
-      <h3>Crear Nuevo Usuario</h3>
-      <form (ngSubmit)="crearUsuario()" style="max-width: 400px">
-        <div style="margin-bottom: 10px">
-          <label>Nombre:</label><br />
-          <input
-            type="text"
-            [(ngModel)]="nuevoUsuario.nombre"
-            name="nombre"
-            required
-            style="width: 100%; padding: 8px"
-          />
-        </div>
-        <div style="margin-bottom: 10px">
-          <label>Email:</label><br />
-          <input
-            type="email"
-            [(ngModel)]="nuevoUsuario.email"
-            name="email"
-            required
-            style="width: 100%; padding: 8px"
-          />
-        </div>
-        <div style="margin-bottom: 10px">
-          <label>Contraseña:</label><br />
-          <input
-            type="password"
-            [(ngModel)]="nuevoUsuario.password"
-            name="password"
-            required
-            style="width: 100%; padding: 8px"
-          />
-        </div>
-        <div style="margin-bottom: 10px">
-          <label>Rol:</label><br />
-          <select [(ngModel)]="nuevoUsuario.rol" name="rol" style="width: 100%; padding: 8px">
-            <option value="paciente">Paciente</option>
-            <option value="medico">Médico</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
-        <button
-          type="submit"
-          style="
-            padding: 8px 16px;
-            background-color: #198754;
-            color: white;
-            border: none;
-            cursor: pointer;
-          "
-        >
-          Guardar Usuario
+  <!-- BARRA DE FILTRO POR MÉDICO -->
+  <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold text-secondary">Filtrar por Médico:</label>
+        <select class="form-select" [(ngModel)]="medicoFiltro">
+          <option value="">-- Todos los médicos --</option>
+          <option *ngFor="let m of medicos" [value]="m._id">
+            {{ m.Nombre }} - {{ m.Registromedico }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-6 text-md-end mt-3 mt-md-0" *ngIf="medicoFiltro">
+        <button class="btn btn-outline-secondary btn-sm" (click)="medicoFiltro = ''">
+          Limpiar filtro
         </button>
-      </form>
-    </div>
-
-    <!-- SECCIÓN 5: ASIGNAR CITA -->
-    <div *ngIf="seccionActiva === 'asignarCita'">
-      <h3>Asignar Cita a Paciente</h3>
-      <form (ngSubmit)="asignarCita()" style="max-width: 400px">
-        <div style="margin-bottom: 10px">
-          <label>ID Cita:</label><br />
-          <input
-            type="text"
-            [(ngModel)]="citaId"
-            name="citaId"
-            required
-            style="width: 100%; padding: 8px"
-          />
-        </div>
-        <div style="margin-bottom: 10px">
-          <label>ID Paciente:</label><br />
-          <input
-            type="text"
-            [(ngModel)]="pacienteId"
-            name="pacienteId"
-            required
-            style="width: 100%; padding: 8px"
-          />
-        </div>
-        <button
-          type="submit"
-          style="
-            padding: 8px 16px;
-            background-color: #0d6efd;
-            color: white;
-            border: none;
-            cursor: pointer;
-          "
-        >
-          Asignar Cita
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 
-  <!-- VISTA PACIENTE -->
-  <div *ngIf="authService.obtenerRol() !== 'admin'">
-    <h3>Bienvenido Paciente</h3>
-    <p>Aquí puedes consultar la información de tus citas de salud.</p>
+  <!-- Spinner de carga -->
+  <div *ngIf="cargando" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Tabla de citas (Itera sobre citasFiltradas) -->
+  <div *ngIf="!cargando" class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Motivo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Usamos citasFiltradas en lugar de citas -->
+        <tr *ngFor="let cita of citasFiltradas; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ cita.paciente?.Nombre || cita.paciente }}</td>
+          <td>{{ cita.medico?.Nombre || cita.medico }}</td>
+          <td>{{ cita.fecha | date: 'shortDate' }}</td>
+          <td>{{ cita.hora }}</td>
+          <td>{{ cita.motivo }}</td>
+        </tr>
+
+        <!-- Mensaje si no hay citas para ese médico -->
+        <tr *ngIf="citasFiltradas.length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">
+            No se encontraron citas programadas para esta consulta.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL AGENDAR CITA (Se mantiene igual) -->
+<div
+  *ngIf="mostrarModal"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Agendar Nueva Cita</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <form (ngSubmit)="guardarCita()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <select class="form-select" [(ngModel)]="nuevaCita.paciente" name="paciente" required>
+              <option value="" disabled selected>Seleccione un paciente</option>
+              <option *ngFor="let p of pacientes" [value]="p._id">
+                {{ p.Nombre }} ({{ p.Documento }})
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Médico</label>
+            <select class="form-select" [(ngModel)]="nuevaCita.medico" name="medico" required>
+              <option value="" disabled selected>Seleccione un médico</option>
+              <option *ngFor="let m of medicos" [value]="m._id">
+                {{ m.Nombre }} - {{ m.Registromedico }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="nuevaCita.fecha"
+              name="fecha"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Hora</label>
+            <input
+              type="time"
+              class="form-control"
+              [(ngModel)]="nuevaCita.hora"
+              name="hora"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Motivo</label>
+            <textarea
+              class="form-control"
+              [(ngModel)]="nuevaCita.motivo"
+              name="motivo"
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-success">Agendar</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

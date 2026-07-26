@@ -158,5 +158,6 @@ Authorization: Bearer {{tokenAdmin}}
 ###
 # eliminar cita
 DELETE http://localhost:3000/api/citas/6a249b531f0a234e5e7a4a6f
+Authorization: Bearer {{tokenAdmin}}
 
 

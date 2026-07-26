@@ -1,29 +1,39 @@
-# API de Gestión Médica
+# Sistema de Gestión Médica (Fullstack)
 
-API REST para la gestión de **pacientes**, **médicos** y **citas**, construida con **Node.js**, **Express** y **MongoDB** (Mongoose).
+Proyecto fullstack para la gestión de pacientes, médicos y citas. Incluye:
+
+- Backend: Node.js, Express y MongoDB (Mongoose).
+- Frontend: aplicación Angular que consume la API.
+
+Este README resume las funcionalidades implementadas (incluida la autenticación), la estructura del proyecto y los pasos para ejecutar localmente ambas partes.
 
 ## Tabla de contenidos
 
-- [Tecnologías](#tecnologías)
+- [¿Qué incluye este repo?](#qué-incluye-este-repo)
+- [Cambios y funcionalidades añadidas](#cambios-y-funcionalidades-añadidas)
 - [Estructura del proyecto](#estructura-del-proyecto)
-- [Configuración del entorno (.env)](#configuración-del-entorno-env)
+- [Configuración del entorno](#configuración-del-entorno)
 - [Instalación y ejecución](#instalación-y-ejecución)
-- [Modelos de datos](#modelos-de-datos)
-- [Endpoints](#endpoints)
-  - [Pacientes](#pacientes)
-  - [Médicos](#médicos)
-  - [Citas](#citas)
+- [Resumen de endpoints principales](#resumen-de-endpoints-principales)
 - [Pruebas con REST Client (VS Code)](#pruebas-con-rest-client-vs-code)
-- [Scripts disponibles](#scripts-disponibles)
+- [Autor](#autor)
 
-## Tecnologías
+## ¿Qué incluye este repo?
 
-- **Node.js** — entorno de ejecución
-- **Express 5** — framework HTTP
-- **Mongoose 9** — ODM para MongoDB
-- **MongoDB Atlas** — base de datos en la nube
-- **dotenv** — manejo de variables de entorno
-- **nodemon** — recarga automática en desarrollo
+- Backend: API REST con rutas para `pacientes`, `medicos`, `citas` y `auth`.
+- Frontend: SPA con rutas de `login`, `dashboard`, páginas para `pacientes`, `medicos` y `citas`.
+
+## Cambios y funcionalidades añadidas
+
+- Autenticación JWT en el backend: registro (`POST /api/auth/registro`) y login (`POST /api/auth/login`).
+- Modelo `User` con hash de contraseñas y roles (`usuario`, `admin`).
+- Middleware de protección de rutas (`proteger`) y autorización por roles (`autorizar`).
+- Rutas de `auth` integradas en el servidor (`/api/auth`).
+- En el frontend:
+  - `AuthService` para login, manejo de token en `localStorage` y estado de autenticación.
+  - `authInterceptor` que adjunta `Authorization: Bearer <token>` a las peticiones HTTP.
+  - `authGuard` para proteger rutas de la aplicación Angular.
+- Archivo de peticiones para pruebas: `Backend/peticiones.rest`.
 
 ## Estructura del proyecto
 
@@ -32,276 +42,111 @@ Backend/
 ├── config/
 │   └── db.js                  # Conexión a MongoDB
 ├── controllers/
+│   ├── authController.js      # Registro / Login (JWT)
 │   ├── citaController.js      # Lógica de citas
 │   ├── medicoController.js    # Lógica de médicos
 │   └── pacienteController.js  # Lógica de pacientes
+├── middleware/
+│   └── auth.js                # proteger + autorizar (roles)
 ├── models/
+│   ├── User.js                # Modelo de usuario (auth)
 │   ├── cita.js                # Esquema de Cita
 │   ├── medico.js              # Esquema de Médico
 │   └── Paciente.js            # Esquema de Paciente
 ├── routes/
-│   ├── citaRoutes.js          # Rutas de citas
-│   ├── medicoRoutes.js        # Rutas de médicos
-│   └── pacienteRoutes.js      # Rutas de pacientes
-├── index.js                   # Punto de entrada
+│   ├── authRoutes.js          # /api/auth
+│   ├── citaRoutes.js          # /api/citas
+│   ├── medicoRoutes.js        # /api/medicos
+│   └── pacienteRoutes.js      # /api/pacientes
+├── index.js                   # Punto de entrada (registra rutas y middlewares)
 ├── peticiones.rest            # Peticiones de prueba (REST Client)
-├── .env                       # Variables de entorno (NO se versiona)
+└── package.json
+
+Frontend/
+├── src/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── guards/        # auth.guard.ts
+│   │   │   ├── interceptors/  # auth.interceptor.ts
+│   │   │   └── services/      # auth.service.ts, cita.service.ts, etc.
+│   │   ├── pages/             # vistas: login, dashboard, medicos, pacientes, citas
+│   │   └── app.routes.ts
+│   └── environments/          # environment.ts / environment.development.ts
+├── angular.json
 └── package.json
 ```
 
-## Configuración del entorno (.env)
+## Configuración del entorno
 
-> ⚠️ **Importante:** crea el archivo `Backend/.env` antes de iniciar el proyecto. **Este archivo está en `.gitignore` y no se sube al repositorio**, por lo que cada desarrollador debe crearlo localmente.
-
-Crea el archivo `Backend/.env` con el siguiente contenido:
+Backend: crea `Backend/.env` con al menos:
 
 ```env
 MONGODB_URI=tu_uri_de_mongodb
 PORT=3000
+JWT_SECRET=una_clave_segura
+JWT_EXPIRES_IN=8h
 ```
 
-### ¿Dónde conseguir la `MONGODB_URI`?
-
-1. Entra a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) y crea una cuenta (o inicia sesión).
-2. Crea un **cluster gratuito** (Free Tier / M0).
-3. En **Database Access**, crea un usuario y contraseña.
-4. En **Network Access**, agrega tu IP (o `0.0.0.0/0` para permitir acceso desde cualquier lugar — solo para desarrollo).
-5. En **Database Deployments → Connect → Drivers**, copia la URI de conexión.
-6. Reemplaza `<username>` y `<password>` por tus credenciales.
-
-Ejemplo de URI:
-
-```
-MONGODB_URI=mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/nombreBD?retryWrites=true&w=majority
-```
-
-> 🔐 **Nunca** subas el archivo `.env` a un repositorio. Contiene credenciales sensibles.
+Frontend: el `environment.development.ts` ya apunta a la API en `http://localhost:3000/api`. Si cambias el puerto o la URL, actualiza `Frontend/src/environments/*`.
 
 ## Instalación y ejecución
 
-### 1. Clonar el repositorio
+Sigue estos pasos para ejecutar la aplicación completa en local.
+
+1. Backend
 
 ```bash
-git clone <url-del-repositorio>
-cd Segundo_Modulo/Backend
-```
-
-### 2. Instalar dependencias
-
-```bash
+cd Backend
 npm install
+# Crear Backend/.env (ver sección anterior)
+npm run dev   # o `npm start` para producción
 ```
 
-### 3. Crear el archivo `.env`
-
-Sigue las instrucciones de la sección [Configuración del entorno](#configuración-del-entorno-env).
-
-### 4. Ejecutar el servidor
+2. Frontend
 
 ```bash
-# Modo desarrollo (con recarga automática)
-npm run dev
-
-# Modo producción
+cd Frontend
+npm install
 npm start
 ```
 
-Verás en consola:
+Accede a la app Angular en `http://localhost:4200` (por defecto) y la API en `http://localhost:3000`.
 
-```
-✅ MongoDB conectada: <host>
-🚀 Servidor escuchando en puerto 3000
-```
+## Resumen de endpoints principales
 
-### 5. Probar que funciona
+Base URL del API: `http://localhost:3000/api`
 
-Abre en el navegador o en REST Client:
+- Auth
+  - `POST /auth/registro` — Registrar usuario (devuelve `token`).
+  - `POST /auth/login` — Iniciar sesión (devuelve `token`).
 
-```
-GET http://localhost:3000/
-```
+- Pacientes
+  - `POST /pacientes` — Crear paciente.
+  - `GET /pacientes` — Listar pacientes.
 
-Respuesta esperada:
+- Médicos
+  - `POST /medicos` — Crear médico.
+  - `GET /medicos` — Listar médicos.
 
-```json
-{ "mensaje": "¡API funcionando!" }
-```
+- Citas
+  - `POST /citas` — Crear cita (requiere `medico` válido).
+  - `PATCH /citas/asignar` — Asignar paciente a cita.
+  - `GET /citas` — Listar citas (populates `medico` y `paciente`).
+  - `DELETE /citas/:id` — Eliminar cita por ID.
 
-## Modelos de datos
-
-### Paciente
-
-| Campo           | Tipo   | Requerido | Notas                               |
-| --------------- | ------ | --------- | ----------------------------------- |
-| `TipoDocumento` | String | ✅        | enum: `CC`, `TI`, `CE`, `Pasaporte` |
-| `Documento`     | String | ✅        | único                               |
-| `Nombre`        | String | ✅        |                                     |
-| `Correo`        | String | ✅        | se guarda en minúsculas             |
-| `Telefono`      | String | ✅        |                                     |
-
-### Médico
-
-| Campo            | Tipo   | Requerido | Notas |
-| ---------------- | ------ | --------- | ----- |
-| `Registromedico` | String | ✅        |       |
-| `Nombre`         | String | ✅        |       |
-
-### Cita
-
-| Campo           | Tipo     | Requerido | Notas                                                          |
-| --------------- | -------- | --------- | -------------------------------------------------------------- |
-| `medico`        | ObjectId | ✅        | referencia a `Medico`                                          |
-| `paciente`      | ObjectId | ❌        | referencia a `Paciente`                                        |
-| `fecha`         | Date     | ✅        |                                                                |
-| `motivo`        | String   | ✅        |                                                                |
-| `estado`        | String   | ❌        | `Pendiente` (default), `Confirmada`, `Cancelada`, `Completada` |
-| `observaciones` | String   | ❌        |                                                                |
-
-## Endpoints
-
-Base URL: `http://localhost:3000`
-
-### Pacientes
-
-| Método | Ruta             | Descripción                |
-| ------ | ---------------- | -------------------------- |
-| `POST` | `/api/pacientes` | Crear un paciente          |
-| `GET`  | `/api/pacientes` | Listar todos los pacientes |
-
-**Ejemplo — Crear paciente**
-
-```http
-POST /api/pacientes
-Content-Type: application/json
-
-{
-  "TipoDocumento": "CC",
-  "Documento": "123456789",
-  "Nombre": "Philip",
-  "Correo": "philipe-dev@email.com",
-  "Telefono": "1234567890"
-}
-```
-
-### Médicos
-
-| Método | Ruta           | Descripción              |
-| ------ | -------------- | ------------------------ |
-| `POST` | `/api/medicos` | Crear un médico          |
-| `GET`  | `/api/medicos` | Listar todos los médicos |
-
-**Ejemplo — Crear médico**
-
-```http
-POST /api/medicos
-Content-Type: application/json
-
-{
-  "Registromedico": "123456",
-  "Nombre": "Luisa"
-}
-```
-
-### Citas
-
-| Método   | Ruta                 | Descripción                                                  |
-| -------- | -------------------- | ------------------------------------------------------------ |
-| `POST`   | `/api/citas`         | Crear una cita (sin paciente)                                |
-| `PATCH`  | `/api/citas/asignar` | Asignar paciente a una cita                                  |
-| `GET`    | `/api/citas`         | Listar todas las citas (con `populate` de paciente y médico) |
-| `DELETE` | `/api/citas/:id`     | Eliminar una cita por ID                                     |
-
-**Ejemplo — Crear cita**
-
-```http
-POST /api/citas
-Content-Type: application/json
-
-{
-  "medico": "665a1b2c3d4e5f6a7b8c9d0e",
-  "fecha": "2024-07-01",
-  "motivo": "Consulta general"
-}
-```
-
-**Ejemplo — Asignar cita a un paciente**
-
-```http
-PATCH /api/citas/asignar
-Content-Type: application/json
-
-{
-  "citaId": "665a...",
-  "pacienteId": "665a..."
-}
-```
-
-**Ejemplo — Eliminar cita**
-
-```http
-DELETE /api/citas/665a1b2c3d4e5f6a7b8c9d0e
-```
+Protección: las rutas que requieran autenticación usan el header `Authorization: Bearer <token>`; el frontend añade automáticamente este header mediante `authInterceptor`.
 
 ## Pruebas con REST Client (VS Code)
 
-Este proyecto incluye el archivo **`Backend/peticiones.rest`** con todas las peticiones listas para ejecutarse desde VS Code usando la extensión **REST Client**.
+El archivo `Backend/peticiones.rest` contiene un conjunto de peticiones listas para ejecutar con la extensión **REST Client**. Úsalas para probar flujo: crear médicos/pacientes → crear cita → asignar cita.
 
-### Instalación de la extensión
+## Notas y recomendaciones
 
-1. Abre VS Code.
-2. Ve a la pestaña de **Extensiones** (`Ctrl+Shift+X`).
-3. Busca **REST Client** (autor: Huachao Mao).
-4. Haz clic en **Install**.
+- El `User` model cifra contraseñas con `bcrypt` y expone un método `compararPassword`.
+- El middleware `proteger` valida el JWT y adjunta `req.usuario` para control de permisos.
+- El frontend guarda el token en `localStorage` y usa `authGuard` para proteger rutas UI.
 
-### Cómo usar las peticiones
-
-1. Abre el archivo `Backend/peticiones.rest` en VS Code.
-2. Verás cada petición como un bloque separado por `###`.
-3. Sobre cada petición aparece el enlace **"Send Request"** — haz clic para ejecutarla.
-4. La respuesta se mostrará en un panel lateral.
-
-### Encadenar peticiones con variables
-
-REST Client permite reutilizar respuestas entre peticiones usando la sintaxis `{{nombre.response.body.campo}}`. El archivo `peticiones.rest` ya viene configurado así:
-
-```http
-# Lista los médicos y guarda la respuesta como "lista_de_medicos"
-# @name lista_de_medicos
-GET http://localhost:3000/api/medicos
-
-###
-# Usa el ID del primer médico de la respuesta anterior
-POST http://localhost:3000/api/citas
-Content-Type: application/json
-
-{
-  "medico": "{{lista_de_medicos.response.body.datos.[0]._id}}",
-  "fecha": "2024-07-01",
-  "motivo": "Consulta general"
-}
-```
-
-### Flujo de prueba sugerido
-
-Ejecuta las peticiones en este orden para evitar errores de referencias:
-
-1. **Crear pacientes** (`POST /api/pacientes`) — 1 o 2 veces.
-2. **Crear médicos** (`POST /api/medicos`) — 1 o 2 veces.
-3. **Listar pacientes** (`GET /api/pacientes`) — para obtener sus IDs.
-4. **Listar médicos** (`GET /api/medicos`) — para obtener sus IDs.
-5. **Crear cita** (`POST /api/citas`) — usando un `medico` válido.
-6. **Asignar cita** (`PATCH /api/citas/asignar`) — usando `citaId` y `pacienteId`.
-7. **Listar citas** (`GET /api/citas`) — para ver la cita con sus referencias pobladas.
-8. **Eliminar cita** (`DELETE /api/citas/:id`) — usando un ID real.
-
-> 💡 **Tip:** si cambias el puerto en `.env`, actualiza también la URL en `peticiones.rest`.
-
-## Scripts disponibles
-
-| Script  | Comando            | Descripción                               |
-| ------- | ------------------ | ----------------------------------------- |
-| `dev`   | `nodemon index.js` | Inicia el servidor con recarga automática |
-| `start` | `node index.js`    | Inicia el servidor en modo producción     |
+Si quieres que añada en el README ejemplos concretos de peticiones `curl` o que actualice `peticiones.rest` con nuevas pruebas, dímelo y lo añado.
 
 ---
 
@@ -309,4 +154,4 @@ Ejecuta las peticiones en este orden para evitar errores de referencias:
 
 Luisa Fernanda Cárdenas Sierra
 
-Desarrollado como proyecto de aprendizaje — Bootcamp Módulo 2.
+Desarrollado como proyecto de aprendizaje — Bootcamp Proyecto Final.

@@ -1,0 +1,108 @@
+<div class="container py-4">
+  <!-- Banner de Bienvenida -->
+  <div
+    class="p-5 mb-4 bg-light rounded-3 shadow-sm border border-0 position-relative overflow-hidden"
+  >
+    <div class="container-fluid py-3 position-relative z-1">
+      <h1 class="display-5 fw-bold text-primary">¡Bienvenido al Sistema de Citas Médicas!</h1>
+      <p class="col-md-8 fs-5 text-muted">
+        Gestiona pacientes, personal médico y programación de citas en un solo lugar de forma rápida
+        y eficiente.
+      </p>
+    </div>
+    <!-- Decoración sutil de fondo -->
+    <div class="position-absolute end-0 bottom-0 opacity-10 pe-4 pb-2 d-none d-md-block">
+      <i class="bi bi-hospital fs-1" style="font-size: 10rem !important; color: #0d6efd"></i>
+    </div>
+  </div>
+
+  <!-- Accesos Rápidos / Tarjetas Informativas -->
+  <div class="row g-4 mt-2">
+    <!-- Tarjeta Pacientes -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center py-4 px-3 card-hover">
+        <div class="card-body">
+          <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-3 text-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              fill="currentColor"
+              class="bi bi-people-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"
+              />
+            </svg>
+          </div>
+          <h4 class="card-title fw-bold mb-2">Pacientes</h4>
+          <p class="card-text text-muted mb-4">
+            Registro, actualización y consulta de historiales de pacientes.
+          </p>
+          <a routerLink="/dashboard/pacientes" class="btn btn-outline-primary rounded-pill px-4"
+            >Ir a Pacientes</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta Médicos -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center py-4 px-3 card-hover">
+        <div class="card-body">
+          <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3 mb-3 text-success">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              fill="currentColor"
+              class="bi bi-person-badge-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5 2.755C12.146 12.825 10.223 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z"
+              />
+            </svg>
+          </div>
+          <h4 class="card-title fw-bold mb-2">Médicos</h4>
+          <p class="card-text text-muted mb-4">
+            Administra los profesionales de la salud y su especialidad.
+          </p>
+          <a routerLink="/dashboard/medicos" class="btn btn-outline-success rounded-pill px-4"
+            >Ir a Médicos</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta Citas -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 text-center py-4 px-3 card-hover">
+        <div class="card-body">
+          <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex p-3 mb-3 text-info">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              fill="currentColor"
+              class="bi bi-calendar2-check-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5m9.981 7.981-4.25 4.25a.75.75 0 0 1-1.06 0L6.03 10.09a.75.75 0 0 1 1.06-1.06l1.59 1.591 3.72-3.72a.75.75 0 1 1 1.061 1.06z"
+              />
+            </svg>
+          </div>
+          <h4 class="card-title fw-bold mb-2">Citas Médicas</h4>
+          <p class="card-text text-muted mb-4">
+            Agenda, programa y organiza las consultas del centro médico.
+          </p>
+          <a routerLink="/dashboard/citas" class="btn btn-outline-info rounded-pill px-4"
+            >Agendar / Ver Citas</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

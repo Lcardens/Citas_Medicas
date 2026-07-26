@@ -3,21 +3,8 @@ const Paciente = require("../models/Paciente");
 // Crear un nuevo paciente
 exports.crearPaciente = async (req, res) => {
   try {
-    const {
-      TipoDocumento,
-      Documento,
-      Nombre,
-      Apellido,
-      Correo,
-      Telefono,
-      Direccion,
-      Genero,
-      FechaNacimiento,
-      TipoSangre,
-      Alergias,
-      Enfermedades,
-      ContactoEmergencia,
-    } = req.body;
+    const { TipoDocumento, Documento, Nombre, Apellido, Correo, Telefono } =
+      req.body;
 
     const nuevoPaciente = new Paciente({
       TipoDocumento,
