@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Paciente = require("../models/Paciente");
+const Medico = require("../models/medico");
 const jwt = require("jsonwebtoken");
 
 // Función auxiliar para generar el Token JWT
@@ -14,7 +16,7 @@ const generarToken = (usuario) => {
 // 1. POST /api/auth/registro
 exports.registrar = async (req, res) => {
   try {
-    const { nombre, email, password, rol } = req.body;
+    const { nombre, email, password, rol, TipoDocumento, Documento, Telefono } = req.body;
 
     // 1. Campos obligatorios
     if (!nombre || !email || !password) {
@@ -53,6 +55,39 @@ exports.registrar = async (req, res) => {
       password,
       rol: rolNormalizado,
     });
+
+    if (rolNormalizado === "paciente" || rolNormalizado === "usuario") {
+      try {
+        const pacienteExiste = await Paciente.findOne({ Correo: email });
+        if (!pacienteExiste) {
+          const nuevoPaciente = await Paciente.create({
+            TipoDocumento: TipoDocumento || "CC",
+            Documento: Documento || email,
+            Nombre: nombre,
+            Correo: email,
+            Telefono: Telefono || "Sin registro",
+          });
+          console.log("Paciente creado desde registro:", nuevoPaciente._id, email);
+        }
+      } catch (errPaciente) {
+        console.error("Error al crear Paciente:", errPaciente.message);
+      }
+    }
+
+    if (rolNormalizado === "medico") {
+      try {
+        const { Registromedico } = req.body;
+        const medicoExiste = await Medico.findOne({ Registromedico });
+        if (!medicoExiste && Registromedico) {
+          await Medico.create({
+            Registromedico,
+            Nombre: nombre,
+          });
+        }
+      } catch (errMedico) {
+        console.error("Error al crear Medico:", errMedico.message);
+      }
+    }
 
     const token = generarToken(usuario);
 

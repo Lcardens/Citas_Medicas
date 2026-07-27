@@ -10,6 +10,7 @@ exports.crearPaciente = async (req, res) => {
       TipoDocumento,
       Documento,
       Nombre,
+      Apellido,
       Correo,
       Telefono,
     });

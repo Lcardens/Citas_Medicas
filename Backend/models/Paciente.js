@@ -20,6 +20,12 @@ const pacienteSchema = new mongoose.Schema(
       trim: true,
     },
 
+    Apellido: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     Correo: {
       type: String,
       required: true,

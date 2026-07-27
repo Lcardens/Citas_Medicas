@@ -1,5 +1,5 @@
 const Cita = require("../models/cita");
-const User = require("../models/user");
+const Paciente = require("../models/Paciente");
 
 // Función auxiliar interna para generar los 10 cupos
 const crearCuposSiNoExisten = async (medicoId, fecha) => {
@@ -22,6 +22,7 @@ const crearCuposSiNoExisten = async (medicoId, fecha) => {
   const nuevasCitas = horarios.map((hora) => ({
     medico: medicoId,
     fecha: fecha,
+    hora,
     motivo: `Cita médica - ${hora}`,
     estado: "Disponible",
   }));
@@ -32,31 +33,49 @@ const crearCuposSiNoExisten = async (medicoId, fecha) => {
 // Crear una nueva cita manual
 exports.crearCita = async (req, res) => {
   try {
-    const { medico, fecha, motivo } = req.body;
+    const { paciente, medico, fecha, hora, motivo } = req.body;
+
+    if (!paciente || !medico || !fecha || !hora) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: "Faltan campos obligatorios (paciente, médico, fecha u hora)",
+      });
+    }
 
     const nuevaCita = new Cita({
+      paciente: paciente || null,
       medico,
       fecha,
+      hora,
       motivo,
-      estado: "Disponible",
+      estado: paciente ? "Confirmada" : "Disponible",
     });
 
-    const cita = await nuevaCita.save();
+    const citaGuardada = await nuevaCita.save();
+
+    const citaPoblada = await Cita.findById(citaGuardada._id)
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
 
     res.status(201).json({
       exitoso: true,
       mensaje: "Cita creada exitosamente",
-      datos: cita,
+      datos: citaPoblada,
     });
   } catch (error) {
     res.status(400).json({
       exitoso: false,
-      mensaje: "Error al crear cita",
+      mensaje: "Error al crear la cita",
       error: error.message,
     });
   }
 };
-
 // Asignar Cita Automática
 exports.asignarCita = async (req, res) => {
   try {
@@ -83,6 +102,16 @@ exports.asignarCita = async (req, res) => {
     citaDisponible.estado = "Confirmada";
     await citaDisponible.save();
 
+    const citaPoblada = await Cita.findById(citaDisponible._id)
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
+
     const cuposRestantes = await Cita.countDocuments({
       medico: medicoId,
       fecha: fechaConsulta,
@@ -92,7 +121,7 @@ exports.asignarCita = async (req, res) => {
     res.status(200).json({
       exitoso: true,
       mensaje: `Cita asignada exitosamente. Le quedan ${cuposRestantes} cupos disponibles.`,
-      datos: citaDisponible,
+      datos: citaPoblada,
     });
   } catch (error) {
     res.status(400).json({
@@ -103,10 +132,44 @@ exports.asignarCita = async (req, res) => {
   }
 };
 
-// Listar citas (sin que marque error en populate)
+// Listar citas (filtrado automático: si es paciente, solo ve las suyas)
 exports.listarCitas = async (req, res) => {
   try {
-    const citas = await Cita.find().populate("paciente").populate("medico");
+    let filtro = {};
+    const usuarioLogueado = req.usuario || req.user;
+
+    if (usuarioLogueado) {
+      const rol = (usuarioLogueado.rol || "").toLowerCase().trim();
+      if (rol === "paciente" || rol === "usuario") {
+        let pacienteEncontrado = await Paciente.findOne({
+          Correo: usuarioLogueado.email,
+        });
+
+        if (!pacienteEncontrado) {
+          pacienteEncontrado = await Paciente.create({
+            TipoDocumento: "CC",
+            Documento: usuarioLogueado.email,
+            Nombre: usuarioLogueado.nombre || usuarioLogueado.email,
+            Correo: usuarioLogueado.email,
+            Telefono: "Sin registro",
+          });
+          console.log("Paciente creado desde listarCitas:", pacienteEncontrado._id, usuarioLogueado.email);
+        }
+
+        filtro.paciente = pacienteEncontrado._id;
+      }
+    }
+
+    const citas = await Cita.find(filtro)
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
+
     res.status(200).json({
       exitoso: true,
       mensaje: "Citas listadas exitosamente",
@@ -151,10 +214,15 @@ exports.obtenerCitasPorMedico = async (req, res) => {
   try {
     const { medicoId } = req.params;
 
-    // Buscamos todas las citas que pertenezcan a ese médico
     const citas = await Cita.find({ medico: medicoId })
-      .populate("paciente", "nombre email") // Trae solo nombre y email del paciente
-      .populate("medico", "nombre email");
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
 
     res.status(200).json({
       exitoso: true,
@@ -175,11 +243,18 @@ exports.obtenerCitasDisponiblesPorMedico = async (req, res) => {
   try {
     const { medicoId } = req.params;
 
-    // Filtramos por el ID del médico Y que el estado sea "Disponible"
     const citasDisponibles = await Cita.find({
       medico: medicoId,
       estado: "Disponible",
-    }).populate("medico", "nombre email");
+    })
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
 
     res.status(200).json({
       exitoso: true,
@@ -207,8 +282,14 @@ exports.actualizarCita = async (req, res) => {
       { $set: camposActualizar },
       { new: true, runValidators: true },
     )
-      .populate("paciente", "nombre email")
-      .populate("medico", "Nombre Registromedico");
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      );
 
     if (!citaActualizada) {
       return res.status(404).json({

@@ -10,7 +10,18 @@
     <a class="nav-link" routerLink="/dashboard/usuarios" routerLinkActive="active">Usuarios</a>
   </div>
 
-  <button class="btn btn-light btn-sm fw-semibold" (click)="cerrarSesion()">Cerrar sesión</button>
+  <!-- Grupo derecho: Nombre, Rol y Botón de salir -->
+  <div class="d-flex align-items-center gap-3">
+    <!-- Perfil de usuario con el saludo original -->
+    <div class="user-info-container text-end">
+      <span class="user-name"
+        >Hola, <strong>{{ nombreUsuario }}</strong></span
+      >
+      <span class="user-role">{{ rolUsuario }}</span>
+    </div>
+
+    <button class="btn btn-light btn-sm fw-semibold" (click)="cerrarSesion()">Cerrar sesión</button>
+  </div>
 </nav>
 
 <!-- CONTENEDOR PRINCIPAL: AQUÍ CARGAN LAS PÁGINAS -->

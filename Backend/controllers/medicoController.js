@@ -29,6 +29,7 @@ exports.crearMedico = async (req, res) => {
     const citasIniciales = horarios.map((hora) => ({
       medico: medicoGuardado._id,
       fecha: fechaHoy,
+      hora,
       motivo: `Cita médica - ${hora}`,
       estado: "Disponible",
     }));

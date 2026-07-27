@@ -48,16 +48,38 @@ exports.proteger = async (req, res, next) => {
   }
 };
 
-// Middleware: autorizar solo ciertos roles
+// Middleware: autorizar solo ciertos roles (Flexible y normalizado)
 exports.autorizar = (...rolesPermitidos) => {
   return (req, res, next) => {
     // req.usuario ya existe porque 'proteger' corrió antes
-    if (!rolesPermitidos.includes(req.usuario.rol)) {
+    if (!req.usuario || !req.usuario.rol) {
+      return res.status(403).json({
+        exitoso: false,
+        mensaje: "No se encontró un rol asignado al usuario",
+      });
+    }
+
+    // 1. Normalizar el rol del usuario (minúsculas y sin espacios)
+    let rolUsuario = req.usuario.rol.toLowerCase().trim();
+
+    // 2. Unificar "usuario" como "paciente" por compatibilidad
+    if (rolUsuario === "usuario") {
+      rolUsuario = "paciente";
+    }
+
+    // 3. Normalizar los roles permitidos que vienen en la ruta
+    const rolesNormalizados = rolesPermitidos.map((r) =>
+      r.toLowerCase().trim(),
+    );
+
+    // 4. Verificar si el rol normalizado está incluido
+    if (!rolesNormalizados.includes(rolUsuario)) {
       return res.status(403).json({
         exitoso: false,
         mensaje: `El rol '${req.usuario.rol}' no tiene permiso para esta acción`,
       });
     }
+
     next();
   };
 };

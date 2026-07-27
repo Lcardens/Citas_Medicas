@@ -131,8 +131,10 @@ content-type: application/json
 Authorization: Bearer {{tokenAdmin}}
 
 {
+    "paciente": "6a6153ecc2c3349229406618",
     "medico": "{{lista_de_medicos.response.body.datos.[0]._id}}",
     "fecha": "2024-07-01",
+    "hora": "09:00 AM",
     "motivo": "Consulta general"
 }
 
@@ -143,13 +145,14 @@ content-type: application/json
 Authorization: Bearer {{tokenAdmin}}
 
 {
-    "medicoId": "{{lista_de_medicos.response.body.datos.[2]._id}}",
-    "pacienteId": "{{lista_de_pacientes.response.body.datos.[2]._id}}"
+    "medicoId": "{{lista_de_medicos.response.body.datos.[0._id}}",
+    "pacienteId": "{{lista_de_pacientes.response.body.datos.[0._id}}"
 }
 
 ###
 # LISTAR CITAS
 GET http://localhost:3000/api/citas 
+Authorization: Bearer {{tokenAdmin}}
 
 ###
 GET http://localhost:3000/api/citas/medico/6a61942ee088ebe08ed48bd6/disponibles

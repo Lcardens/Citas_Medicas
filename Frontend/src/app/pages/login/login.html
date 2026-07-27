@@ -5,17 +5,32 @@
         <div class="card-body">
           <h3 class="text-center mb-4">Sistema de Citas Médicas</h3>
 
-          <form (ngSubmit)="iniciarSesion()">
+          <!-- FORMULARIO DE INICIO DE SESIÓN -->
+          <form *ngIf="!mostrarRegistro" (ngSubmit)="iniciarSesion()">
             <div class="mb-3">
-              <label>Email</label>
-
-              <input type="email" class="form-control" [(ngModel)]="email" name="email" />
+              <label>Usuario</label>
+              <input
+                type="email"
+                class="form-control"
+                [(ngModel)]="email"
+                name="email"
+                placeholder="Ingrese su email"
+              />
             </div>
 
             <div class="mb-3">
               <label>Contraseña</label>
+              <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="password"
+                name="password"
+                placeholder="Ingrese su contraseña"
+              />
+            </div>
 
-              <input type="password" class="form-control" [(ngModel)]="password" name="password" />
+            <div class="alert alert-success" *ngIf="exito">
+              {{ exito }}
             </div>
 
             <div class="alert alert-danger" *ngIf="error">
@@ -23,6 +38,74 @@
             </div>
 
             <button class="btn btn-primary w-100">Iniciar Sesión</button>
+
+            <div class="text-center mt-3">
+              <a href="javascript:void(0)" (click)="mostrarRegistro = true; error = ''; exito = ''">¿No tienes cuenta? Regístrate</a>
+            </div>
+          </form>
+
+          <!-- FORMULARIO DE REGISTRO -->
+          <form *ngIf="mostrarRegistro" (ngSubmit)="registrar()">
+            <div class="mb-3">
+              <label>Nombre completo</label>
+              <input type="text" class="form-control" [(ngModel)]="registro.nombre" name="regNombre" required />
+            </div>
+
+            <div class="mb-3">
+              <label>Email</label>
+              <input type="email" class="form-control" [(ngModel)]="registro.email" name="regEmail" required />
+            </div>
+
+            <div class="mb-3">
+              <label>Contraseña</label>
+              <input type="password" class="form-control" [(ngModel)]="registro.password" name="regPassword" required />
+            </div>
+
+            <div class="mb-3">
+              <label>Rol</label>
+              <select class="form-select" [(ngModel)]="registro.rol" name="regRol" required>
+                <option value="paciente">Paciente</option>
+                <option value="medico">Médico</option>
+              </select>
+            </div>
+
+            <div class="mb-3" *ngIf="registro.rol === 'paciente'">
+              <label>Tipo de Documento</label>
+              <select class="form-select" [(ngModel)]="registro.TipoDocumento" name="regTipoDoc">
+                <option value="CC">Cédula de Ciudadanía (CC)</option>
+                <option value="TI">Tarjeta de Identidad (TI)</option>
+                <option value="CE">Cédula de Extranjería (CE)</option>
+              </select>
+            </div>
+
+            <div class="mb-3" *ngIf="registro.rol === 'paciente'">
+              <label>Número de Documento</label>
+              <input type="text" class="form-control" [(ngModel)]="registro.Documento" name="regDocumento" />
+            </div>
+
+            <div class="mb-3" *ngIf="registro.rol === 'paciente'">
+              <label>Teléfono</label>
+              <input type="text" class="form-control" [(ngModel)]="registro.Telefono" name="regTelefono" />
+            </div>
+
+            <div class="mb-3" *ngIf="registro.rol === 'medico'">
+              <label>Registro Médico</label>
+              <input type="text" class="form-control" [(ngModel)]="registro.Registromedico" name="regRegistroMedico" required />
+            </div>
+
+            <div class="alert alert-danger" *ngIf="error">
+              {{ error }}
+            </div>
+
+            <div class="alert alert-success" *ngIf="exito">
+              {{ exito }}
+            </div>
+
+            <button class="btn btn-success w-100">Registrarse</button>
+
+            <div class="text-center mt-3">
+              <a href="javascript:void(0)" (click)="mostrarRegistro = false; error = ''; exito = ''">¿Ya tienes cuenta? Inicia sesión</a>
+            </div>
           </form>
         </div>
       </div>

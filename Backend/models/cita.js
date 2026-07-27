@@ -9,10 +9,14 @@ const citaSchema = new mongoose.Schema(
     },
     paciente: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Paciente",
       default: null,
     },
     fecha: {
+      type: String,
+      required: true,
+    },
+    hora: {
       type: String,
       required: true,
     },

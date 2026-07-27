@@ -1,27 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const { proteger, autorizar } = require("../middleware/auth");
+const { proteger } = require("../middleware/auth");
 const {
+  listarCitas,
   crearCita,
   asignarCita,
-  listarCitas,
+  actualizarCita,
   eliminarCita,
   obtenerCitasPorMedico,
   obtenerCitasDisponiblesPorMedico,
-  actualizarCita, // 👈 Se importa directamente aquí
 } = require("../controllers/citaController");
 
-// 🔒 Aplica el chequeo de token a ABSOLUTAMENTE TODAS las rutas de abajo
-router.use(proteger);
+// Rutas generales
+router.get("/", proteger, listarCitas);
+router.post("/", proteger, crearCita);
+router.post("/asignar", proteger, asignarCita);
 
-router.get("/", listarCitas);
-router.post("/", autorizar("admin", "medico"), crearCita);
-router.patch("/asignar", autorizar("admin"), asignarCita);
-router.delete("/:id", autorizar("admin"), eliminarCita);
-router.get("/medico/:medicoId", obtenerCitasPorMedico);
-router.get("/medico/:medicoId/disponibles", obtenerCitasDisponiblesPorMedico);
+// 🟢 Añade estas dos rutas que ya tienes en el controlador pero faltaban en el router
+router.get("/medico/:medicoId", proteger, obtenerCitasPorMedico);
+router.get(
+  "/disponibles/:medicoId",
+  proteger,
+  obtenerCitasDisponiblesPorMedico,
+);
 
-// 👈 Se llama directamente por su nombre
-router.patch("/:id", autorizar("admin", "medico"), actualizarCita);
+router.patch("/:id", proteger, actualizarCita);
+router.delete("/:id", proteger, eliminarCita);
 
 module.exports = router;

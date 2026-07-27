@@ -10,6 +10,7 @@ import { UsuariosComponent } from './pages/usuarios/usuarios';
 // Guards
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -36,23 +37,24 @@ export const routes: Routes = [
         component: InicioComponent,
       },
       {
+        path: 'citas',
+        component: CitasComponent,
+        canActivate: [roleGuard], // Los pacientes sí pueden entrar a citas
+      },
+      {
         path: 'medicos',
         component: MedicosComponent,
+        canActivate: [adminGuard], // 🔒 Solo administradores
       },
       {
         path: 'pacientes',
         component: PacientesComponent,
-        canActivate: [roleGuard],
-      },
-      {
-        path: 'citas',
-        component: CitasComponent,
-        canActivate: [roleGuard],
+        canActivate: [adminGuard], // 🔒 Solo administradores (aquí estaba abierto con roleGuard)
       },
       {
         path: 'usuarios',
         component: UsuariosComponent,
-        canActivate: [roleGuard],
+        canActivate: [adminGuard], // 🔒 Solo administradores
       },
     ],
   },

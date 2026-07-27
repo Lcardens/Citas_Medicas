@@ -20,8 +20,27 @@ export class CitaService {
     return this.http.get(`${this.apiUrl}/citas`, { headers: this.getHeaders() });
   }
 
-  crearCita(cita: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/citas`, cita, { headers: this.getHeaders() });
+  crearCita(citaData: any): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+
+    // Aseguramos cabeceras limpias para application/json
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+
+    // Limpiamos el objeto por seguridad antes de enviarlo
+    const bodyLimpio = {
+      paciente: typeof citaData.paciente === 'object' ? citaData.paciente._id : citaData.paciente,
+      medico: typeof citaData.medico === 'object' ? citaData.medico._id : citaData.medico,
+      fecha: citaData.fecha,
+      hora: citaData.hora,
+      motivo: citaData.motivo || 'Consulta general',
+    };
+
+    console.log('JSON exacto que sale hacia el backend:', JSON.stringify(bodyLimpio));
+
+    return this.http.post<any>(`${this.apiUrl}/citas`, bodyLimpio, { headers });
   }
 
   // ✏️ Actualizar cita (PATCH)
