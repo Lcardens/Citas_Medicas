@@ -1,7 +1,16 @@
 /* ==========================================
-   1. CONFIGURACIÓN GENERAL Y FUENTE
+   1. CONFIGURACIÓN GENERAL Y VARIABLES
    ========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #27b7f5;
+  --secondary-color: #b8a6de; /* Tu tono morado principal */
+  --secondary-hover: #9d88cc;
+  --primary-hover: #1da3e0;
+  --bg-app: #f7f6fb; /* Fondo general con un matiz muy suave hacia el lila */
+  --text-main: #333333;
+}
 
 html,
 body {
@@ -14,25 +23,23 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
-  background-color: #f4f6f9; /* Fondo gris claro muy suave */
-  color: #333333;
+  background-color: var(--bg-app);
+  color: var(--text-main);
 }
 
 /* ==========================================
    2. REGLAS PARA TABLAS Y CONTENEDORES
    ========================================== */
-/* Redondear contenedores y tarjetas */
 .card,
 .table-responsive {
   border-radius: 12px !important;
+  border: 1px solid rgba(184, 166, 222, 0.25) !important; /* Borde sutil en tono morado */
 }
 
-/* Sombras suaves para dar elevación */
 .shadow-sm {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 4px 12px rgba(184, 166, 222, 0.12) !important;
 }
 
-/* Estilos de las tablas */
 .table {
   background-color: #ffffff;
   border-radius: 8px;
@@ -44,11 +51,102 @@ body {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 0.85rem;
+  background-color: rgba(184, 166, 222, 0.2) !important; /* Encabezados de tabla en morado suave */
+  color: #5a4b7c;
 }
 
 /* ==========================================
    3. BOTONES Y ACCIONES
    ========================================== */
+/* ==========================================
+/* ==========================================
+   BOTÓN DE INICIO DE SESIÓN PROFESIONAL
+   ========================================== */
+.btn-primary,
+button[type='submit'] {
+  background-color: #27b7f5 !important; /* Celeste principal corporativo */
+  border: 1px solid #27b7f5 !important;
+  border-radius: 10px !important;
+  padding: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  color: #ffffff !important; /* Texto blanco nítido */
+  width: 100% !important;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(39, 183, 245, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover,
+button[type='submit']:hover {
+  background-color: #1da3e0 !important; /* Celeste un poco más oscuro al pasar el cursor */
+  border-color: #1da3e0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(39, 183, 245, 0.35);
+}
+
+/* Contenedor o grupo de botones en la tabla */
+.table td .btn-group,
+.table td .d-flex {
+  gap: 6px;
+}
+
+/* Botón de Editar (Tono celeste suave y limpio) */
+.btn-outline-warning,
+.btn-editar {
+  background-color: rgba(39, 183, 245, 0.1) !important;
+  color: #1a96ce !important;
+  border: 1px solid rgba(39, 183, 245, 0.3) !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-warning:hover,
+.btn-editar:hover {
+  background-color: #27b7f5 !important;
+  color: #ffffff !important;
+  border-color: #27b7f5 !important;
+}
+
+/* Botón de Eliminar (Tono morado suave/neutro o rojo discreto) */
+.btn-outline-danger,
+.btn-eliminar {
+  background-color: rgba(184, 166, 222, 0.15) !important;
+  color: #7b65ad !important;
+  border: 1px solid rgba(184, 166, 222, 0.35) !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-danger:hover,
+.btn-eliminar:hover {
+  background-color: #b8a6de !important;
+  color: #ffffff !important;
+  border-color: #b8a6de !important;
+}
+
+/* Clases para usar botones con el color morado secundario */
+.btn-secondary,
+.btn-secondary-custom {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+  color: #ffffff !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary-custom:hover {
+  background-color: var(--secondary-hover) !important;
+  border-color: var(--secondary-hover) !important;
+  color: #ffffff !important;
+}
+
 .btn {
   border-radius: 8px;
   font-weight: 500;
@@ -59,8 +157,19 @@ body {
   transform: translateY(-1px);
 }
 
+/* Textos principales con acento */
+.text-primary {
+  color: #1a96ce !important;
+}
+
+/* Textos secundarios o acentos en morado */
+.text-secondary-custom,
+.text-purple {
+  color: #8c75c4 !important;
+}
+
 /* ==========================================
-   4. PERSONALIZACIÓN DE BARRAS DE DESPLAZAMIENTO
+   4. BARRAS DE DESPLAZAMIENTO
    ========================================== */
 ::-webkit-scrollbar {
   width: 8px;
@@ -72,16 +181,16 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--secondary-color);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--secondary-hover);
 }
 
 /* ==========================================
-   5. EFECTO HOVER PARA TARJETAS DE INICIO
+   5. TARJETAS Y MODALES CON ACENTO MORADO
    ========================================== */
 .card-hover {
   transition:
@@ -91,5 +200,84 @@ body {
 
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 20px rgba(184, 166, 222, 0.25) !important;
+}
+
+/* Encabezados de modales en tono morado elegante */
+.modal-header.bg-primary,
+.bg-purple-header {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+/* ==========================================
+   6. BARRA DE NAVEGACIÓN (Degradado Celeste + Morado)
+   ========================================== */
+.bg-navbar,
+.navbar,
+.bg-primary.text-white {
+  background: linear-gradient(135deg, #27b7f5 30%, #b8a6de 100%) !important;
+}
+
+/* ==========================================
+   PERSONALIZACIÓN DE ETIQUETAS "DISPONIBLE"
+   ========================================== */
+.badge.bg-primary,
+.badge.bg-success,
+.badge {
+  background-color: #d1e7dd !important; /* Verde pastel suave */
+  color: #0f5132 !important; /* Texto verde oscuro legible */
+  border: 1px solid #badbcc !important;
+  font-weight: 500 !important;
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+}
+
+/* ==========================================
+   ESTILOS PARA LA PANTALLA DE LOGIN
+   ========================================== */
+
+/* Tarjeta de login centrada con ancho correcto */
+.card,
+.login-container {
+  background: #ffffff !important;
+  border: 1px solid rgba(184, 166, 222, 0.25) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 15px 35px rgba(39, 183, 245, 0.1),
+    0 5px 15px rgba(184, 166, 222, 0.15) !important;
+  padding: 2.5rem !important;
+  width: 100% !important;
+  max-width: 440px !important; /* Ancho ideal para que quepa el texto */
+  margin: 0 auto;
+}
+
+/* Forzar que el título ocupe una sola línea horizontalmente */
+.card h1,
+.card h2,
+.login-title {
+  color: #2c224c;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 1.8rem;
+  text-align: center;
+  letter-spacing: -0.5px;
+  white-space: nowrap; /* Evita que las letras se bajen */
+}
+
+/* Asegurar que los inputs recuperen su ancho completo */
+.form-control {
+  width: 100% !important;
+  border-radius: 10px !important;
+  border: 1px solid #dcd4ed !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem;
+  background-color: #faf9fd !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #27b7f5 !important;
+  box-shadow: 0 0 0 4px rgba(39, 183, 245, 0.15) !important;
+  background-color: #ffffff !important;
 }

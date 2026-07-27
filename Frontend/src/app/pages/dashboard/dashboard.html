@@ -1,17 +1,19 @@
-<!-- Barra de navegación superior (fija) -->
+<!-- Barra de navegación superior -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4">
-  <a class="navbar-brand fw-bold" routerLink="/dashboard">Sistema de Citas</a>
+  <a class="navbar-brand fw-bold" routerLink="/dashboard/inicio">Sistema de Citas</a>
 
   <div class="navbar-nav me-auto">
+    <a class="nav-link" routerLink="/dashboard/inicio" routerLinkActive="active">Inicio</a>
     <a class="nav-link" routerLink="/dashboard/pacientes" routerLinkActive="active">Pacientes</a>
     <a class="nav-link" routerLink="/dashboard/medicos" routerLinkActive="active">Médicos</a>
     <a class="nav-link" routerLink="/dashboard/citas" routerLinkActive="active">Citas</a>
+    <a class="nav-link" routerLink="/dashboard/usuarios" routerLinkActive="active">Usuarios</a>
   </div>
 
   <button class="btn btn-light btn-sm fw-semibold" (click)="cerrarSesion()">Cerrar sesión</button>
 </nav>
 
-<!-- Contenedor dinámico: Aquí Angular meterá Inicio, Pacientes, Médicos o Citas -->
+<!-- CONTENEDOR PRINCIPAL: AQUÍ CARGAN LAS PÁGINAS -->
 <main class="container py-4">
   <router-outlet></router-outlet>
 </main>

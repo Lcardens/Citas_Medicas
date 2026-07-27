@@ -8,17 +8,20 @@ const {
   eliminarCita,
   obtenerCitasPorMedico,
   obtenerCitasDisponiblesPorMedico,
+  actualizarCita, // 👈 Se importa directamente aquí
 } = require("../controllers/citaController");
 
-router.post("/", proteger, crearCita);
-router.patch("/asignar", proteger, autorizar("admin"), asignarCita);
+// 🔒 Aplica el chequeo de token a ABSOLUTAMENTE TODAS las rutas de abajo
+router.use(proteger);
+
 router.get("/", listarCitas);
-router.delete("/:id", proteger, autorizar("admin"), eliminarCita);
-router.get("/medico/:medicoId", proteger, obtenerCitasPorMedico);
-router.get(
-  "/medico/:medicoId/disponibles",
-  proteger,
-  obtenerCitasDisponiblesPorMedico,
-);
+router.post("/", autorizar("admin", "medico"), crearCita);
+router.patch("/asignar", autorizar("admin"), asignarCita);
+router.delete("/:id", autorizar("admin"), eliminarCita);
+router.get("/medico/:medicoId", obtenerCitasPorMedico);
+router.get("/medico/:medicoId/disponibles", obtenerCitasDisponiblesPorMedico);
+
+// 👈 Se llama directamente por su nombre
+router.patch("/:id", autorizar("admin", "medico"), actualizarCita);
 
 module.exports = router;

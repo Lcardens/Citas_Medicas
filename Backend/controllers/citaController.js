@@ -146,6 +146,7 @@ exports.eliminarCita = async (req, res) => {
     });
   }
 };
+
 exports.obtenerCitasPorMedico = async (req, res) => {
   try {
     const { medicoId } = req.params;
@@ -169,6 +170,7 @@ exports.obtenerCitasPorMedico = async (req, res) => {
     });
   }
 };
+
 exports.obtenerCitasDisponiblesPorMedico = async (req, res) => {
   try {
     const { medicoId } = req.params;
@@ -189,6 +191,41 @@ exports.obtenerCitasDisponiblesPorMedico = async (req, res) => {
     res.status(400).json({
       exitoso: false,
       mensaje: "Error al obtener las citas disponibles",
+      error: error.message,
+    });
+  }
+};
+
+// Actualizar/Modificar Cita (Método PATCH)
+exports.actualizarCita = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const camposActualizar = req.body;
+
+    const citaActualizada = await Cita.findByIdAndUpdate(
+      id,
+      { $set: camposActualizar },
+      { new: true, runValidators: true },
+    )
+      .populate("paciente", "nombre email")
+      .populate("medico", "Nombre Registromedico");
+
+    if (!citaActualizada) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: "Cita no encontrada",
+      });
+    }
+
+    res.status(200).json({
+      exitoso: true,
+      mensaje: "Cita actualizada exitosamente",
+      datos: citaActualizada,
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: "Error al actualizar la cita",
       error: error.message,
     });
   }

@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicoService } from '../../core/services/medico.service';
+import { AuthService } from '../../core/services/auth.service'; // 👈 1. Importar AuthService
 
 @Component({
   selector: 'app-medicos',
@@ -12,11 +13,15 @@ import { MedicoService } from '../../core/services/medico.service';
 })
 export class MedicosComponent implements OnInit {
   private medicoService = inject(MedicoService);
+  private authService = inject(AuthService); // 👈 2. Inyectar AuthService
   private cdr = inject(ChangeDetectorRef);
 
   medicos: any[] = [];
   cargando = true;
   mostrarModal = false;
+
+  // 👈 3. Definir la variable que leerá el HTML
+  esPersonalMedico = false;
 
   // Modelo con la estructura exacta que pide tu backend
   nuevoMedico = {
@@ -25,6 +30,8 @@ export class MedicosComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    // 👈 4. Comprobar si es admin o médico al cargar la vista
+    this.esPersonalMedico = this.authService.esPersonalMedico();
     this.obtenerMedicos();
   }
 
@@ -45,6 +52,8 @@ export class MedicosComponent implements OnInit {
   }
 
   abrirModal(): void {
+    // Protección adicional por seguridad en el cliente
+    if (!this.esPersonalMedico) return;
     this.mostrarModal = true;
   }
 
@@ -54,6 +63,8 @@ export class MedicosComponent implements OnInit {
   }
 
   guardarMedico(): void {
+    if (!this.esPersonalMedico) return;
+
     this.medicoService.crearMedico(this.nuevoMedico).subscribe({
       next: (res) => {
         console.log('Médico registrado:', res);

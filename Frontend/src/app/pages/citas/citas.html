@@ -1,7 +1,11 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Citas Médicas</h2>
-    <button class="btn btn-primary" (click)="abrirModal()">+ Agendar Cita</button>
+
+    <!-- 🔒 SOLO se muestra si el usuario es Admin o Médico -->
+    <button *ngIf="esPersonalMedico" class="btn btn-primary" (click)="abrirModal()">
+      + Agendar Cita
+    </button>
   </div>
 
   <!-- BARRA DE FILTRO POR MÉDICO -->
@@ -42,10 +46,13 @@
           <th>Fecha</th>
           <th>Hora</th>
           <th>Motivo</th>
+          <th>Estado</th>
+          <!-- Columna visible solo para personal médico/admin -->
+          <th *ngIf="esPersonalMedico" class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Usamos citasFiltradas en lugar de citas -->
+        <!-- Iteración sobre citasFiltradas -->
         <tr *ngFor="let cita of citasFiltradas; let i = index">
           <td>{{ i + 1 }}</td>
           <td>{{ cita.paciente?.Nombre || cita.paciente }}</td>
@@ -53,11 +60,43 @@
           <td>{{ cita.fecha | date: 'shortDate' }}</td>
           <td>{{ cita.hora }}</td>
           <td>{{ cita.motivo }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'bg-success': cita.estado === 'Confirmada',
+                'bg-primary': cita.estado === 'Disponible' || !cita.estado,
+                'bg-danger': cita.estado === 'Cancelada',
+              }"
+            >
+              {{ cita.estado || 'Disponible' }}
+            </span>
+          </td>
+
+          <!-- Botones de Acción -->
+          <td *ngIf="esPersonalMedico" class="text-center">
+            <div class="btn-group btn-group-sm" role="group">
+              <button
+                class="btn btn-outline-warning"
+                title="Editar cita"
+                (click)="abrirModalEditar(cita)"
+              >
+                Editar
+              </button>
+              <button
+                class="btn btn-outline-danger"
+                title="Eliminar cita"
+                (click)="eliminarCita(cita._id)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </td>
         </tr>
 
-        <!-- Mensaje si no hay citas para ese médico -->
+        <!-- Mensaje si no hay citas -->
         <tr *ngIf="citasFiltradas.length === 0">
-          <td colspan="6" class="text-center py-4 text-muted">
+          <td [attr.colspan]="esPersonalMedico ? 8 : 7" class="text-center py-4 text-muted">
             No se encontraron citas programadas para esta consulta.
           </td>
         </tr>
@@ -66,9 +105,9 @@
   </div>
 </div>
 
-<!-- MODAL AGENDAR CITA (Se mantiene igual) -->
+<!-- MODAL 1: AGENDAR NUEVA CITA -->
 <div
-  *ngIf="mostrarModal"
+  *ngIf="mostrarModal && esPersonalMedico"
   class="modal fade show d-block"
   tabindex="-1"
   style="background-color: rgba(0, 0, 0, 0.5)"
@@ -130,6 +169,8 @@
               [(ngModel)]="nuevaCita.motivo"
               name="motivo"
               rows="2"
+              spellcheck="false"
+              data-gramm="false"
             ></textarea>
           </div>
         </div>
@@ -137,6 +178,55 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
           <button type="submit" class="btn btn-success">Agendar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: MODIFICAR CITA -->
+<div
+  *ngIf="mostrarModalEditar && esPersonalMedico"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning-subtle">
+        <h5 class="modal-title">Modificar Cita</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalEditar()"></button>
+      </div>
+      <form (ngSubmit)="actualizarCita()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Motivo de la Cita</label>
+            <textarea
+              class="form-control"
+              [(ngModel)]="citaEditando.motivo"
+              name="editMotivo"
+              rows="3"
+              required
+              spellcheck="false"
+              data-gramm="false"
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Estado de la Cita</label>
+            <select class="form-select" [(ngModel)]="citaEditando.estado" name="editEstado">
+              <option value="Disponible">Disponible</option>
+              <option value="Confirmada">Confirmada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalEditar()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-warning">Guardar Cambios</button>
         </div>
       </form>
     </div>

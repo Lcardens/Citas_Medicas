@@ -1,7 +1,11 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Médicos</h2>
-    <button class="btn btn-primary" (click)="abrirModal()">+ Nuevo Médico</button>
+
+    <!-- 🔒 Oculto para pacientes; solo visible si esPersonalMedico es true -->
+    <button *ngIf="esPersonalMedico" class="btn btn-primary" (click)="abrirModal()">
+      + Nuevo Médico
+    </button>
   </div>
 
   <!-- Spinner mientras carga -->
@@ -11,7 +15,7 @@
     </div>
   </div>
 
-  <!-- Tabla de médicos -->
+  <!-- Tabla de médicos (Visible para todos) -->
   <div *ngIf="!cargando" class="table-responsive">
     <table class="table table-striped table-hover align-middle">
       <thead class="table-dark">
@@ -32,9 +36,10 @@
   </div>
 </div>
 
-<!-- MODAL REGISTRAR MÉRICO -->
+<!-- MODAL REGISTRAR MÉDICO -->
+<!-- 🔒 Solo se renderiza si mostrarModal es true Y el usuario es personal médico -->
 <div
-  *ngIf="mostrarModal"
+  *ngIf="mostrarModal && esPersonalMedico"
   class="modal fade show d-block"
   tabindex="-1"
   style="background-color: rgba(0, 0, 0, 0.5)"

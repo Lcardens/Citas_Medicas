@@ -16,7 +16,7 @@ exports.registrar = async (req, res) => {
   try {
     const { nombre, email, password, rol } = req.body;
 
-    // Validar campos requeridos
+    // 1. Campos obligatorios
     if (!nombre || !email || !password) {
       return res.status(400).json({
         exitoso: false,
@@ -24,27 +24,38 @@ exports.registrar = async (req, res) => {
       });
     }
 
-    // Comprobar si el email ya existe
+    // 2. Validación de contraseña corta
+    if (password.length < 6) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: "La contraseña debe tener al menos 6 caracteres",
+      });
+    }
+
+    // 3. Comprobar si el email ya existe
     const usuarioExiste = await User.findOne({ email });
     if (usuarioExiste) {
       return res.status(400).json({
         exitoso: false,
-        mensaje: "Este correo ya está registrado",
+        mensaje: "Este correo electrónico ya está registrado",
       });
     }
 
-    // Crear el usuario (el rol por defecto será "usuario" si no se envía "admin")
+    let rolNormalizado = (rol || "usuario")
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
     const usuario = await User.create({
       nombre,
       email,
       password,
-      rol: rol || "usuario",
+      rol: rolNormalizado,
     });
 
-    // Generar token JWT
     const token = generarToken(usuario);
 
-    // Responder con token y datos básicos del usuario
     res.status(201).json({
       exitoso: true,
       mensaje: "Usuario registrado con éxito",
@@ -59,8 +70,7 @@ exports.registrar = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       exitoso: false,
-      mensaje: "Error al registrar el usuario",
-      error: error.message,
+      mensaje: error.message || "Error al registrar el usuario",
     });
   }
 };
@@ -70,7 +80,6 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validar campos requeridos
     if (!email || !password) {
       return res.status(400).json({
         exitoso: false,
@@ -78,7 +87,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Buscar al usuario e incluir la contraseña cifrada para comparar
     const usuario = await User.findOne({ email }).select("+password");
     if (!usuario) {
       return res.status(401).json({
@@ -87,7 +95,6 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Comparar la contraseña enviada con la de la BD
     const esPasswordCorrecta = await usuario.compararPassword(password);
     if (!esPasswordCorrecta) {
       return res.status(401).json({
@@ -96,10 +103,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generar token JWT
     const token = generarToken(usuario);
 
-    // Responder con token y datos del usuario que inicia sesión
     res.status(200).json({
       exitoso: true,
       mensaje: "Inicio de sesión exitoso",
@@ -108,13 +113,32 @@ exports.login = async (req, res) => {
         id: usuario._id,
         nombre: usuario.nombre,
         email: usuario.email,
-        rol: usuario.rol, // Aquí viaja si es 'admin' o 'usuario'
+        rol: usuario.rol,
       },
     });
   } catch (error) {
     res.status(500).json({
       exitoso: false,
       mensaje: "Error al iniciar sesión",
+      error: error.message,
+    });
+  }
+};
+
+// 3. GET /api/auth/usuarios
+exports.obtenerUsuarios = async (req, res) => {
+  try {
+    const usuarios = await User.find().select("-password");
+
+    // Responder con estructura estandarizada
+    res.status(200).json({
+      exitoso: true,
+      datos: usuarios,
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: "Error al obtener la lista de usuarios",
       error: error.message,
     });
   }

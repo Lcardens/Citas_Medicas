@@ -31,7 +31,7 @@ exports.crearPaciente = async (req, res) => {
   }
 };
 
-// Listar todos los Medicos
+// Listar todos los pacientes
 exports.listarPacientes = async (req, res) => {
   try {
     const pacientes = await Paciente.find();

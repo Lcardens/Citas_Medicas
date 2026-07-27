@@ -1,19 +1,17 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './dashboard.html',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  templateUrl: './dashboard.html', // 👈 Verifica que este sea el archivo donde pusiste el <router-outlet></router-outlet>
   styleUrls: ['./dashboard.css'],
 })
 export class DashboardComponent {
-  private router = inject(Router);
-
   cerrarSesion(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    localStorage.removeItem('rol');
+    window.location.href = '/login';
   }
 }

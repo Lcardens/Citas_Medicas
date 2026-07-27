@@ -23,8 +23,9 @@ export class CitasComponent implements OnInit {
   medicos: any[] = [];
   cargando = true;
   mostrarModal = false;
+  mostrarModalEditar = false; // 👈 Controla el modal de edición
 
-  // Variable para almacenar el ID del médico seleccionado en el filtro
+  rolUsuario: string = '';
   medicoFiltro: string = '';
 
   nuevaCita = {
@@ -35,18 +36,33 @@ export class CitasComponent implements OnInit {
     motivo: '',
   };
 
+  // 👈 Objeto para capturar y modificar la cita elegida
+  citaEditando: any = {
+    _id: '',
+    motivo: '',
+    estado: 'Disponible',
+    fecha: '',
+  };
+
   ngOnInit(): void {
+    this.rolUsuario = localStorage.getItem('rol') || 'paciente';
     this.obtenerCitas();
     this.cargarSelects();
   }
 
-  // Getter que filtra las citas en tiempo real
+  get esAdmin(): boolean {
+    return this.rolUsuario === 'admin';
+  }
+
+  get esPersonalMedico(): boolean {
+    return this.rolUsuario === 'admin' || this.rolUsuario === 'medico';
+  }
+
   get citasFiltradas(): any[] {
     if (!this.medicoFiltro) {
-      return this.citas; // Si no hay filtro, muestra todas las citas
+      return this.citas;
     }
     return this.citas.filter((cita) => {
-      // Maneja si cita.medico es el objeto populado o solo el ID
       const medicoId = cita.medico?._id || cita.medico;
       return medicoId === this.medicoFiltro;
     });
@@ -69,12 +85,14 @@ export class CitasComponent implements OnInit {
   }
 
   cargarSelects(): void {
-    this.pacienteService.obtenerPacientes().subscribe({
-      next: (res: any) => (this.pacientes = res?.datos || res || []),
-    });
-    this.medicoService.obtenerMedicos().subscribe({
-      next: (res: any) => (this.medicos = res?.datos || res || []),
-    });
+    if (this.esPersonalMedico) {
+      this.pacienteService.obtenerPacientes().subscribe({
+        next: (res: any) => (this.pacientes = res?.datos || res || []),
+      });
+      this.medicoService.obtenerMedicos().subscribe({
+        next: (res: any) => (this.medicos = res?.datos || res || []),
+      });
+    }
   }
 
   abrirModal(): void {
@@ -88,12 +106,70 @@ export class CitasComponent implements OnInit {
 
   guardarCita(): void {
     this.citaService.crearCita(this.nuevaCita).subscribe({
-      next: (res) => {
+      next: () => {
         this.cerrarModal();
         this.obtenerCitas();
       },
       error: (err) => console.error('Error al agendar cita:', err),
     });
+  }
+
+  // ✏️ ABRIR Y PREPARAR EDICIÓN
+  abrirModalEditar(cita: any): void {
+    // Clonamos la cita para evitar modificar la tabla antes de guardar
+    this.citaEditando = {
+      _id: cita._id,
+      motivo: cita.motivo,
+      estado: cita.estado,
+      fecha: cita.fecha,
+    };
+    this.mostrarModalEditar = true;
+  }
+
+  cerrarModalEditar(): void {
+    this.mostrarModalEditar = false;
+    this.citaEditando = { _id: '', motivo: '', estado: 'Disponible', fecha: '' };
+  }
+
+  // 💾 GUARDAR CAMBIOS (PATCH)
+  actualizarCita(): void {
+    if (!this.citaEditando._id) return;
+
+    const { _id, ...datosAActualizar } = this.citaEditando;
+
+    this.citaService.actualizarCita(_id, datosAActualizar).subscribe({
+      next: () => {
+        this.cerrarModalEditar();
+        this.obtenerCitas();
+      },
+      error: (err) => console.error('Error al actualizar cita:', err),
+    });
+  }
+
+  //  ELIMINAR CITA (DELETE)
+  eliminarCita(id: string): void {
+    if (!id) {
+      alert('Error: No se encontró el ID de la cita.');
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+      this.citaService.eliminarCita(id).subscribe({
+        next: () => {
+          alert('Cita eliminada exitosamente');
+          this.obtenerCitas(); // Recargar la lista limpia
+        },
+        error: (err) => {
+          console.error('Error al eliminar cita:', err);
+          if (err.status === 404) {
+            alert('La cita no existe o ya fue eliminada previamente.');
+            this.obtenerCitas(); // Recargar la lista para actualizar la vista
+          } else {
+            alert('Ocurrió un error al intentar eliminar la cita.');
+          }
+        },
+      });
+    }
   }
 
   limpiarFormulario(): void {

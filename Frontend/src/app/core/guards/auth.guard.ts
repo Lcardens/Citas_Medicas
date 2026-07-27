@@ -1,18 +1,15 @@
-import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import { CanActivateFn, Router } from '@angular/router';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
   const router = inject(Router);
+  const token = localStorage.getItem('token'); // O la clave donde guardes el JWT
 
-  // Verificamos si el usuario está autenticado usando el AuthService
-  if (authService.estaAutenticado()) {
-    return true; // Le permite entrar a la ruta
+  if (token && token.trim() !== '') {
+    return true; // 🔓 Permite el acceso a la ruta
   }
 
-  // Si no está autenticado, lo redirige al login y bloquea la navegación
-  console.warn('Acceso denegado: redirigiendo a /login');
+  // 🔒 Si no hay token, redirige al Login
   router.navigate(['/login']);
   return false;
 };

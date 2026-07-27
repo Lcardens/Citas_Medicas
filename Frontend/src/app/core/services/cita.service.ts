@@ -10,15 +10,27 @@ export class CitaService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  obtenerCitas(): Observable<any> {
+  // Método auxiliar interno para obtener los headers con el Token
+  private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    return this.http.get(`${this.apiUrl}/citas`, { headers });
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+  }
+
+  obtenerCitas(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/citas`, { headers: this.getHeaders() });
   }
 
   crearCita(cita: any): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    return this.http.post(`${this.apiUrl}/citas`, cita, { headers });
+    return this.http.post(`${this.apiUrl}/citas`, cita, { headers: this.getHeaders() });
+  }
+
+  // ✏️ Actualizar cita (PATCH)
+  actualizarCita(id: string, cita: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/citas/${id}`, cita, { headers: this.getHeaders() });
+  }
+
+  //  Eliminar cita (DELETE)
+  eliminarCita(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/citas/${id}`, { headers: this.getHeaders() });
   }
 }
