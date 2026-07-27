@@ -28,9 +28,9 @@ body {
 }
 
 /* ==========================================
-   2. REGLAS PARA TABLAS Y CONTENEDORES
+   2. REGLAS PARA TABLAS Y CONTENEDORES GENERALES
    ========================================== */
-.card,
+.card:not(.login-card),
 .table-responsive {
   border-radius: 12px !important;
   border: 1px solid rgba(184, 166, 222, 0.25) !important; /* Borde sutil en tono morado */
@@ -56,37 +56,8 @@ body {
 }
 
 /* ==========================================
-   3. BOTONES Y ACCIONES
+   3. BOTONES Y ACCIONES GENERALES
    ========================================== */
-/* ==========================================
-/* ==========================================
-   BOTÓN DE INICIO DE SESIÓN PROFESIONAL
-   ========================================== */
-.btn-primary,
-button[type='submit'] {
-  background-color: #27b7f5 !important; /* Celeste principal corporativo */
-  border: 1px solid #27b7f5 !important;
-  border-radius: 10px !important;
-  padding: 0.75rem !important;
-  font-weight: 600 !important;
-  font-size: 1rem;
-  letter-spacing: 0.3px;
-  color: #ffffff !important; /* Texto blanco nítido */
-  width: 100% !important;
-  margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(39, 183, 245, 0.25);
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-primary:hover,
-button[type='submit']:hover {
-  background-color: #1da3e0 !important; /* Celeste un poco más oscuro al pasar el cursor */
-  border-color: #1da3e0 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(39, 183, 245, 0.35);
-}
-
-/* Contenedor o grupo de botones en la tabla */
 .table td .btn-group,
 .table td .d-flex {
   gap: 6px;
@@ -112,7 +83,7 @@ button[type='submit']:hover {
   border-color: #27b7f5 !important;
 }
 
-/* Botón de Eliminar (Tono morado suave/neutro o rojo discreto) */
+/* Botón de Eliminar (Tono morado suave) */
 .btn-outline-danger,
 .btn-eliminar {
   background-color: rgba(184, 166, 222, 0.15) !important;
@@ -132,19 +103,22 @@ button[type='submit']:hover {
   border-color: #b8a6de !important;
 }
 
-/* Clases para usar botones con el color morado secundario */
-.btn-secondary,
-.btn-secondary-custom {
-  background-color: var(--secondary-color) !important;
-  border-color: var(--secondary-color) !important;
+/* Botones principales estándar de la app (ej. Nuevo Paciente / Nuevo Usuario) */
+.btn-primary:not(.login-card button) {
+  background-color: #27b7f5 !important;
+  border-color: #27b7f5 !important;
+  border-radius: 8px !important;
+  font-weight: 500;
   color: #ffffff !important;
+  width: auto !important;
+  display: inline-block !important;
+  transition: all 0.2s ease-in-out;
 }
 
-.btn-secondary:hover,
-.btn-secondary-custom:hover {
-  background-color: var(--secondary-hover) !important;
-  border-color: var(--secondary-hover) !important;
-  color: #ffffff !important;
+.btn-primary:not(.login-card button):hover {
+  background-color: #1da3e0 !important;
+  border-color: #1da3e0 !important;
+  transform: translateY(-1px);
 }
 
 .btn {
@@ -157,12 +131,11 @@ button[type='submit']:hover {
   transform: translateY(-1px);
 }
 
-/* Textos principales con acento */
+/* Textos con acento */
 .text-primary {
   color: #1a96ce !important;
 }
 
-/* Textos secundarios o acentos en morado */
 .text-secondary-custom,
 .text-purple {
   color: #8c75c4 !important;
@@ -190,7 +163,7 @@ button[type='submit']:hover {
 }
 
 /* ==========================================
-   5. TARJETAS Y MODALES CON ACENTO MORADO
+   5. EFECTO HOVER PARA TARJETAS
    ========================================== */
 .card-hover {
   transition:
@@ -203,7 +176,7 @@ button[type='submit']:hover {
   box-shadow: 0 10px 20px rgba(184, 166, 222, 0.25) !important;
 }
 
-/* Encabezados de modales en tono morado elegante */
+/* Encabezados de modales */
 .modal-header.bg-primary,
 .bg-purple-header {
   background-color: var(--secondary-color) !important;
@@ -220,13 +193,13 @@ button[type='submit']:hover {
 }
 
 /* ==========================================
-   PERSONALIZACIÓN DE ETIQUETAS "DISPONIBLE"
+   7. ETIQUETAS "DISPONIBLE" (Verde Pastel)
    ========================================== */
 .badge.bg-primary,
 .badge.bg-success,
 .badge {
-  background-color: #d1e7dd !important; /* Verde pastel suave */
-  color: #0f5132 !important; /* Texto verde oscuro legible */
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
   border: 1px solid #badbcc !important;
   font-weight: 500 !important;
   padding: 6px 12px !important;
@@ -234,12 +207,9 @@ button[type='submit']:hover {
 }
 
 /* ==========================================
-   ESTILOS PARA LA PANTALLA DE LOGIN
+   8. ESTILOS EXCLUSIVOS PARA LA PANTALLA DE LOGIN
    ========================================== */
-
-/* Tarjeta de login centrada con ancho correcto */
-.card,
-.login-container {
+.login-card {
   background: #ffffff !important;
   border: 1px solid rgba(184, 166, 222, 0.25) !important;
   border-radius: 16px !important;
@@ -248,13 +218,12 @@ button[type='submit']:hover {
     0 5px 15px rgba(184, 166, 222, 0.15) !important;
   padding: 2.5rem !important;
   width: 100% !important;
-  max-width: 440px !important; /* Ancho ideal para que quepa el texto */
+  max-width: 440px !important;
   margin: 0 auto;
 }
 
-/* Forzar que el título ocupe una sola línea horizontalmente */
-.card h1,
-.card h2,
+.login-card h1,
+.login-card h2,
 .login-title {
   color: #2c224c;
   font-weight: 700;
@@ -262,11 +231,10 @@ button[type='submit']:hover {
   margin-bottom: 1.8rem;
   text-align: center;
   letter-spacing: -0.5px;
-  white-space: nowrap; /* Evita que las letras se bajen */
+  white-space: nowrap;
 }
 
-/* Asegurar que los inputs recuperen su ancho completo */
-.form-control {
+.login-card .form-control {
   width: 100% !important;
   border-radius: 10px !important;
   border: 1px solid #dcd4ed !important;
@@ -276,8 +244,31 @@ button[type='submit']:hover {
   transition: all 0.2s ease-in-out;
 }
 
-.form-control:focus {
+.login-card .form-control:focus {
   border-color: #27b7f5 !important;
   box-shadow: 0 0 0 4px rgba(39, 183, 245, 0.15) !important;
   background-color: #ffffff !important;
+}
+
+.login-card button[type='submit'],
+.login-card .btn-primary {
+  background-color: #27b7f5 !important;
+  border: 1px solid #27b7f5 !important;
+  border-radius: 10px !important;
+  padding: 0.75rem !important;
+  font-weight: 600 !important;
+  font-size: 1rem;
+  color: #ffffff !important;
+  width: 100% !important;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(39, 183, 245, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+
+.login-card button[type='submit']:hover,
+.login-card .btn-primary:hover {
+  background-color: #1da3e0 !important;
+  border-color: #1da3e0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(39, 183, 245, 0.35);
 }
