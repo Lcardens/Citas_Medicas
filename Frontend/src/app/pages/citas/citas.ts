@@ -441,7 +441,7 @@ export class CitasComponent implements OnInit {
       return;
     }
 
-    this.citaService.asignarCitaRapida().subscribe({
+    this.citaService.asignarCitaRapida({}).subscribe({
       next: (res: any) => {
         alert(res.mensaje || 'Cita asignada automÃ¡ticamente');
         this.cargarDatosGlobales();

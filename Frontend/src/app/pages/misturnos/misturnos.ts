@@ -34,7 +34,7 @@ export class MisturnosComponent implements OnInit {
 
   cargarAgenda(): void {
     this.cargando = true;
-    this.citaService.obtenerAgenda().subscribe({
+    this.citaService.obtenerAgendaMedico().subscribe({
       next: (res: any) => {
         const datos = res?.datos || [];
         this.citas = datos.slice().sort((a: any, b: any) => {

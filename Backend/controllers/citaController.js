@@ -89,6 +89,23 @@ exports.crearCita = async (req, res) => {
       paciente = pacienteResuelto._id;
     }
 
+    // Si el usuario es médico, solo puede crear citas para sí mismo
+    if (rolUsuario === "medico") {
+      const medicoVinculado = await Medico.findOne({ email: usuarioLogueado.email });
+      if (!medicoVinculado) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "No se encontró un perfil de médico vinculado a tu cuenta.",
+        });
+      }
+      if (String(medico) !== String(medicoVinculado._id)) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "Solo puedes crear citas para ti mismo.",
+        });
+      }
+    }
+
     if (!paciente) {
       return res.status(400).json({
         exitoso: false,
@@ -437,7 +454,6 @@ exports.asignarCitaRapida = async (req, res) => {
       exitoso: false,
       mensaje: "Error en la asignación rápida",
       error: error.message,
-      stack: error.stack,
     });
   }
 };
@@ -510,14 +526,40 @@ exports.listarCitas = async (req, res) => {
 exports.eliminarCita = async (req, res) => {
   try {
     const { id } = req.params;
-    const cita = await Cita.findByIdAndDelete(id);
 
+    const cita = await Cita.findById(id);
     if (!cita) {
       return res.status(404).json({
         exitoso: false,
         mensaje: "Cita no encontrada",
       });
     }
+
+    // Si el usuario es médico, solo puede eliminar sus propias citas
+    const usuarioLogueado = req.usuario || req.user;
+    const rolUsuario = (usuarioLogueado?.rol || "")
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (rolUsuario === "medico") {
+      const medicoVinculado = await Medico.findOne({ email: usuarioLogueado.email });
+      if (!medicoVinculado) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "No se encontró un perfil de médico vinculado a tu cuenta.",
+        });
+      }
+      if (String(cita.medico) !== String(medicoVinculado._id)) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "Solo puedes eliminar citas que te pertenezcan.",
+        });
+      }
+    }
+
+    await Cita.findByIdAndDelete(id);
 
     res.status(200).json({
       exitoso: true,
@@ -654,11 +696,11 @@ exports.obtenerDisponibilidadPorRango = async (req, res) => {
     }
 
     const resumen = {};
-    let cursor = moment(inicio, "YYYY-MM-DD");
-    const ultimo = moment(fin, "YYYY-MM-DD");
+    const cursorDate = new Date(`${inicio}T00:00:00`);
+    const ultimoDate = new Date(`${fin}T00:00:00`);
 
-    while (cursor.isSameOrBefore(ultimo)) {
-      const fechaISO = cursor.format("YYYY-MM-DD");
+    while (cursorDate <= ultimoDate) {
+      const fechaISO = cursorDate.toISOString().split("T")[0];
       await crearCuposSiNoExisten(medicoId, fechaISO);
       const horasDisponibles = await Cita.countDocuments({
         medico: medicoId,
@@ -667,7 +709,7 @@ exports.obtenerDisponibilidadPorRango = async (req, res) => {
         $or: [{ paciente: null }, { paciente: { $exists: false } }],
       });
       resumen[fechaISO] = horasDisponibles > 0;
-      cursor = cursor.add(1, "day");
+      cursorDate.setDate(cursorDate.getDate() + 1);
     }
 
     res.status(200).json({
@@ -705,7 +747,7 @@ exports.agendaDelMedico = async (req, res) => {
 
     if (!medico) {
       return res.status(404).json({
-        exitoso: true,
+        exitoso: false,
         mensaje: "No se encontró un perfil de médico vinculado a tu cuenta.",
         datos: [],
       });
@@ -745,7 +787,46 @@ exports.agendaDelMedico = async (req, res) => {
 exports.actualizarCita = async (req, res) => {
   try {
     const { id } = req.params;
-    const camposActualizar = req.body;
+
+    // Whitelist: solo permitir actualizar ciertos campos
+    const camposPermitidos = ["motivo", "estado", "diagnostico", "notasConsulta"];
+    const camposActualizar = {};
+    for (const campo of camposPermitidos) {
+      if (req.body[campo] !== undefined) {
+        camposActualizar[campo] = req.body[campo];
+      }
+    }
+
+    // Si el usuario es médico, solo puede modificar sus propias citas
+    const usuarioLogueado = req.usuario || req.user;
+    const rolUsuario = (usuarioLogueado?.rol || "")
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    if (rolUsuario === "medico") {
+      const medicoVinculado = await Medico.findOne({ email: usuarioLogueado.email });
+      if (!medicoVinculado) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "No se encontró un perfil de médico vinculado a tu cuenta.",
+        });
+      }
+      const cita = await Cita.findById(id);
+      if (!cita) {
+        return res.status(404).json({
+          exitoso: false,
+          mensaje: "Cita no encontrada",
+        });
+      }
+      if (String(cita.medico) !== String(medicoVinculado._id)) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "Solo puedes modificar citas que te pertenezcan.",
+        });
+      }
+    }
 
     const citaActualizada = await Cita.findByIdAndUpdate(
       id,

@@ -11,7 +11,7 @@ import { UsuarioService } from '../../core/services/usuario.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent {
   private authService = inject(AuthService);

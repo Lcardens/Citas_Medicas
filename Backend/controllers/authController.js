@@ -51,6 +51,13 @@ exports.registrar = async (req, res) => {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
+    if (rolNormalizado === "admin" || rolNormalizado === "administrador") {
+      return res.status(403).json({
+        exitoso: false,
+        mensaje: "No puedes auto-registrarte como administrador",
+      });
+    }
+
     // Si el rol es médico, el Registromedico debe existir previamente en el sistema
     // (lo crea un administrador). Sin él no se puede crear el usuario médico.
     if (rolNormalizado === "medico") {
@@ -389,7 +396,7 @@ exports.actualizarMiPerfil = async (req, res) => {
       }
     }
 
-    if (telefono) {
+    if (telefono && (rol === "paciente" || rol === "usuario")) {
       await Paciente.updateOne(
         { Correo: usuario.email },
         { $set: { Telefono: telefono.trim() } },
