@@ -801,8 +801,19 @@ exports.actualizarCita = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Whitelist: solo ciertos campos
-    const camposPermitidos = ["motivo", "estado", "diagnostico", "notasConsulta"];
+    const usuarioLogueado = req.usuario || req.user;
+    const rolUsuario = (usuarioLogueado?.rol || "")
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    const esAdmin = rolUsuario === "admin" || rolUsuario === "administrador";
+
+    // Whitelist: solo ciertos campos, según el rol
+    const camposBase = ["motivo", "estado", "diagnostico", "notasConsulta"];
+    const camposAdmin = [...camposBase, "fecha", "hora", "paciente", "medico"];
+    const camposPermitidos = esAdmin ? camposAdmin : camposBase;
     const camposActualizar = {};
     for (const campo of camposPermitidos) {
       if (req.body[campo] !== undefined) {
@@ -811,13 +822,6 @@ exports.actualizarCita = async (req, res) => {
     }
 
     // Si el usuario es médico, solo puede modificar sus propias citas
-    const usuarioLogueado = req.usuario || req.user;
-    const rolUsuario = (usuarioLogueado?.rol || "")
-      .toLowerCase()
-      .trim()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-
     if (rolUsuario === "medico") {
       const medicoVinculado = await Medico.findOne({ email: usuarioLogueado.email });
       if (!medicoVinculado) {
