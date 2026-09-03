@@ -52,7 +52,7 @@ exports.listarPacientes = async (req, res) => {
   }
 };
 
-// Eliminar un paciente en cascada: su registro, su usuario vinculado y sus citas
+// Eliminar paciente en cascada: registro, usuario y citas
 exports.eliminarPaciente = async (req, res) => {
   try {
     const { id } = req.params;

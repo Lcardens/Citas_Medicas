@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-// Middleware: proteger rutas (verifica el token)
+// Middleware: protege rutas (verifica el token)
 exports.proteger = async (req, res, next) => {
   try {
     let token;
@@ -14,7 +14,7 @@ exports.proteger = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
     }
 
-    // Si no hay token, denegar acceso
+    // Sin token, denegar acceso
     if (!token) {
       return res.status(401).json({
         exitoso: false,
@@ -22,7 +22,7 @@ exports.proteger = async (req, res, next) => {
       });
     }
 
-    // Verifica el token (lanza error si la firma es inválida o expiró)
+    // Verifica el token; lanza error si es inválido o expiró
     const decodificado = jwt.verify(token, process.env.JWT_SECRET);
 
     // Busca el usuario y lo adjunta a la petición
@@ -34,10 +34,8 @@ exports.proteger = async (req, res, next) => {
       });
     }
 
-    // Deja el usuario en req para los siguientes pasos
     req.usuario = usuario;
 
-    // Pasa al siguiente middleware o controlador
     next();
   } catch (error) {
     return res.status(401).json({
@@ -47,10 +45,10 @@ exports.proteger = async (req, res, next) => {
   }
 };
 
-// Middleware: autorizar solo ciertos roles
+// Middleware: autoriza solo ciertos roles
 exports.autorizar = (...rolesPermitidos) => {
   return (req, res, next) => {
-    // req.usuario ya existe porque 'proteger' corrió antes
+    // req.usuario existe porque 'proteger' corrió antes
     if (!req.usuario || !req.usuario.rol) {
       return res.status(403).json({
         exitoso: false,
@@ -58,20 +56,20 @@ exports.autorizar = (...rolesPermitidos) => {
       });
     }
 
-    // Normaliza el rol del usuario (minúsculas y sin espacios)
+    // Normaliza el rol del usuario
     let rolUsuario = req.usuario.rol.toLowerCase().trim();
 
-    // Unifica "usuario" como "paciente" por compatibilidad
+    // Unifica "usuario" como "paciente"
     if (rolUsuario === "usuario") {
       rolUsuario = "paciente";
     }
 
-    // Normaliza los roles permitidos que vienen en la ruta
+    // Normaliza los roles permitidos de la ruta
     const rolesNormalizados = rolesPermitidos.map((r) =>
       r.toLowerCase().trim(),
     );
 
-    // Verifica si el rol normalizado está incluido
+    // Verifica si el rol está incluido
     if (!rolesNormalizados.includes(rolUsuario)) {
       return res.status(403).json({
         exitoso: false,

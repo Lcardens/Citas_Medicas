@@ -3,7 +3,7 @@ const Paciente = require("../models/Paciente");
 const Medico = require("../models/medico");
 const { registrarEvento } = require("./auditController");
 
-// Horarios de atención fijos del centro médico
+// Horarios de atención fijos
 const HORARIOS = [
   "08:00 AM",
   "09:00 AM",
@@ -17,9 +17,7 @@ const HORARIOS = [
   "06:00 PM",
 ];
 
-// Función auxiliar: genera únicamente los cupos que faltan para un médico/fecha.
-// Si ya existen citas en algunos horarios, solo crea los que no están cubiertos.
-// Los horarios cancelados se regeneran como disponibles.
+// Genera los cupos que faltan para un médico/fecha
 const crearCuposSiNoExisten = async (medicoId, fecha) => {
   const citasExistentes = await Cita.find({ medico: medicoId, fecha });
 
@@ -47,7 +45,7 @@ const crearCuposSiNoExisten = async (medicoId, fecha) => {
   return { creados: nuevasCitas.length };
 };
 
-// Función auxiliar: obtener o crear el paciente asociado al usuario logueado
+// Obtiene o crea el paciente del usuario logueado
 const resolverPacientePorUsuario = async (usuarioLogueado) => {
   const correo = usuarioLogueado.email;
   let paciente = await Paciente.findOne({ Correo: correo });
@@ -65,7 +63,7 @@ const resolverPacientePorUsuario = async (usuarioLogueado) => {
   return paciente;
 };
 
-// Crear una nueva cita manual
+// Crear una cita manual
 exports.crearCita = async (req, res) => {
   try {
     let { paciente, medico, fecha, hora, motivo } = req.body;
@@ -77,7 +75,7 @@ exports.crearCita = async (req, res) => {
       });
     }
 
-    // Si el usuario logueado es paciente, resolver su perfil automáticamente
+    // Paciente logueado: resolver su perfil automáticamente
     const usuarioLogueado = req.usuario || req.user;
     const rolUsuario = (usuarioLogueado?.rol || "")
       .toLowerCase()
@@ -90,7 +88,7 @@ exports.crearCita = async (req, res) => {
       paciente = pacienteResuelto._id;
     }
 
-    // Si el usuario es médico, solo puede crear citas para sí mismo
+    // Si el usuario es médico, solo crea para sí mismo
     if (rolUsuario === "medico") {
       const medicoVinculado = await Medico.findOne({ email: usuarioLogueado.email });
       if (!medicoVinculado) {
@@ -122,7 +120,7 @@ exports.crearCita = async (req, res) => {
       });
     }
 
-    // Buscar si ya existe una cita Confirmada en esa hora (ocupada)
+    // Cita Confirmada en esa hora (ocupada)
     const citaConfirmada = await Cita.findOne({
       medico,
       fecha,
@@ -136,7 +134,7 @@ exports.crearCita = async (req, res) => {
       });
     }
 
-    // Si existe un cupo "Disponible" (sin paciente) en esa hora, se reutiliza
+    // Reutilizar cupo "Disponible" sin paciente en esa hora
     const cupoDisponible = await Cita.findOne({
       medico,
       fecha,
@@ -202,7 +200,7 @@ exports.asignarCita = async (req, res) => {
 
     const fechaConsulta = fecha || new Date().toISOString().split("T")[0];
 
-    // Si el usuario logueado es paciente y no se envió pacienteId, resolver su perfil
+    // Si es paciente y no se envía pacienteId, resolver su perfil
     const usuarioLogueado = req.usuario || req.user;
     const rolUsuario = (usuarioLogueado?.rol || "")
       .toLowerCase()
@@ -237,7 +235,7 @@ exports.asignarCita = async (req, res) => {
       });
     }
 
-    // El paciente no puede ser asignado a sí mismo dos veces el mismo día
+    // Evitar doble asignación el mismo día
     const yaTieneCita = await Cita.findOne({
       medico: medicoId,
       paciente: pacienteId,
@@ -301,8 +299,7 @@ exports.asignarCita = async (req, res) => {
   }
 };
 
-// Asignación rápida: el sistema elige automáticamente el primer médico que tenga
-// al menos un cupo disponible (desde la fecha indicada o desde hoy).
+// Asignación rápida: primer médico con cupo disponible
 exports.asignarCitaRapida = async (req, res) => {
   try {
     let { pacienteId, fecha } = req.body;
@@ -336,7 +333,7 @@ exports.asignarCitaRapida = async (req, res) => {
 
     const fechaDesde = fecha || new Date().toISOString().split("T")[0];
 
-    // Buscar el primer cupo disponible (cualquier médico, fecha desde hoy)
+    // Primer cupo disponible (cualquier médico, desde hoy)
     let cupoEncontrado = await Cita.findOne({
       estado: "Disponible",
       fecha: { $gte: fechaDesde },
@@ -349,9 +346,7 @@ exports.asignarCitaRapida = async (req, res) => {
       );
 
     if (!cupoEncontrado) {
-      // No hay cupos pre-generados: generar automáticamente. Probamos desde la
-      // fecha base y, si ese día ya no queda disponibilidad (ej. hoy con horas
-      // pasadas), avanzamos hasta 30 días hasta encontrar cupos libres.
+      // Generar cupos: desde hoy y hasta 30 días buscando disponibilidad
       const medicoReferencia = await Medico.findOne()
         .sort({ createdAt: 1 })
         .select("_id");
@@ -385,7 +380,7 @@ exports.asignarCitaRapida = async (req, res) => {
       });
     }
 
-    // Obtener el id del médico de forma segura (poblado o referencia)
+    // Obtener el id del médico (poblado o referencia)
     const medicoId =
       cupoEncontrado.medico && cupoEncontrado.medico._id
         ? cupoEncontrado.medico._id
@@ -398,10 +393,10 @@ exports.asignarCitaRapida = async (req, res) => {
           "el médico"
         : "el médico";
 
-    // Asegurar que el médico tenga todos sus cupos generados para esa fecha
+    // Asegurar todos los cupos del médico para esa fecha
     await crearCuposSiNoExisten(medicoId, cupoEncontrado.fecha);
 
-    // IDs de cupos que el paciente ya tiene (no se le pueden asignar de nuevo)
+    // Cupos que el paciente ya tiene (no reasignables)
     const idsYaAsignados = await Cita.find({
       paciente: pacienteId,
       estado: "Confirmada",
@@ -410,7 +405,7 @@ exports.asignarCitaRapida = async (req, res) => {
     const arrayIdsExcluidos = idsYaAsignados.map((c) => c._id);
     arrayIdsExcluidos.push(cupoEncontrado._id);
 
-    // Buscar el siguiente cupo disponible sin chocar con citas existentes del paciente
+    // Siguiente cupo sin chocar con citas del paciente
     const cupoFinal = await Cita.findOne({
       estado: "Disponible",
       fecha: { $gte: fechaDesde },
@@ -468,7 +463,7 @@ exports.asignarCitaRapida = async (req, res) => {
   }
 };
 
-// Listar citas (filtrado automático: si es paciente, solo ve las suyas)
+// Listar citas (los pacientes solo ven las suyas)
 exports.listarCitas = async (req, res) => {
   try {
     let filtro = {};
@@ -501,7 +496,7 @@ exports.listarCitas = async (req, res) => {
         "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
       );
 
-    // Para pacientes, también devolver los cupos disponibles (fecha desde hoy)
+    // Para pacientes, devolver también los cupos disponibles
     let citasDisponibles = [];
     if (esPaciente) {
       const hoy = new Date().toISOString().split("T")[0];
@@ -626,7 +621,7 @@ exports.obtenerCitasDisponiblesPorMedico = async (req, res) => {
   try {
     const { medicoId } = req.params;
 
-    // Solo traer cupos disponibles sin asignar y con fecha desde hoy en adelante
+    // Solo cupos sin asignar desde hoy en adelante
     const hoy = new Date().toISOString().split("T")[0];
 
     const citasDisponibles = await Cita.find({
@@ -660,8 +655,7 @@ exports.obtenerCitasDisponiblesPorMedico = async (req, res) => {
   }
 };
 
-// Horas disponibles de un médico para una fecha concreta.
-// Genera los cupos faltantes y devuelve solo las horas libres.
+// Horas disponibles de un médico para una fecha concreta
 exports.obtenerHorasDisponiblesPorMedicoYFecha = async (req, res) => {
   try {
     const { medicoId, fecha } = req.params;
@@ -673,7 +667,7 @@ exports.obtenerHorasDisponiblesPorMedicoYFecha = async (req, res) => {
       });
     }
 
-    // Asegurar que existan los cupos generados para esa fecha
+    // Asegurar cupos generados para esa fecha
     await crearCuposSiNoExisten(medicoId, fecha);
 
     const horasDisponibles = await Cita.find({
@@ -701,7 +695,7 @@ exports.obtenerHorasDisponiblesPorMedicoYFecha = async (req, res) => {
   }
 };
 
-// Disponibilidad por día (¿tiene al menos una hora libre?) de un médico en un rango de fechas.
+// Disponibilidad por día de un médico en un rango de fechas
 exports.obtenerDisponibilidadPorRango = async (req, res) => {
   try {
     const { medicoId } = req.params;
@@ -745,7 +739,7 @@ exports.obtenerDisponibilidadPorRango = async (req, res) => {
   }
 };
 
-// Agenda del médico logueado: sus citas confirmadas y atendidas
+// Agenda del médico logueado
 exports.agendaDelMedico = async (req, res) => {
   try {
     const usuarioLogueado = req.usuario || req.user;
@@ -756,7 +750,7 @@ exports.agendaDelMedico = async (req, res) => {
       });
     }
 
-    // Resuelve el registro del médico vinculado por correo; si no, por nombre
+    // Busca el médico vinculado por correo; si no, por nombre
     let medico = await Medico.findOne({ email: usuarioLogueado.email });
     if (!medico) {
       medico = await Medico.findOne({
@@ -802,12 +796,12 @@ exports.agendaDelMedico = async (req, res) => {
   }
 };
 
-// Actualizar/Modificar Cita (Método PATCH)
+// Actualizar/Modificar Cita (PATCH)
 exports.actualizarCita = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Whitelist: solo permitir actualizar ciertos campos
+    // Whitelist: solo ciertos campos
     const camposPermitidos = ["motivo", "estado", "diagnostico", "notasConsulta"];
     const camposActualizar = {};
     for (const campo of camposPermitidos) {

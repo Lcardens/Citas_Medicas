@@ -5,7 +5,7 @@ const Cita = require("../models/cita");
 const jwt = require("jsonwebtoken");
 const { registrarEvento } = require("./auditController");
 
-// Función auxiliar para generar el Token JWT
+// Genera el token JWT
 const generarToken = (usuario) => {
   const secret = process.env.JWT_SECRET || "dev_jwt_secret";
   const expiresIn = process.env.JWT_EXPIRES_IN || "8h";
@@ -59,8 +59,7 @@ exports.registrar = async (req, res) => {
       });
     }
 
-    // Si el rol es médico, el Registromedico debe existir previamente en el sistema
-    // (lo crea un administrador). Sin él no se puede crear el usuario médico.
+    // El médico debe existir previamente en el sistema
     if (rolNormalizado === "medico") {
       const { Registromedico } = req.body;
       if (!Registromedico || !Registromedico.trim()) {
@@ -127,7 +126,7 @@ exports.registrar = async (req, res) => {
           Registromedico: Registromedico.trim(),
         });
         if (medicoExistente) {
-          // Vincula el médico existente con el usuario: email y nombre del registro
+          // Vincula el médico existente con el usuario
           await Medico.updateOne(
             { _id: medicoExistente._id },
             { $set: { email, Nombre: nombre } },
@@ -237,7 +236,7 @@ exports.obtenerUsuarios = async (req, res) => {
   try {
     const usuarios = await User.find().select("-password");
 
-    // Responder con estructura estandarizada
+    // Respuesta estándar
     res.status(200).json({
       exitoso: true,
       datos: usuarios,
@@ -251,7 +250,7 @@ exports.obtenerUsuarios = async (req, res) => {
   }
 };
 
-// DELETE /api/auth/usuarios/:id — Eliminar un usuario en cascada (solo admin)
+// DELETE /api/auth/usuarios/:id
 exports.eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -292,7 +291,7 @@ exports.eliminarUsuario = async (req, res) => {
       }
     }
 
-    // Eliminar citas asociadas (del paciente o del médico)
+    // Eliminar citas asociadas
     if (pacienteId) {
       await Cita.deleteMany({ paciente: pacienteId });
     }
@@ -325,12 +324,12 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
-// GET /api/auth/me - Obtener el perfil del usuario logueado
+// GET /api/auth/me
 exports.obtenerMiPerfil = async (req, res) => {
   try {
     const usuario = await User.findById(req.usuario._id).select("-password");
 
-    // Datos complementarios según el rol (vinculados por correo)
+    // Datos complementarios según el rol
     let detalle = {};
     const rol = (usuario.rol || "").toLowerCase().trim();
 
@@ -378,7 +377,7 @@ exports.obtenerMiPerfil = async (req, res) => {
   }
 };
 
-// PUT /api/auth/perfil — Actualizar datos del usuario logueado
+// PUT /api/auth/perfil
 exports.actualizarMiPerfil = async (req, res) => {
   try {
     const { nombre, password, passwordActual, telefono } = req.body;
@@ -398,8 +397,8 @@ exports.actualizarMiPerfil = async (req, res) => {
         });
       }
 
-      // Seguridad: exige la contraseña actual antes de cambiarla
-      if (!passwordActual) {
+    // Exige la contraseña actual antes de cambiarla
+    if (!passwordActual) {
         return res.status(400).json({
           exitoso: false,
           mensaje: "Debes ingresar tu contraseña actual para cambiarla",
@@ -422,7 +421,7 @@ exports.actualizarMiPerfil = async (req, res) => {
 
     await usuario.save();
 
-    // Sincronizar nombre/telefono en el registro vinculado (Paciente/Medico)
+    // Sincroniza nombre/telefono en el registro vinculado
     const rol = (usuario.rol || "").toLowerCase().trim();
     if (nombre && nombre.trim()) {
       if (rol === "paciente" || rol === "usuario") {

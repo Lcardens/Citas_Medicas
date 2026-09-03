@@ -6,7 +6,7 @@ exports.crearMedico = async (req, res) => {
   try {
     const { Registromedico, Nombre } = req.body;
 
-    // Guardar el médico únicamente con su nombre
+    // Guardar el médico
     const nuevoMedico = new Medico({ Registromedico, Nombre });
     const medicoGuardado = await nuevoMedico.save();
 
@@ -27,8 +27,7 @@ exports.crearMedico = async (req, res) => {
     const fechaHoy = new Date().toISOString().split("T")[0];
 
     // Generar las 10 citas automáticas asociadas a su _id
-    const citasIniciales = horarios.map((hora) => ({
-      medico: medicoGuardado._id,
+    const citasIniciales = horarios.map((hora) => ({      medico: medicoGuardado._id,
       fecha: fechaHoy,
       hora,
       motivo: `Cita médica - ${hora}`,
@@ -75,7 +74,7 @@ exports.listarMedicos = async (req, res) => {
   }
 };
 
-// Eliminar un médico en cascada: su registro, su usuario vinculado y sus citas
+// Eliminar médico en cascada: registro, usuario y citas
 exports.eliminarMedico = async (req, res) => {
   try {
     const { id } = req.params;

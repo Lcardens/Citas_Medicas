@@ -1,7 +1,7 @@
 const AuditLog = require("../models/auditLog");
 const User = require("../models/user");
 
-// Helper: obtener IP del cliente
+// Obtención de IP del cliente
 const obtenerIP = (req) => {
   return (
     req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
@@ -11,7 +11,7 @@ const obtenerIP = (req) => {
   );
 };
 
-// Helper: registrar evento
+// Registra el evento de auditoría
 exports.registrarEvento = async ({
   req,
   usuario,
@@ -36,7 +36,7 @@ exports.registrarEvento = async ({
   }
 };
 
-// GET /api/audit — Listar logs de auditoría (solo admin)
+// GET /api/audit
 exports.listarLogs = async (req, res) => {
   try {
     const {
