@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
-import { Router } from '@angular/router';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -17,23 +16,28 @@ export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private timer: any;
-  private readonly TIMEOUT_MS = 10 * 60 * 1000;
+  private readonly TIMEOUT_MS = 5 * 60 * 1000;
 
-  private eventos = [
-    'mousemove', 'keydown', 'click', 'scroll', 'touchstart',
-  ];
+  private handlers: { evento: string; fn: EventListener }[] = [];
 
   ngOnInit(): void {
-    this.eventos.forEach((evento) =>
-      document.addEventListener(evento, this.reiniciarTimer.bind(this)),
+    this.handlers = [
+      { evento: 'keydown', fn: () => this.reiniciarTimer() },
+      { evento: 'click', fn: () => this.reiniciarTimer() },
+      { evento: 'touchstart', fn: () => this.reiniciarTimer() },
+      { evento: 'mousemove', fn: () => this.reiniciarTimer() },
+      { evento: 'scroll', fn: () => this.reiniciarTimer() },
+    ];
+    this.handlers.forEach((h) =>
+      document.addEventListener(h.evento, h.fn),
     );
     this.reiniciarTimer();
   }
 
   ngOnDestroy(): void {
     clearTimeout(this.timer);
-    this.eventos.forEach((evento) =>
-      document.removeEventListener(evento, this.reiniciarTimer.bind(this)),
+    this.handlers.forEach((h) =>
+      document.removeEventListener(h.evento, h.fn),
     );
   }
 
