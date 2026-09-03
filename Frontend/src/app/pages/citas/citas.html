@@ -393,6 +393,103 @@
       </div>
       <form (ngSubmit)="actualizarCita()">
         <div class="modal-body">
+          <div *ngIf="esAdmin" class="mb-3">
+            <label class="form-label">Paciente</label>
+            <select
+              class="form-select"
+              [(ngModel)]="citaEditando.paciente"
+              name="editPaciente"
+              required
+            >
+              <option value="">Seleccione un paciente</option>
+              <option *ngFor="let p of pacientes" [value]="p._id">
+                {{ p.Nombre || p.nombre || p.nombres }}
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="esAdmin" class="mb-3">
+            <label class="form-label">Médico</label>
+            <select
+              class="form-select"
+              [(ngModel)]="citaEditando.medico"
+              name="editMedico"
+              required
+              (ngModelChange)="onMedicoChangeEditar()"
+            >
+              <option value="" disabled>Seleccione un médico</option>
+              <option *ngFor="let m of medicos" [value]="m._id">
+                {{ m.Nombre || m.nombre }} - {{ m.Registromedico || m.registroMedico }}
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="esAdmin" class="mb-3">
+            <label class="form-label">Fecha</label>
+            <div class="calendario-cita border rounded p-2">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="fw-semibold text-capitalize">{{ etiquetaMes }}</span>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    title="Mes anterior"
+                    (click)="cambiarMes(-1)"
+                  >
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    title="Mes siguiente"
+                    (click)="cambiarMes(1)"
+                  >
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="cargandoDisponibilidad" class="text-center text-muted small py-1">
+                <div class="spinner-border spinner-border-sm me-1"></div>
+                Consultando disponibilidad...
+              </div>
+              <div class="calendario-grid">
+                <div class="calendario-cab" *ngFor="let nd of nombresDias">{{ nd }}</div>
+                <ng-container *ngFor="let d of diasCalendario">
+                  <button
+                    *ngIf="!d.vacio"
+                    type="button"
+                    class="calendario-dia"
+                    [ngClass]="{
+                      'sin-disponibilidad': !d.pasada && !d.disponible,
+                      'seleccionado': d.seleccionada,
+                      'hoy': d.esHoy,
+                      'pasado': d.pasada
+                    }"
+                    [disabled]="!esDiaSeleccionable(d)"
+                    (click)="seleccionarFechaEditar(d.fecha)"
+                  >
+                    {{ d.dia }}
+                  </button>
+                  <span *ngIf="d.vacio" class="calendario-dia vacio"></span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="esAdmin" class="mb-3">
+            <label class="form-label">Hora</label>
+            <select
+              class="form-select"
+              [(ngModel)]="citaEditando.hora"
+              name="editHora"
+              required
+              [disabled]="horasDisponibles.length === 0"
+            >
+              <option value="" disabled>Seleccione un horario</option>
+              <option *ngFor="let h of horasDisponibles" [value]="h">{{ h }}</option>
+            </select>
+          </div>
+
           <div class="mb-3">
             <label class="form-label">Motivo de la Cita</label>
             <textarea

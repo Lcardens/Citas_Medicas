@@ -70,6 +70,9 @@ export class CitasComponent implements OnInit {
     motivo: '',
     estado: 'Disponible',
     fecha: '',
+    hora: '',
+    paciente: '',
+    medico: '',
   };
 
   get minFecha(): string {
@@ -386,7 +389,11 @@ export class CitasComponent implements OnInit {
     m.setMonth(m.getMonth() + offset);
     this.mesCalendario = m;
     this.construirCalendario();
-    this.cargarDisponibilidadMes();
+    if (this.mostrarModalEditar && this.esAdmin) {
+      this.cargarDisponibilidadMesEditar();
+    } else {
+      this.cargarDisponibilidadMes();
+    }
   }
 
   seleccionarFecha(fecha: string): void {
@@ -397,6 +404,17 @@ export class CitasComponent implements OnInit {
     this.nuevaCita.fecha = fecha;
     this.construirCalendario();
     this.onDisponibilidadChange();
+  }
+
+  seleccionarFechaEditar(fecha: string): void {
+    const dia = this.diasCalendario.find((d) => !d.vacio && d.fecha === fecha);
+    if (!dia) return;
+    if (dia.pasada || !dia.disponible) return;
+    this.fechaSeleccionada = fecha;
+    this.citaEditando.fecha = fecha;
+    this.citaEditando.hora = '';
+    this.construirCalendario();
+    this.cargarHorasSinFiltroHoy();
   }
 
   cargarDisponibilidadMes(): void {
@@ -443,6 +461,47 @@ export class CitasComponent implements OnInit {
       return;
     }
     this.cargarDisponibilidadMes();
+  }
+
+  onMedicoChangeEditar(): void {
+    this.citaEditando.hora = '';
+    this.fechaSeleccionada = '';
+    this.horasDisponibles = [];
+    if (!this.citaEditando.medico) {
+      this.disponibilidadMapa = {};
+      this.construirCalendario();
+      return;
+    }
+    this.cargarDisponibilidadMesEditar();
+  }
+
+  cargarDisponibilidadMesEditar(): void {
+    if (!this.citaEditando.medico) {
+      this.disponibilidadMapa = {};
+      this.construirCalendario();
+      return;
+    }
+    this.cargandoDisponibilidad = true;
+    const anio = this.mesCalendario.getFullYear();
+    const mes = this.mesCalendario.getMonth();
+    const inicio = this.fechaAAAAMMDD(new Date(anio, mes, 1));
+    const fin = this.fechaAAAAMMDD(new Date(anio, mes + 1, 0));
+    this.citaService
+      .obtenerDisponibilidadRango(this.citaEditando.medico, inicio, fin)
+      .subscribe({
+        next: (res: any) => {
+          this.disponibilidadMapa = res?.disponibilidad || {};
+          this.cargandoDisponibilidad = false;
+          this.construirCalendario();
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.disponibilidadMapa = {};
+          this.cargandoDisponibilidad = false;
+          this.construirCalendario();
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onDisponibilidadChange(): void {
@@ -615,18 +674,86 @@ export class CitasComponent implements OnInit {
   }
 
   abrirModalEditar(cita: any): void {
+    const idPaciente =
+      typeof cita.paciente === 'object' && cita.paciente !== null
+        ? cita.paciente._id || cita.paciente.id
+        : cita.paciente;
+    const idMedico =
+      typeof cita.medico === 'object' && cita.medico !== null
+        ? cita.medico._id || cita.medico.id
+        : cita.medico;
+
     this.citaEditando = {
       _id: cita._id,
       motivo: cita.motivo,
       estado: cita.estado,
       fecha: cita.fecha,
+      hora: cita.hora,
+      paciente: idPaciente || '',
+      medico: idMedico || '',
     };
+
+    if (this.esAdmin) {
+      if (cita.fecha) {
+        const f = new Date(String(cita.fecha).slice(0, 10));
+        if (!isNaN(f.getTime())) {
+          this.mesCalendario = new Date(f.getFullYear(), f.getMonth(), 1);
+        }
+      }
+      this.fechaSeleccionada = cita.fecha || '';
+      this.construirCalendario();
+      this.cargarDisponibilidadMesEditar();
+      this.cargarHorasSinFiltroHoy();
+    }
+
     this.mostrarModalEditar = true;
+  }
+
+  cargarHorasSinFiltroHoy(): void {
+    if (!this.citaEditando.medico || !this.citaEditando.fecha) {
+      this.horasDisponibles = [];
+      return;
+    }
+    this.cargandoHoras = true;
+    this.citaService
+      .obtenerHorasDisponibles(this.citaEditando.medico, this.citaEditando.fecha)
+      .subscribe({
+        next: (res: any) => {
+          const horasDevueltas: string[] = res?.horas || [];
+          this.horasDisponibles = this.horariosAtencion.filter((h) =>
+            horasDevueltas.includes(h),
+          );
+          const horaActual = this.citaEditando.hora;
+          if (horaActual && !this.horasDisponibles.includes(horaActual)) {
+            this.horasDisponibles.push(horaActual);
+            this.horasDisponibles.sort((a, b) =>
+              this.horaAMinutos(a) - this.horaAMinutos(b),
+            );
+          }
+          this.cargandoHoras = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.horasDisponibles = [];
+          this.cargandoHoras = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   cerrarModalEditar(): void {
     this.mostrarModalEditar = false;
-    this.citaEditando = { _id: '', motivo: '', estado: 'Disponible', fecha: '' };
+    this.horasDisponibles = [];
+    this.fechaSeleccionada = '';
+    this.citaEditando = {
+      _id: '',
+      motivo: '',
+      estado: 'Disponible',
+      fecha: '',
+      hora: '',
+      paciente: '',
+      medico: '',
+    };
   }
 
   actualizarCita(): void {
