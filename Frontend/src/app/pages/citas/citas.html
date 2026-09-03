@@ -337,6 +337,13 @@
               <i class="bi bi-exclamation-circle me-1"></i>
               No hay disponibilidad para la fecha seleccionada.
             </div>
+            <div
+              *ngIf="pacienteYaTieneCitaEseDia"
+              class="alert alert-warning mt-2 py-2"
+            >
+              <i class="bi bi-info-circle me-1"></i>
+              Ya tienes una cita asignada para esta fecha. Solo puedes agendar una cita por día.
+            </div>
           </div>
 
           <div class="mb-3">
@@ -370,7 +377,11 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-          <button type="submit" class="btn btn-success">
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="pacienteYaTieneCitaEseDia"
+          >
             {{ rolUsuario === 'paciente' ? 'Agendar Cita' : 'Agendar' }}
           </button>
         </div>

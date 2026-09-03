@@ -41,6 +41,7 @@ export class CitasComponent implements OnInit {
   horasDisponibles: string[] = [];
   cargandoHoras = false;
   fechaSinDisponibilidad = false;
+  pacienteYaTieneCitaEseDia = false;
 
   rolUsuario: string = '';
   usuarioId: string = '';
@@ -325,6 +326,7 @@ export class CitasComponent implements OnInit {
     this.limpiarFormulario();
     this.horasDisponibles = [];
     this.fechaSinDisponibilidad = false;
+    this.pacienteYaTieneCitaEseDia = false;
     this.mesCalendario = new Date();
     this.fechaSeleccionada = '';
     if (this.rolUsuario === 'medico' && this.medicoId) {
@@ -338,6 +340,7 @@ export class CitasComponent implements OnInit {
     this.limpiarFormulario();
     this.horasDisponibles = [];
     this.fechaSinDisponibilidad = false;
+    this.pacienteYaTieneCitaEseDia = false;
     this.fechaSeleccionada = '';
   }
 
@@ -403,7 +406,21 @@ export class CitasComponent implements OnInit {
     this.fechaSeleccionada = fecha;
     this.nuevaCita.fecha = fecha;
     this.construirCalendario();
+    this.verificarCitaExistentePaciente(fecha);
     this.onDisponibilidadChange();
+  }
+
+  verificarCitaExistentePaciente(fecha: string): void {
+    if (this.rolUsuario !== 'paciente') {
+      this.pacienteYaTieneCitaEseDia = false;
+      return;
+    }
+    const existeDia = this.citas.some(
+      (c) =>
+        String(c.fecha || '').slice(0, 10) === String(fecha).slice(0, 10) &&
+        ['Confirmada', 'Reservada', 'Disponible'].includes(c.estado),
+    );
+    this.pacienteYaTieneCitaEseDia = existeDia;
   }
 
   seleccionarFechaEditar(fecha: string): void {
@@ -455,6 +472,7 @@ export class CitasComponent implements OnInit {
     this.fechaSinDisponibilidad = false;
     this.horasDisponibles = [];
     this.fechaSeleccionada = '';
+    this.pacienteYaTieneCitaEseDia = false;
     if (!this.nuevaCita.medico) {
       this.disponibilidadMapa = {};
       this.construirCalendario();
