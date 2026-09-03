@@ -1,0 +1,121 @@
+.estado-confirmada {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #9ec5ac !important;
+}
+
+.estado-disponible {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffc107 !important;
+}
+
+.estado-cancelada {
+  background-color: #f5a0b8 !important;
+  color: #ffffff !important;
+  border: 1px solid #e0869e !important;
+}
+
+.estado-atendida {
+  background-color: #cfe2ff !important;
+  color: #084298 !important;
+  border: 1px solid #9ec5fe !important;
+}
+
+.table-filtros th {
+  background: linear-gradient(180deg, #eef4fb, #f7fafd) !important;
+  border-bottom: 1px solid #dbe4ee !important;
+  padding: 0.45rem 0.5rem;
+  vertical-align: middle;
+}
+
+.table-filtros .form-select,
+.table-filtros .form-control {
+  font-size: 0.78rem;
+  border-radius: 8px;
+  border: 1px solid #d4dbe4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  background-color: #fff;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
+.table-filtros .form-select:focus,
+.table-filtros .form-control:focus {
+  border-color: #27b7f5;
+  box-shadow: 0 0 0 0.15rem rgba(39, 183, 245, 0.15);
+}
+
+.table-filtros .filtro-ic {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.calendario-cita {
+  background: #fff;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+
+.calendario-cab {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-align: center;
+  padding: 0.15rem 0;
+}
+
+.calendario-dia {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #212529;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.calendario-dia.vacio {
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.calendario-dia.hoy {
+  border: 2px solid #27b7f5;
+  font-weight: 600;
+}
+
+.calendario-dia.pasado {
+  color: #ced4da;
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.calendario-dia.sin-disponibilidad {
+  color: #adb5bd;
+  background: #e9ecef;
+  cursor: not-allowed;
+}
+
+.calendario-dia.seleccionado {
+  background: #27b7f5;
+  color: #fff;
+  border-color: #27b7f5;
+}
+
+.calendario-dia:not(.pasado):not(.sin-disponibilidad):not(.seleccionado):hover {
+  background: #e8f4fd;
+  border-color: #27b7f5;
+}

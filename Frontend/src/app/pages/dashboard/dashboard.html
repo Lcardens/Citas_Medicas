@@ -1,0 +1,112 @@
+<!-- Barra de navegación superior -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4">
+  <a class="navbar-brand fw-bold" routerLink="/dashboard/inicio">
+    <i class="bi bi-heart-pulse-fill me-2"></i>Sistema de Citas
+  </a>
+
+  <div class="navbar-nav me-auto">
+    <a class="nav-link" routerLink="/dashboard/inicio" routerLinkActive="active">
+      <i class="bi bi-house-fill me-1"></i>Inicio
+    </a>
+  </div>
+
+  <div class="d-flex align-items-center gap-3">
+    <div class="user-info-container text-end">
+      <span class="user-name">
+        <i class="bi bi-person-circle me-1"></i>Hola, <strong>{{ nombreUsuario }}</strong>
+      </span>
+      <span class="user-role">{{ rolUsuario }}</span>
+    </div>
+
+    <div class="dropdown">
+      <button
+        class="btn btn-outline-light dropdown-toggle p-2 d-flex align-items-center"
+        type="button"
+        id="navbarMenuDropdown"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+        title="Abrir menú"
+      >
+        <i class="bi bi-list fs-3"></i>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarMenuDropdown">
+        <a class="dropdown-item" routerLink="/dashboard/citas" routerLinkActive="active">
+          <i class="bi bi-calendar-check-fill me-2"></i>Citas
+        </a>
+        <a *ngIf="esMedico" class="dropdown-item" routerLink="/dashboard/misturnos" routerLinkActive="active">
+          <i class="bi bi-clipboard2-pulse me-2"></i>Mi agenda
+        </a>
+        <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/pacientes" routerLinkActive="active">
+          <i class="bi bi-people-fill me-2"></i>Pacientes
+        </a>
+        <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/medicos" routerLinkActive="active">
+          <i class="bi bi-person-badge-fill me-2"></i>Médicos
+        </a>
+        <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/usuarios" routerLinkActive="active">
+          <i class="bi bi-person-gear me-2"></i>Usuarios
+        </a>
+        <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/reportes" routerLinkActive="active">
+          <i class="bi bi-bar-chart-line me-2"></i>Reportes
+        </a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" routerLink="/dashboard/perfil" routerLinkActive="active">
+          <i class="bi bi-person-gear me-2"></i>Mi perfil
+        </a>
+        <a class="dropdown-item text-danger" href="javascript:void(0)" (click)="cerrarSesion()">
+          <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<main class="container py-4">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h6 class="fw-bold"><i class="bi bi-heart-pulse-fill me-2"></i>Sistema de Citas Médicas</h6>
+        <p class="footer-desc">
+          Plataforma integral para la gestión de citas médicas. Conectamos pacientes, médicos y
+          administradores de forma eficiente y segura.
+        </p>
+      </div>
+      <div class="col-md-4 mb-3 mb-md-0">
+        <h6 class="fw-bold">Contacto</h6>
+        <ul class="footer-contact">
+          <li><i class="bi bi-envelope-fill me-2"></i>contacto@citamedica.co</li>
+          <li><i class="bi bi-telephone-fill me-2"></i>+57 300 123 4567</li>
+          <li><i class="bi bi-geo-alt-fill me-2"></i>Medellín, Colombia</li>
+          <li><i class="bi bi-clock-fill me-2"></i>Lun - Vie: 8:00 AM - 6:00 PM</li>
+        </ul>
+      </div>
+      <div class="col-md-4 text-center text-md-end">
+        <h6 class="fw-bold">Síguenos</h6>
+        <div class="footer-social">
+          <a href="#" class="footer-icon" title="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="footer-icon" title="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="footer-icon" title="Twitter"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="footer-icon" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="footer-icon" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </div>
+    </div>
+    <hr />
+    <div class="row align-items-center">
+      <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+        <small
+          >&copy; {{ currentYear }} Sistema de Citas Médicas. Todos los derechos reservados.</small
+        >
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <small>Desarrollado por <strong>Luisa Cárdenas</strong> &mdash; Bootcamp BIT</small>
+      </div>
+    </div>
+  </div>
+</footer>

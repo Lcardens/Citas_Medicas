@@ -1,0 +1,21 @@
+.perfil-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.avatar-circle {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #27b7f5;
+  color: #fff;
+  font-size: 2.6rem;
+}
+
+.role-badge {
+  background: #b8a6de;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.4em 0.9em;
+  border-radius: 8px;
+}

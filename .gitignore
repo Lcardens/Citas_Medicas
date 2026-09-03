@@ -1,0 +1,5 @@
+.vscode 
+
+# archivos del backend
+Backend/node_modules
+Backend/.env

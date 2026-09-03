@@ -1,0 +1,11 @@
+.estado-confirmada {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #9ec5ac !important;
+}
+
+.estado-atendida {
+  background-color: #cfe2ff !important;
+  color: #084298 !important;
+  border: 1px solid #9ec5fe !important;
+}

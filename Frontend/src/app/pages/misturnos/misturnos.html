@@ -1,0 +1,137 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h2>Mi Agenda</h2>
+    <button class="btn btn-outline-secondary btn-sm" (click)="cargarAgenda()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+    </button>
+  </div>
+
+  <div *ngIf="mensaje" class="alert alert-success d-flex align-items-center">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ mensaje }}
+  </div>
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+  </div>
+
+  <div *ngIf="cargando" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!cargando && citas.length === 0 && !mensaje" class="text-center py-5 text-muted">
+    <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+    No tienes citas confirmadas en tu agenda.
+  </div>
+
+  <div *ngIf="!cargando && citas.length > 0" class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cita of citas">
+          <td>{{ cita.fecha | date: 'shortDate' }}</td>
+          <td>{{ cita.hora }}</td>
+          <td>{{ nombrePaciente(cita) }}</td>
+          <td>
+            {{ cita.motivo }}
+            <div *ngIf="cita.diagnostico" class="small text-muted mt-1">
+              <strong>Diagnóstico:</strong> {{ cita.diagnostico }}
+            </div>
+            <div *ngIf="cita.notasConsulta" class="small text-muted mt-1">
+              <strong>Notas:</strong> {{ cita.notasConsulta }}
+            </div>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'estado-atendida': cita.estado === 'Atendida',
+                'estado-confirmada': cita.estado === 'Confirmada',
+              }"
+            >
+              {{ cita.estado }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button
+              *ngIf="cita.estado !== 'Atendida'"
+              class="btn btn-success btn-sm"
+              title="Marcar como atendida"
+              (click)="abrirModalAtender(cita)"
+            >
+              <i class="bi bi-check-lg me-1"></i>Atender
+            </button>
+            <span *ngIf="cita.estado === 'Atendida'" class="text-muted small">
+              Registrada
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModal"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success-subtle">
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard2-pulse me-1"></i>Atender cita
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Diagnóstico</label>
+          <textarea
+            class="form-control"
+            [(ngModel)]="citaEditando.diagnostico"
+            name="diagnostico"
+            rows="2"
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notas de la consulta</label>
+          <textarea
+            class="form-control"
+            [(ngModel)]="citaEditando.notasConsulta"
+            name="notas"
+            rows="2"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="guardando"
+          (click)="marcarAtendida()"
+        >
+          <span
+            *ngIf="guardando"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+          ></span>
+          Marcar como atendida
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

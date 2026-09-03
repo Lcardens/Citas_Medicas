@@ -1,0 +1,158 @@
+﻿<div class="container py-2">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary mb-0">GestiÃ³n de Usuarios</h2>
+    <button class="btn btn-primary rounded-pill px-4" (click)="abrirModal()">
+      + Crear Usuario
+    </button>
+  </div>
+
+  <div class="card p-3 mb-3 border-0 shadow-sm bg-light">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label fw-semibold text-secondary mb-1">Filtrar por Rol:</label>
+        <select class="form-select" [(ngModel)]="rolFiltro">
+          <option value="">-- Todos los roles --</option>
+          <option value="admin">Administradores</option>
+          <option value="medico">MÃ©dicos</option>
+          <option value="paciente">Pacientes</option>
+        </select>
+      </div>
+      <div class="col-auto" *ngIf="rolFiltro">
+        <button class="btn btn-outline-secondary btn-sm" (click)="rolFiltro = ''">
+          Limpiar filtro
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuariosFiltrados">
+            <td class="fw-semibold">{{ usuario.nombre || usuario.Nombre }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <span
+                class="badge rounded-pill"
+                [ngClass]="{
+                  'rol-admin':
+                    usuario.rol?.toLowerCase() === 'admin' ||
+                    usuario.rol?.toLowerCase() === 'administrador',
+                  'rol-medico': usuario.rol?.toLowerCase() === 'medico',
+                  'rol-paciente':
+                    usuario.rol?.toLowerCase() === 'paciente' ||
+                    usuario.rol?.toLowerCase() === 'usuario',
+                }"
+              >
+                {{ usuario.rol }}
+              </span>
+            </td>
+            <td class="text-center">
+              <button
+                *ngIf="!esUsuarioActual(usuario._id)"
+                class="btn btn-outline-danger btn-sm"
+                title="Eliminar usuario y sus datos"
+                (click)="eliminarUsuario(usuario._id, usuario.nombre || usuario.Nombre)"
+              >
+                <i class="bi bi-trash me-1"></i>Eliminar
+              </button>
+              <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tÃº</span>
+            </td>
+          </tr>
+          <tr *ngIf="usuariosFiltrados.length === 0">
+            <td colspan="4" class="text-center py-4 text-muted">No hay usuarios registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModalCrear"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">Registrar Nuevo Usuario</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+
+      <form (ngSubmit)="crearUsuario()">
+        <div class="modal-body p-4">
+          <div
+            *ngIf="mensajeError"
+            class="alert alert-danger py-2 px-3 mb-3 text-center small"
+            role="alert"
+          >
+            {{ mensajeError }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre Completo</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nuevoUsuario.nombre"
+              name="nombre"
+              placeholder="Ej: Juan PÃ©rez"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Correo ElectrÃ³nico</label>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="nuevoUsuario.email"
+              name="email"
+              placeholder="correo@ejemplo.com"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">ContraseÃ±a</label>
+            <input
+              type="password"
+              class="form-control"
+              [(ngModel)]="nuevoUsuario.password"
+              name="password"
+              placeholder="******"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Rol del Usuario</label>
+            <select class="form-select" [(ngModel)]="nuevoUsuario.rol" name="rol" required>
+              <option value="paciente">Paciente</option>
+              <option value="medico">MÃ©dico</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" (click)="cerrarModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary px-4">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

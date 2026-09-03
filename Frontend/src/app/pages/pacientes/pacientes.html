@@ -1,0 +1,123 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Pacientes</h2>
+
+    <button class="btn btn-primary" (click)="abrirModal()">+ Nuevo Paciente</button>
+  </div>
+
+  <div *ngIf="cargando" class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!cargando" class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Documento</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let paciente of pacientes; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ paciente.TipoDocumento }} {{ paciente.Documento }}</td>
+          <td>{{ paciente.Nombre }}</td>
+          <td>{{ paciente.Correo }}</td>
+          <td>{{ paciente.Telefono }}</td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-danger btn-sm"
+              title="Eliminar paciente y sus datos"
+              (click)="eliminarPaciente(paciente._id, paciente.Nombre)"
+            >
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModal"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar Paciente</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <form (ngSubmit)="guardarPaciente()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Tipo de Documento</label>
+            <select
+              class="form-select"
+              [(ngModel)]="nuevoPaciente.TipoDocumento"
+              name="TipoDocumento"
+              required
+            >
+              <option value="CC">Cédula de Ciudadanía (CC)</option>
+              <option value="TI">Tarjeta de Identidad (TI)</option>
+              <option value="CE">Cédula de Extranjería (CE)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Número de Documento</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nuevoPaciente.Documento"
+              name="Documento"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nombre Completo</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nuevoPaciente.Nombre"
+              name="Nombre"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo Electrónico</label>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="nuevoPaciente.Correo"
+              name="Correo"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nuevoPaciente.Telefono"
+              name="Telefono"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

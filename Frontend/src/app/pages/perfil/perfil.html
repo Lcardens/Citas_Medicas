@@ -1,0 +1,170 @@
+﻿<div class="perfil-container">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+      <i class="bi bi-person-gear me-2"></i>
+      <h5 class="mb-0">Mi Perfil</h5>
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="cargando" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Cargando tu perfil...</p>
+      </div>
+
+      <div *ngIf="mensaje" class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ mensaje }}
+      </div>
+      <div *ngIf="error" class="alert alert-danger d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+      </div>
+
+      <div *ngIf="!cargando">
+        <div class="text-center mb-4">
+          <div class="avatar-circle mx-auto d-flex align-items-center justify-content-center">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <h4 class="mt-3 mb-0">{{ nombre }}</h4>
+          <span class="text-muted">{{ email }}</span>
+          <div>
+            <span class="badge role-badge mt-2">{{ rolLegible }}</span>
+          </div>
+        </div>
+
+        <form (ngSubmit)="guardarPerfil()" #perfilForm="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" for="nombre">Nombre completo</label>
+              <input
+                id="nombre"
+                type="text"
+                class="form-control"
+                [(ngModel)]="nombre"
+                name="nombre"
+                required
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold" for="email">Correo electrÃ³nico</label>
+              <input
+                id="email"
+                type="email"
+                class="form-control"
+                [value]="email"
+                disabled
+              />
+              <small class="text-muted">El correo no se puede cambiar.</small>
+            </div>
+
+            <div class="col-md-6" *ngIf="puedeActualizarTelefono">
+              <label class="form-label fw-semibold" for="telefono">TelÃ©fono</label>
+              <input
+                id="telefono"
+                type="text"
+                class="form-control"
+                [(ngModel)]="telefono"
+                name="telefono"
+              />
+            </div>
+
+            <div class="col-md-6" *ngIf="puedeActualizarTelefono">
+              <label class="form-label fw-semibold">Documento</label>
+              <input type="text" class="form-control" [value]="documento" disabled />
+            </div>
+
+            <div class="col-md-6" *ngIf="!puedeActualizarTelefono">
+              <label class="form-label fw-semibold">Registro mÃ©dico</label>
+              <input type="text" class="form-control" [value]="registroMedico ? registroMedico : 'â€”'" disabled />
+            </div>
+
+            <hr class="mt-4" />
+
+            <div class="col-12">
+              <button
+                *ngIf="!mostrarCambioPassword"
+                type="button"
+                class="btn btn-outline-primary"
+                (click)="abrirCambioPassword()"
+              >
+                <i class="bi bi-shield-lock me-1"></i>Cambiar contraseÃ±a
+              </button>
+
+              <div *ngIf="mostrarCambioPassword">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="fw-bold mb-0">
+                    <i class="bi bi-shield-lock me-1"></i>Cambiar contraseÃ±a
+                  </h6>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-link text-muted"
+                    (click)="cancelarCambioPassword()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+                <small class="text-muted d-block mb-2">
+                  Escribe la contraseÃ±a actual y la nueva (mÃ­nimo 6 caracteres).
+                </small>
+
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold" for="passwordActual">ContraseÃ±a actual</label>
+                    <input
+                      id="passwordActual"
+                      type="password"
+                      class="form-control"
+                      [(ngModel)]="passwordActual"
+                      name="passwordActual"
+                      autocomplete="current-password"
+                    />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold" for="passwordNueva">Nueva contraseÃ±a</label>
+                    <input
+                      id="passwordNueva"
+                      type="password"
+                      class="form-control"
+                      [(ngModel)]="passwordNueva"
+                      name="passwordNueva"
+                      minlength="6"
+                      autocomplete="new-password"
+                    />
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold" for="confirmarPassword">Confirmar contraseÃ±a</label>
+                    <input
+                      id="confirmarPassword"
+                      type="password"
+                      class="form-control"
+                      [(ngModel)]="confirmarPassword"
+                      name="confirmarPassword"
+                      autocomplete="new-password"
+                    />
+                  </div>
+                </div>
+
+                <div *ngIf="errorPassword" class="alert alert-danger mt-3 mb-0 d-flex align-items-center">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <div>{{ errorPassword }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary fw-semibold" [disabled]="guardando">
+              <span
+                *ngIf="guardando"
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              <i class="bi bi-check-lg me-1"></i>Guardar cambios
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

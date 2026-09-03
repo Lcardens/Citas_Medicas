@@ -1,0 +1,17 @@
+.rol-admin {
+  background-color: #5a4b7c !important;
+  color: #ffffff !important;
+  border: 1px solid #4a3d68 !important;
+}
+
+.rol-medico {
+  background-color: #27b7f5 !important;
+  color: #ffffff !important;
+  border: 1px solid #1da3e0 !important;
+}
+
+.rol-paciente {
+  background-color: #b8a6de !important;
+  color: #3d2e6b !important;
+  border: 1px solid #9d88cc !important;
+}

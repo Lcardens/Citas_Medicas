@@ -1,0 +1,49 @@
+const mongoose = require("mongoose");
+
+const citaSchema = new mongoose.Schema(
+  {
+    medico: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Medico",
+      required: true,
+    },
+    paciente: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Paciente",
+      default: null,
+    },
+    fecha: {
+      type: String,
+      required: true,
+    },
+    hora: {
+      type: String,
+      required: true,
+    },
+    motivo: {
+      type: String,
+      default: "Consulta Médica",
+    },
+    diagnostico: {
+      type: String,
+      default: "",
+    },
+    notasConsulta: {
+      type: String,
+      default: "",
+    },
+    estado: {
+      type: String,
+      enum: [
+        "Disponible",
+        "Confirmada",
+        "Atendida",
+        "Cancelada",
+      ],
+      default: "Disponible",
+    },
+  },
+  { timestamps: true },
+);
+
+module.exports = mongoose.models.Cita || mongoose.model("Cita", citaSchema);
