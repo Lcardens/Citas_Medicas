@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../core/services/dialog.service';
 
@@ -16,10 +16,7 @@ import { DialogService } from '../../core/services/dialog.service';
       <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content border-0 shadow">
           <div class="modal-header" [ngClass]="headerClass">
-            <h5 class="modal-title fw-bold">
-              <i class="bi me-2" [ngClass]="iconClass"></i>
-              {{ dialog.config?.titulo }}
-            </h5>
+            <h5 class="modal-title fw-bold">{{ dialog.config?.titulo }}</h5>
             <button type="button" class="btn-close" (click)="dialog.resolver(false)"></button>
           </div>
           <div class="modal-body text-center py-4">
@@ -49,19 +46,17 @@ import { DialogService } from '../../core/services/dialog.service';
 })
 export class ConfirmDialogComponent {
   dialog = inject(DialogService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    this.dialog.state$.subscribe(() => this.cdr.detectChanges());
+  }
 
   get headerClass(): string {
     const tipo = this.dialog.config?.tipo || 'peligro';
     if (tipo === 'peligro') return 'bg-danger-subtle';
     if (tipo === 'advertencia') return 'bg-warning-subtle';
     return 'bg-info-subtle';
-  }
-
-  get iconClass(): string {
-    const tipo = this.dialog.config?.tipo || 'peligro';
-    if (tipo === 'peligro') return 'bi-exclamation-triangle-fill text-danger';
-    if (tipo === 'advertencia') return 'bi-exclamation-circle-fill text-warning';
-    return 'bi-info-circle-fill text-info';
   }
 
   get btnClass(): string {

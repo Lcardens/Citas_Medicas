@@ -550,9 +550,26 @@ export class CitasComponent implements OnInit {
 
         this.citaService.asignarCitaRapida({}).subscribe({
           next: (res: any) => {
+            const datos = res.datos || {};
+            const medicoNom =
+              datos.medico?.Nombre ||
+              datos.medico?.nombre ||
+              datos.medico?.nombreCompleto ||
+              'tu médico';
+            const fecha = datos.fecha || '';
+            const hora = datos.hora || '';
+
+            let mensaje = res.mensaje || 'Cita asignada automáticamente';
+            if (medicoNom && (fecha || hora)) {
+              mensaje = `Tu cita fue asignada con éxito con ${medicoNom}`;
+              if (fecha) mensaje += ` para el día ${fecha}`;
+              if (hora) mensaje += ` a las ${hora}`;
+              mensaje += '.';
+            }
+
             this.dialogService.confirmar({
               titulo: 'Cita asignada',
-              mensaje: res.mensaje || 'Cita asignada automáticamente',
+              mensaje,
               textoConfirmar: 'Aceptar',
               textoCancelar: '',
               tipo: 'info',
