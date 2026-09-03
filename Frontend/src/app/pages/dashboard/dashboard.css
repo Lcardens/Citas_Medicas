@@ -9,6 +9,19 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
 }
 
+/* ============= NAVBAR POR ROL ============= */
+.nav-paciente {
+  background: linear-gradient(135deg, #6fbf8f 0%, #9ed8b2 100%);
+}
+
+.nav-medico {
+  background: linear-gradient(135deg, #27b7f5 0%, #7fd0f3 100%);
+}
+
+.nav-admin {
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%);
+}
+
 .user-info-container {
   display: flex;
   flex-direction: column;
