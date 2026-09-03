@@ -11,7 +11,56 @@
   </div>
 
   <div class="row g-4 mt-2 justify-content-center">
-    <div class="col-md-4">
+
+    <!-- RESUMEN DEL MÉDICO -->
+    <div *ngIf="esMedico" class="container-fluid">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="fs-3 fw-bold text-primary">{{ citasHoy }}</div>
+              <div class="text-muted">Citas para hoy</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="fs-3 fw-bold text-warning">{{ citasPendientes }}</div>
+              <div class="text-muted">Citas por atender</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-4">
+              <div class="fs-3 fw-bold text-success">{{ citasAtendidas }}</div>
+              <div class="text-muted">Citas atendidas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="proximasCitas.length > 0" class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white fw-bold">Próximas citas</div>
+        <ul class="list-group list-group-flush">
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center"
+            *ngFor="let c of proximasCitas"
+          >
+            <div>
+              <strong>{{ nombrePaciente(c) }}</strong>
+              <div class="small text-muted">{{ c.motivo || 'Consulta' }}</div>
+            </div>
+            <span class="badge bg-primary text-uppercase">
+              {{ c.fecha | date: 'shortDate' }} · {{ c.hora }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-4" *ngIf="esPaciente || esAdmin">
       <div class="card border-0 shadow-sm h-100 text-center py-4 px-3 card-hover">
         <div class="card-body">
           <div class="rounded-circle bg-info bg-opacity-10 d-inline-flex p-3 mb-3 text-info">
@@ -34,6 +83,35 @@
           </p>
           <a routerLink="/dashboard/citas" class="btn btn-outline-info rounded-pill px-4"
             >Agendar / Ver Citas</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- MIS PRÓXIMAS CITAS (PACIENTE) -->
+    <div class="col-md-4" *ngIf="esPaciente">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white fw-bold">Mis próximas citas</div>
+        <div class="card-body" *ngIf="misProximasCitas.length > 0">
+          <ul class="list-unstyled mb-0">
+            <li
+              class="d-flex justify-content-between align-items-center border-bottom py-2"
+              *ngFor="let c of misProximasCitas"
+            >
+              <div>
+                <div class="fw-semibold">
+                  {{ c.medico?.Nombre || c.medico?.nombre || 'Médico' }}
+                </div>
+                <div class="small text-muted">{{ c.motivo || 'Consulta' }}</div>
+              </div>
+              <span class="badge bg-primary">{{ c.fecha | date: 'shortDate' }} · {{ c.hora }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body text-center" *ngIf="misProximasCitas.length === 0">
+          <p class="text-muted mb-3">No tienes citas agendadas próximamente.</p>
+          <a routerLink="/dashboard/citas" class="btn btn-primary rounded-pill px-4"
+            >Agendar una cita</a
           >
         </div>
       </div>
