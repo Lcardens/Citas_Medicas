@@ -25,6 +25,8 @@ export class LoginComponent {
   exito = '';
   mostrarRegistro = false;
   mostrarPassword = false;
+  cargando = false;
+  anioActual = new Date().getFullYear();
 
   registro = {
     nombre: '',
@@ -39,6 +41,7 @@ export class LoginComponent {
 
   iniciarSesion(): void {
     this.error = '';
+    this.cargando = true;
 
     this.authService.login(this.email, this.password).subscribe({
       next: (res: any) => {
@@ -60,10 +63,12 @@ export class LoginComponent {
         localStorage.setItem('nombreUsuario', nombreReal);
         localStorage.setItem('emailUsuario', this.email);
 
+        this.cargando = false;
         this.router.navigate(['/dashboard/inicio']);
       },
       error: (err: any) => {
         console.error('Error al iniciar sesión:', err);
+        this.cargando = false;
         this.error = err.error?.mensaje || 'Credenciales incorrectas o error de conexión';
         this.cdr.detectChanges();
       },
@@ -103,14 +108,18 @@ export class LoginComponent {
       datosRegistro.Registromedico = this.registro.Registromedico;
     }
 
+    this.cargando = true;
+
     this.usuarioService.registrarUsuario(datosRegistro).subscribe({
       next: (res: any) => {
+        this.cargando = false;
         this.exito = res.mensaje || 'Registro exitoso. Ahora puedes iniciar sesión.';
         this.mostrarRegistro = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('Error al registrar:', err);
+        this.cargando = false;
         this.error = err.error?.mensaje || 'Error al registrar usuario';
         this.cdr.detectChanges();
       },

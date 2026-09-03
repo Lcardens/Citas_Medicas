@@ -1,14 +1,11 @@
-/* ==========================================
-   1. CONFIGURACIÓN GENERAL Y VARIABLES
-   ========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
   --primary-color: #27b7f5;
-  --secondary-color: #b8a6de; /* Tu tono morado principal */
+  --secondary-color: #b8a6de;
   --secondary-hover: #9d88cc;
   --primary-hover: #1da3e0;
-  --bg-app: #f7f6fb; /* Fondo general con un matiz muy suave hacia el lila */
+  --bg-app: #f7f6fb;
   --text-main: #333333;
 }
 
@@ -27,13 +24,11 @@ body {
   color: var(--text-main);
 }
 
-/* ==========================================
-   2. REGLAS PARA TABLAS Y CONTENEDORES GENERALES
-   ========================================== */
+/* Tablas y contenedores */
 .card:not(.login-card),
 .table-responsive {
   border-radius: 12px !important;
-  border: 1px solid rgba(184, 166, 222, 0.25) !important; /* Borde sutil en tono morado */
+  border: 1px solid rgba(184, 166, 222, 0.25) !important;
 }
 
 .shadow-sm {
@@ -51,19 +46,16 @@ body {
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-size: 0.85rem;
-  background-color: rgba(184, 166, 222, 0.2) !important; /* Encabezados de tabla en morado suave */
+  background-color: rgba(184, 166, 222, 0.2) !important;
   color: #5a4b7c;
 }
 
-/* ==========================================
-   3. BOTONES Y ACCIONES GENERALES
-   ========================================== */
+/* Acciones en tablas */
 .table td .btn-group,
 .table td .d-flex {
   gap: 6px;
 }
 
-/* Botón de Editar (Tono celeste suave y limpio) */
 .btn-outline-warning,
 .btn-editar {
   background-color: rgba(39, 183, 245, 0.1) !important;
@@ -83,7 +75,6 @@ body {
   border-color: #27b7f5 !important;
 }
 
-/* Botón de Eliminar (Tono morado suave) */
 .btn-outline-danger,
 .btn-eliminar {
   background-color: rgba(184, 166, 222, 0.15) !important;
@@ -103,7 +94,6 @@ body {
   border-color: #b8a6de !important;
 }
 
-/* Botones principales estándar de la app (ej. Nuevo Paciente / Nuevo Usuario) */
 .btn-primary:not(.login-card button) {
   background-color: #27b7f5 !important;
   border-color: #27b7f5 !important;
@@ -131,7 +121,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Textos con acento */
 .text-primary {
   color: #1a96ce !important;
 }
@@ -141,9 +130,7 @@ body {
   color: #8c75c4 !important;
 }
 
-/* ==========================================
-   4. BARRAS DE DESPLAZAMIENTO
-   ========================================== */
+/* Barras de desplazamiento */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -162,9 +149,7 @@ body {
   background: var(--secondary-hover);
 }
 
-/* ==========================================
-   5. EFECTO HOVER PARA TARJETAS
-   ========================================== */
+/* Tarjetas con hover */
 .card-hover {
   transition:
     transform 0.2s ease-in-out,
@@ -176,25 +161,20 @@ body {
   box-shadow: 0 10px 20px rgba(184, 166, 222, 0.25) !important;
 }
 
-/* Encabezados de modales */
 .modal-header.bg-primary,
 .bg-purple-header {
   background-color: var(--secondary-color) !important;
   border-color: var(--secondary-color) !important;
 }
 
-/* ==========================================
-   6. BARRA DE NAVEGACIÓN (Degradado Celeste + Morado)
-   ========================================== */
+/* Navbar */
 .bg-navbar,
 .navbar,
 .bg-primary.text-white {
   background: linear-gradient(135deg, #27b7f5 30%, #b8a6de 100%) !important;
 }
 
-/* ==========================================
-   7. ETIQUETAS BADGE - Estilo base (sin forzar color)
-   ========================================== */
+/* Badges */
 .badge {
   font-weight: 500 !important;
   padding: 5px 12px !important;
@@ -202,74 +182,7 @@ body {
   font-size: 0.78rem !important;
 }
 
-/* ==========================================
-   9. PAGINACIÓN
-   ========================================== */
-.pagination .page-link {
-  color: #5a4b7c;
-  border-color: rgba(184, 166, 222, 0.3);
-}
-
-.pagination .page-item.active .page-link {
-  background-color: #27b7f5 !important;
-  border-color: #27b7f5 !important;
-  color: #ffffff !important;
-}
-
-.pagination .page-link:hover {
-  background-color: rgba(39, 183, 245, 0.1);
-  color: #1a96ce;
-}
-
-/* ==========================================
-   10. RESPONSIVE - TABLAS COMO TARJETAS
-   ========================================== */
-@media (max-width: 768px) {
-  .tabla-responsive thead {
-    display: none;
-  }
-
-  .tabla-responsive,
-  .tabla-responsive tbody,
-  .tabla-responsive tr,
-  .tabla-responsive td {
-    display: block;
-    width: 100%;
-  }
-
-  .tabla-responsive tr {
-    background: #ffffff;
-    border: 1px solid rgba(184, 166, 222, 0.25);
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
-    padding: 0.5rem 0;
-  }
-
-  .tabla-responsive td {
-    border: none;
-    padding: 0.4rem 1rem;
-    text-align: left !important;
-  }
-
-  .tabla-responsive td[data-label]::before {
-    content: attr(data-label);
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #8c75c4;
-    margin-bottom: 0.1rem;
-  }
-
-  .tabla-responsive td.text-center {
-    text-align: center !important;
-  }
-}
-
-/* ==========================================
-   8. ESTILOS EXCLUSIVOS PARA LA PANTALLA DE LOGIN
-   ========================================== */
+/* Pantalla de login */
 .login-card {
   background: #ffffff !important;
   border: 1px solid rgba(184, 166, 222, 0.25) !important;
@@ -332,4 +245,65 @@ body {
   border-color: #1da3e0 !important;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(39, 183, 245, 0.35);
+}
+
+/* Paginación */
+.pagination .page-link {
+  color: #5a4b7c;
+  border-color: rgba(184, 166, 222, 0.3);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #27b7f5 !important;
+  border-color: #27b7f5 !important;
+  color: #ffffff !important;
+}
+
+.pagination .page-link:hover {
+  background-color: rgba(39, 183, 245, 0.1);
+  color: #1a96ce;
+}
+
+/* Responsive: tablas como tarjetas */
+@media (max-width: 768px) {
+  .tabla-responsive thead {
+    display: none;
+  }
+
+  .tabla-responsive,
+  .tabla-responsive tbody,
+  .tabla-responsive tr,
+  .tabla-responsive td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla-responsive tr {
+    background: #ffffff;
+    border: 1px solid rgba(184, 166, 222, 0.25);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  .tabla-responsive td {
+    border: none;
+    padding: 0.4rem 1rem;
+    text-align: left !important;
+  }
+
+  .tabla-responsive td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8c75c4;
+    margin-bottom: 0.1rem;
+  }
+
+  .tabla-responsive td.text-center {
+    text-align: center !important;
+  }
 }
