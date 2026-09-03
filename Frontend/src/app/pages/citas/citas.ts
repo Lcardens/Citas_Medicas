@@ -519,8 +519,31 @@ export class CitasComponent implements OnInit {
     }
 
     this.citaService.crearCita(datosEnviar).subscribe({
-      next: () => {
+      next: (res: any) => {
         this.cerrarModal();
+
+        const datos = res.datos || {};
+        const medicoNom =
+          datos.medico?.Nombre ||
+          datos.medico?.nombre ||
+          datos.medico?.nombreCompleto ||
+          'el médico seleccionado';
+        const fecha = datos.fecha || this.nuevaCita.fecha || '';
+        const hora = datos.hora || this.nuevaCita.hora || '';
+
+        let mensaje = `Tu cita fue asignada con éxito con ${medicoNom}`;
+        if (fecha) mensaje += ` para el día ${fecha}`;
+        if (hora) mensaje += ` a las ${hora}`;
+        mensaje += '.';
+
+        this.dialogService.confirmar({
+          titulo: 'Cita asignada',
+          mensaje,
+          textoConfirmar: 'Aceptar',
+          textoCancelar: '',
+          tipo: 'info',
+        });
+
         this.cargarDatosGlobales();
       },
       error: (err) => {

@@ -24,6 +24,7 @@ import { DialogService } from '../../core/services/dialog.service';
           </div>
           <div class="modal-footer justify-content-center border-0 pt-0 pb-3">
             <button
+              *ngIf="dialog.config?.textoCancelar"
               type="button"
               class="btn btn-outline-secondary px-3"
               (click)="dialog.resolver(false)"
