@@ -10,16 +10,34 @@
     <div class="row g-3 align-items-end">
       <div class="col-md-4">
         <label class="form-label fw-semibold text-secondary mb-1">Filtrar por Rol:</label>
-        <select class="form-select" [(ngModel)]="rolFiltro">
+        <select class="form-select" [(ngModel)]="rolFiltro" (change)="paginaActual = 1">
           <option value="">-- Todos los roles --</option>
           <option value="admin">Administradores</option>
           <option value="medico">Médicos</option>
           <option value="paciente">Pacientes</option>
         </select>
       </div>
-      <div class="col-auto" *ngIf="rolFiltro">
-        <button class="btn btn-outline-secondary btn-sm" (click)="rolFiltro = ''">
-          Limpiar filtro
+      <div class="col-md-4">
+        <label class="form-label fw-semibold text-secondary mb-1">Buscar:</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white text-secondary">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nombre, email o rol..."
+            [(ngModel)]="busqueda"
+            (input)="paginaActual = 1"
+          />
+        </div>
+      </div>
+      <div class="col-auto" *ngIf="rolFiltro || busqueda">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          (click)="rolFiltro = ''; busqueda = ''; paginaActual = 1"
+        >
+          Limpiar filtros
         </button>
       </div>
     </div>
@@ -27,53 +45,74 @@
 
   <div class="card border-0 shadow-sm">
     <div class="card-body p-0">
-      <table class="table table-hover mb-0 align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th class="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let usuario of usuariosFiltrados">
-            <td class="fw-semibold">{{ usuario.nombre || usuario.Nombre }}</td>
-            <td>{{ usuario.email }}</td>
-            <td>
-              <span
-                class="badge rounded-pill"
-                [ngClass]="{
-                  'rol-admin':
-                    usuario.rol?.toLowerCase() === 'admin' ||
-                    usuario.rol?.toLowerCase() === 'administrador',
-                  'rol-medico': usuario.rol?.toLowerCase() === 'medico',
-                  'rol-paciente':
-                    usuario.rol?.toLowerCase() === 'paciente' ||
-                    usuario.rol?.toLowerCase() === 'usuario',
-                }"
-              >
-                {{ usuario.rol }}
-              </span>
-            </td>
-            <td class="text-center">
-              <button
-                *ngIf="!esUsuarioActual(usuario._id)"
-                class="btn btn-outline-danger btn-sm"
-                title="Eliminar usuario y sus datos"
-                (click)="eliminarUsuario(usuario._id, usuario.nombre || usuario.Nombre)"
-              >
-                <i class="bi bi-trash me-1"></i>Eliminar
-              </button>
-              <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tú</span>
-            </td>
-          </tr>
-          <tr *ngIf="usuariosFiltrados.length === 0">
-            <td colspan="4" class="text-center py-4 text-muted">No hay usuarios registrados.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle tabla-responsive">
+          <thead class="table-light">
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let usuario of usuariosPaginados">
+              <td data-label="Nombre" class="fw-semibold">{{ usuario.nombre || usuario.Nombre }}</td>
+              <td data-label="Email">{{ usuario.email }}</td>
+              <td data-label="Rol">
+                <span
+                  class="badge rounded-pill"
+                  [ngClass]="{
+                    'rol-admin':
+                      usuario.rol?.toLowerCase() === 'admin' ||
+                      usuario.rol?.toLowerCase() === 'administrador',
+                    'rol-medico': usuario.rol?.toLowerCase() === 'medico',
+                    'rol-paciente':
+                      usuario.rol?.toLowerCase() === 'paciente' ||
+                      usuario.rol?.toLowerCase() === 'usuario',
+                  }"
+                >
+                  {{ usuario.rol }}
+                </span>
+              </td>
+              <td data-label="Acciones" class="text-center">
+                <button
+                  *ngIf="!esUsuarioActual(usuario._id)"
+                  class="btn btn-outline-danger btn-sm"
+                  title="Eliminar usuario y sus datos"
+                  (click)="eliminarUsuario(usuario._id, usuario.nombre || usuario.Nombre)"
+                >
+                  <i class="bi bi-trash me-1"></i>Eliminar
+                </button>
+                <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tú</span>
+              </td>
+            </tr>
+            <tr *ngIf="usuariosPaginados.length === 0">
+              <td colspan="4" class="text-center py-4 text-muted">No hay usuarios registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  <div *ngIf="usuariosFiltrados.length > 0" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <small class="text-muted">
+      Mostrando {{ inicioRegistro }}-{{ finRegistro }} de {{ usuariosFiltrados.length }} usuarios
+    </small>
+    <nav *ngIf="totalPaginas > 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="paginaActual === 1">
+          <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&laquo;</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPaginas); let idx = index" class="page-item" [class.active]="paginaActual === idx + 1">
+          <button class="page-link" (click)="cambiarPagina(idx + 1)">{{ idx + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+          <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&raquo;</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 

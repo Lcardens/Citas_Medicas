@@ -203,6 +203,71 @@ body {
 }
 
 /* ==========================================
+   9. PAGINACIÓN
+   ========================================== */
+.pagination .page-link {
+  color: #5a4b7c;
+  border-color: rgba(184, 166, 222, 0.3);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #27b7f5 !important;
+  border-color: #27b7f5 !important;
+  color: #ffffff !important;
+}
+
+.pagination .page-link:hover {
+  background-color: rgba(39, 183, 245, 0.1);
+  color: #1a96ce;
+}
+
+/* ==========================================
+   10. RESPONSIVE - TABLAS COMO TARJETAS
+   ========================================== */
+@media (max-width: 768px) {
+  .tabla-responsive thead {
+    display: none;
+  }
+
+  .tabla-responsive,
+  .tabla-responsive tbody,
+  .tabla-responsive tr,
+  .tabla-responsive td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla-responsive tr {
+    background: #ffffff;
+    border: 1px solid rgba(184, 166, 222, 0.25);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+  }
+
+  .tabla-responsive td {
+    border: none;
+    padding: 0.4rem 1rem;
+    text-align: left !important;
+  }
+
+  .tabla-responsive td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8c75c4;
+    margin-bottom: 0.1rem;
+  }
+
+  .tabla-responsive td.text-center {
+    text-align: center !important;
+  }
+}
+
+/* ==========================================
    8. ESTILOS EXCLUSIVOS PARA LA PANTALLA DE LOGIN
    ========================================== */
 .login-card {

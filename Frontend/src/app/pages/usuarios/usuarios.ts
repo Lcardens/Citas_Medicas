@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../../core/services/usuario.service';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-usuarios',
@@ -16,7 +17,11 @@ export class UsuariosComponent implements OnInit {
   mensajeError: string = '';
   usuarioIdActual: string = '';
   rolFiltro: string = '';
+  busqueda: string = '';
+  paginaActual = 1;
+  elementosPorPagina = 10;
   private cdr = inject(ChangeDetectorRef);
+  private dialogService = inject(DialogService);
 
   nuevoUsuario = {
     nombre: '',
@@ -33,18 +38,54 @@ export class UsuariosComponent implements OnInit {
   }
 
   get usuariosFiltrados(): any[] {
-    if (!this.rolFiltro) return this.usuarios;
+    let lista = this.usuarios;
 
-    return this.usuarios.filter((u) => {
-      const rol = String(u.rol || '').toLowerCase().trim();
-      if (this.rolFiltro === 'usuario') {
-        return rol === 'usuario' || rol === 'paciente';
-      }
-      if (this.rolFiltro === 'administrador') {
-        return rol === 'administrador' || rol === 'admin';
-      }
-      return rol === this.rolFiltro;
-    });
+    if (this.rolFiltro) {
+      lista = lista.filter((u) => {
+        const rol = String(u.rol || '').toLowerCase().trim();
+        if (this.rolFiltro === 'usuario') {
+          return rol === 'usuario' || rol === 'paciente';
+        }
+        if (this.rolFiltro === 'administrador') {
+          return rol === 'administrador' || rol === 'admin';
+        }
+        return rol === this.rolFiltro;
+      });
+    }
+
+    if (this.busqueda.trim()) {
+      const q = this.busqueda.trim().toLowerCase();
+      lista = lista.filter((u) => {
+        const nombre = (u.nombre || u.Nombre || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const rol = (u.rol || '').toLowerCase();
+        return nombre.includes(q) || email.includes(q) || rol.includes(q);
+      });
+    }
+
+    return lista;
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.usuariosFiltrados.length / this.elementosPorPagina));
+  }
+
+  get usuariosPaginados(): any[] {
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    return this.usuariosFiltrados.slice(inicio, inicio + this.elementosPorPagina);
+  }
+
+  get inicioRegistro(): number {
+    return this.usuariosFiltrados.length === 0 ? 0 : (this.paginaActual - 1) * this.elementosPorPagina + 1;
+  }
+
+  get finRegistro(): number {
+    return Math.min(this.paginaActual * this.elementosPorPagina, this.usuariosFiltrados.length);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPaginas) return;
+    this.paginaActual = pagina;
   }
 
   obtenerUsuarios(): void {
@@ -110,21 +151,27 @@ export class UsuariosComponent implements OnInit {
   }
 
   eliminarUsuario(id: string, nombre: string): void {
-    if (!confirm(
-      `¿Eliminar al usuario "${nombre || ''}"? Se borrará también su perfil y sus citas. Esta acción no se puede deshacer.`
-    )) {
-      return;
-    }
+    this.dialogService
+      .confirmar({
+        titulo: 'Eliminar usuario',
+        mensaje: `¿Eliminar al usuario "${nombre || ''}"? Se borrará también su perfil y sus citas. Esta acción no se puede deshacer.`,
+        textoConfirmar: 'Eliminar',
+        textoCancelar: 'Cancelar',
+        tipo: 'peligro',
+      })
+      .then((confirmado) => {
+        if (!confirmado) return;
 
-    this.usuarioService.eliminarUsuario(id).subscribe({
-      next: (res: any) => {
-        alert(res?.mensaje || 'Usuario eliminado.');
-        this.obtenerUsuarios();
-      },
-      error: (err: any) => {
-        console.error('Error al eliminar usuario:', err);
-        alert(err.error?.mensaje || 'Ocurrió un error al eliminar el usuario.');
-      },
-    });
+        this.usuarioService.eliminarUsuario(id).subscribe({
+          next: (res: any) => {
+            this.cdr.detectChanges();
+            this.obtenerUsuarios();
+          },
+          error: (err: any) => {
+            console.error('Error al eliminar usuario:', err);
+            this.cdr.detectChanges();
+          },
+        });
+      });
   }
 }

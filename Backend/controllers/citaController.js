@@ -1,6 +1,7 @@
 const Cita = require("../models/cita");
 const Paciente = require("../models/Paciente");
 const Medico = require("../models/medico");
+const { registrarEvento } = require("./auditController");
 
 // Horarios de atención fijos del centro médico
 const HORARIOS = [
@@ -171,6 +172,15 @@ exports.crearCita = async (req, res) => {
         "medico",
         "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
       );
+
+    await registrarEvento({
+      req,
+      usuario: usuarioLogueado,
+      accion: "crear_cita",
+      entidad: "cita",
+      entidadId: citaGuardada._id,
+      detalles: { fecha, hora, motivo, estado: "Confirmada" },
+    });
 
     res.status(201).json({
       exitoso: true,
@@ -561,6 +571,15 @@ exports.eliminarCita = async (req, res) => {
 
     await Cita.findByIdAndDelete(id);
 
+    await registrarEvento({
+      req,
+      usuario: usuarioLogueado,
+      accion: "eliminar_cita",
+      entidad: "cita",
+      entidadId: id,
+      detalles: { fecha: cita.fecha, hora: cita.hora },
+    });
+
     res.status(200).json({
       exitoso: true,
       mensaje: "Cita eliminada exitosamente",
@@ -848,6 +867,15 @@ exports.actualizarCita = async (req, res) => {
         mensaje: "Cita no encontrada",
       });
     }
+
+    await registrarEvento({
+      req,
+      usuario: usuarioLogueado,
+      accion: "actualizar_cita",
+      entidad: "cita",
+      entidadId: id,
+      detalles: { campos: Object.keys(camposActualizar), ...camposActualizar },
+    });
 
     res.status(200).json({
       exitoso: true,

@@ -10,6 +10,7 @@ const medicoRoutes = require("./routes/medicoRoutes");
 const citaRoutes = require("./routes/citaRoutes");
 const authRoutes = require("./routes/authRoutes");
 const reporteRoutes = require("./routes/reporteRoutes");
+const auditRoutes = require("./routes/auditRoutes");
 
 const app = express();
 app.set("etag", false);
@@ -26,6 +27,7 @@ app.use("/api/pacientes", pacienteRoutes);
 app.use("/api/medicos", medicoRoutes);
 app.use("/api/citas", citaRoutes);
 app.use("/api/reportes", reporteRoutes);
+app.use("/api/audit", auditRoutes);
 
 // Servir el build de producción del frontend Angular
 const angularBuildPath = path.join(__dirname, "../Frontend/dist/frontend/browser");

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { proteger } = require("../middleware/auth");
+const { proteger, autorizar } = require("../middleware/auth");
 const {
   listarCitas,
   crearCita,
@@ -40,6 +40,11 @@ router.get(
 );
 
 router.patch("/:id", proteger, actualizarCita);
-router.delete("/:id", proteger, eliminarCita);
+router.delete(
+  "/:id",
+  proteger,
+  autorizar("admin", "administrador"),
+  eliminarCita
+);
 
 module.exports = router;

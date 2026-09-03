@@ -49,6 +49,9 @@
         <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/reportes" routerLinkActive="active">
           <i class="bi bi-bar-chart-line me-2"></i>Reportes
         </a>
+        <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/auditoria" routerLinkActive="active">
+          <i class="bi bi-shield-lock me-2"></i>Auditoría
+        </a>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" routerLink="/dashboard/perfil" routerLinkActive="active">
           <i class="bi bi-person-gear me-2"></i>Mi perfil

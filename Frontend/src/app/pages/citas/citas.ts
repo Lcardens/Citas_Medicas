@@ -7,6 +7,7 @@ import { CitaService } from '../../core/services/cita.service';
 import { PacienteService } from '../../core/services/paciente.service';
 import { MedicoService } from '../../core/services/medico.service';
 import { rolDesdeToken, normalizarRol } from '../../core/utils/auth.util';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-citas',
@@ -19,6 +20,7 @@ export class CitasComponent implements OnInit {
   private citaService = inject(CitaService);
   private pacienteService = inject(PacienteService);
   private medicoService = inject(MedicoService);
+  private dialogService = inject(DialogService);
   private cdr = inject(ChangeDetectorRef);
 
   citas: any[] = [];
@@ -27,6 +29,10 @@ export class CitasComponent implements OnInit {
   cargando = true;
   mostrarModal = false;
   mostrarModalEditar = false;
+
+  busqueda = '';
+  paginaActual = 1;
+  elementosPorPagina = 10;
 
   horariosAtencion: string[] = [
     '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
@@ -164,11 +170,65 @@ export class CitasComponent implements OnInit {
       });
     }
 
+    if (this.busqueda.trim()) {
+      const q = this.busqueda.trim().toLowerCase();
+      lista = lista.filter((cita) => {
+        const paciente = (
+          cita.paciente?.Nombre ||
+          cita.paciente?.nombre ||
+          cita.paciente?.nombres ||
+          (typeof cita.paciente === 'string' ? cita.paciente : '') ||
+          ''
+        ).toLowerCase();
+        const medico = (
+          cita.medico?.Nombre ||
+          cita.medico?.nombre ||
+          cita.medico?.nombres ||
+          (typeof cita.medico === 'string' ? cita.medico : '') ||
+          ''
+        ).toLowerCase();
+        const motivo = (cita.motivo || '').toLowerCase();
+        const estado = (cita.estado || '').toLowerCase();
+        const fecha = String(cita.fecha || '').toLowerCase();
+        const hora = (cita.hora || '').toLowerCase();
+        return (
+          paciente.includes(q) ||
+          medico.includes(q) ||
+          motivo.includes(q) ||
+          estado.includes(q) ||
+          fecha.includes(q) ||
+          hora.includes(q)
+        );
+      });
+    }
+
     return lista.slice().sort((a, b) => {
       const difFecha = String(a.fecha || '').localeCompare(String(b.fecha || ''));
       if (difFecha !== 0) return difFecha;
       return this.horaAMinutos(a.hora || '') - this.horaAMinutos(b.hora || '');
     });
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.citasFiltradas.length / this.elementosPorPagina));
+  }
+
+  get citasPaginadas(): any[] {
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    return this.citasFiltradas.slice(inicio, inicio + this.elementosPorPagina);
+  }
+
+  get inicioRegistro(): number {
+    return this.citasFiltradas.length === 0 ? 0 : (this.paginaActual - 1) * this.elementosPorPagina + 1;
+  }
+
+  get finRegistro(): number {
+    return Math.min(this.paginaActual * this.elementosPorPagina, this.citasFiltradas.length);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPaginas) return;
+    this.paginaActual = pagina;
   }
 
   get puedeFiltrarPorPaciente(): boolean {
@@ -180,6 +240,8 @@ export class CitasComponent implements OnInit {
     this.pacienteFiltro = '';
     this.estadoFiltro = '';
     this.fechaFiltro = '';
+    this.busqueda = '';
+    this.paginaActual = 1;
   }
 
   cargarDatosGlobales(): void {
@@ -435,44 +497,81 @@ export class CitasComponent implements OnInit {
     }
 
     if (this.rolUsuario !== 'paciente' && !datosEnviar.paciente) {
-      alert('Por favor seleccione un paciente.');
+      this.dialogService.confirmar({
+        titulo: 'Datos incompletos',
+        mensaje: 'Por favor seleccione un paciente.',
+        textoConfirmar: 'Entendido',
+        textoCancelar: '',
+        tipo: 'advertencia',
+      });
       return;
     }
 
     if (!datosEnviar.medico || !datosEnviar.fecha || !datosEnviar.hora) {
-      alert('Por favor complete todos los campos obligatorios (médico, fecha, hora).');
+      this.dialogService.confirmar({
+        titulo: 'Datos incompletos',
+        mensaje: 'Por favor complete todos los campos obligatorios (médico, fecha, hora).',
+        textoConfirmar: 'Entendido',
+        textoCancelar: '',
+        tipo: 'advertencia',
+      });
       return;
     }
 
     this.citaService.crearCita(datosEnviar).subscribe({
       next: () => {
-        alert('Cita agendada exitosamente');
         this.cerrarModal();
         this.cargarDatosGlobales();
       },
       error: (err) => {
         console.error('Error al agendar cita:', err);
-        alert('Ocurrió un error al agendar la cita');
+        this.dialogService.confirmar({
+          titulo: 'Error',
+          mensaje: err.error?.mensaje || 'Ocurrió un error al agendar la cita.',
+          textoConfirmar: 'Entendido',
+          textoCancelar: '',
+          tipo: 'peligro',
+        });
       },
     });
   }
 
   asignacionRapida(): void {
-    if (!confirm('¿Deseas que el sistema te asigne automáticamente el primer médico con cupo disponible?')) {
-      return;
-    }
+    this.dialogService
+      .confirmar({
+        titulo: 'Asignación automática',
+        mensaje: '¿Deseas que el sistema te asigne automáticamente el primer médico con cupo disponible?',
+        textoConfirmar: 'Sí, asignar',
+        textoCancelar: 'Cancelar',
+        tipo: 'info',
+      })
+      .then((confirmado) => {
+        if (!confirmado) return;
 
-    this.citaService.asignarCitaRapida({}).subscribe({
-      next: (res: any) => {
-        alert(res.mensaje || 'Cita asignada automáticamente');
-        this.cargarDatosGlobales();
-      },
-      error: (err) => {
-        console.error('Error en asignación rápida:', err);
-        const detalle = err.error?.error || err.error?.mensaje;
-        alert(detalle || 'Ocurrió un error al asignar la cita automáticamente');
-      },
-    });
+        this.citaService.asignarCitaRapida({}).subscribe({
+          next: (res: any) => {
+            this.dialogService.confirmar({
+              titulo: 'Cita asignada',
+              mensaje: res.mensaje || 'Cita asignada automáticamente',
+              textoConfirmar: 'Aceptar',
+              textoCancelar: '',
+              tipo: 'info',
+            });
+            this.cargarDatosGlobales();
+          },
+          error: (err) => {
+            console.error('Error en asignación rápida:', err);
+            const detalle = err.error?.error || err.error?.mensaje;
+            this.dialogService.confirmar({
+              titulo: 'Error',
+              mensaje: detalle || 'Ocurrió un error al asignar la cita automáticamente',
+              textoConfirmar: 'Entendido',
+              textoCancelar: '',
+              tipo: 'peligro',
+            });
+          },
+        });
+      });
   }
 
   abrirModalEditar(cita: any): void {
@@ -504,21 +603,40 @@ export class CitasComponent implements OnInit {
     });
   }
 
+  puedeEliminarCita(cita: any): boolean {
+    return this.esAdmin;
+  }
+
   eliminarCita(id: string): void {
     if (!id) return;
 
-    if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
-      this.citaService.eliminarCita(id).subscribe({
-        next: () => {
-          alert('Cita eliminada exitosamente');
-          this.cargarDatosGlobales();
-        },
-        error: (err) => {
-          console.error('Error al eliminar cita:', err);
-          alert('Ocurrió un error al intentar eliminar la cita.');
-        },
+    this.dialogService
+      .confirmar({
+        titulo: 'Eliminar cita',
+        mensaje: '¿Estás seguro de que deseas eliminar esta cita permanentemente?',
+        textoConfirmar: 'Eliminar',
+        textoCancelar: 'Cancelar',
+        tipo: 'peligro',
+      })
+      .then((confirmado) => {
+        if (!confirmado) return;
+
+        this.citaService.eliminarCita(id).subscribe({
+          next: () => {
+            this.cargarDatosGlobales();
+          },
+          error: (err) => {
+            console.error('Error al eliminar cita:', err);
+            this.dialogService.confirmar({
+              titulo: 'Error',
+              mensaje: err.error?.mensaje || 'Ocurrió un error al intentar eliminar la cita.',
+              textoConfirmar: 'Entendido',
+              textoCancelar: '',
+              tipo: 'peligro',
+            });
+          },
+        });
       });
-    }
   }
 
   esCitaDelPacienteLogueado(cita: any): boolean {
@@ -544,18 +662,33 @@ export class CitasComponent implements OnInit {
   cancelarCita(id: string): void {
     if (!id) return;
 
-    if (confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
-      this.citaService.actualizarCita(id, { estado: 'Cancelada' }).subscribe({
-        next: () => {
-          alert('Cita cancelada exitosamente');
-          this.cargarDatosGlobales();
-        },
-        error: (err) => {
-          console.error('Error al cancelar cita:', err);
-          alert('Ocurrió un error al intentar cancelar la cita.');
-        },
+    this.dialogService
+      .confirmar({
+        titulo: 'Cancelar cita',
+        mensaje: '¿Estás seguro de que deseas cancelar esta cita? El cupo quedará disponible.',
+        textoConfirmar: 'Cancelar cita',
+        textoCancelar: 'No, volver',
+        tipo: 'advertencia',
+      })
+      .then((confirmado) => {
+        if (!confirmado) return;
+
+        this.citaService.actualizarCita(id, { estado: 'Cancelada' }).subscribe({
+          next: () => {
+            this.cargarDatosGlobales();
+          },
+          error: (err) => {
+            console.error('Error al cancelar cita:', err);
+            this.dialogService.confirmar({
+              titulo: 'Error',
+              mensaje: err.error?.mensaje || 'Ocurrió un error al intentar cancelar la cita.',
+              textoConfirmar: 'Entendido',
+              textoCancelar: '',
+              tipo: 'peligro',
+            });
+          },
+        });
       });
-    }
   }
 
   limpiarFormulario(): void {

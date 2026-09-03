@@ -20,6 +20,10 @@ export class MisturnosComponent implements OnInit {
   mensaje = '';
   error = '';
 
+  busqueda = '';
+  paginaActual = 1;
+  elementosPorPagina = 10;
+
   citaEditando: any = {
     _id: '',
     diagnostico: '',
@@ -30,6 +34,45 @@ export class MisturnosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarAgenda();
+  }
+
+  get citasFiltradas(): any[] {
+    let lista = this.citas;
+    if (this.busqueda.trim()) {
+      const q = this.busqueda.trim().toLowerCase();
+      lista = lista.filter((c) => {
+        const paciente = (this.nombrePaciente(c) || '').toLowerCase();
+        const motivo = (c.motivo || '').toLowerCase();
+        const estado = (c.estado || '').toLowerCase();
+        const fecha = String(c.fecha || '').toLowerCase();
+        const hora = (c.hora || '').toLowerCase();
+        return paciente.includes(q) || motivo.includes(q) || estado.includes(q) ||
+          fecha.includes(q) || hora.includes(q);
+      });
+    }
+    return lista;
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.citasFiltradas.length / this.elementosPorPagina));
+  }
+
+  get citasPaginadas(): any[] {
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    return this.citasFiltradas.slice(inicio, inicio + this.elementosPorPagina);
+  }
+
+  get inicioRegistro(): number {
+    return this.citasFiltradas.length === 0 ? 0 : (this.paginaActual - 1) * this.elementosPorPagina + 1;
+  }
+
+  get finRegistro(): number {
+    return Math.min(this.paginaActual * this.elementosPorPagina, this.citasFiltradas.length);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPaginas) return;
+    this.paginaActual = pagina;
   }
 
   cargarAgenda(): void {

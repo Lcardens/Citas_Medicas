@@ -3,6 +3,7 @@ const Paciente = require("../models/Paciente");
 const Medico = require("../models/medico");
 const Cita = require("../models/cita");
 const jwt = require("jsonwebtoken");
+const { registrarEvento } = require("./auditController");
 
 // Función auxiliar para generar el Token JWT
 const generarToken = (usuario) => {
@@ -88,6 +89,15 @@ exports.registrar = async (req, res) => {
       rol: rolNormalizado,
     });
 
+    await registrarEvento({
+      req,
+      usuario,
+      accion: "registro",
+      entidad: "auth",
+      entidadId: usuario._id,
+      detalles: { email, rol: rolNormalizado },
+    });
+
     if (rolNormalizado === "paciente" || rolNormalizado === "usuario") {
       try {
         const pacienteExiste = await Paciente.findOne({ Correo: email });
@@ -163,6 +173,14 @@ exports.login = async (req, res) => {
 
     const usuario = await User.findOne({ email }).select("+password");
     if (!usuario) {
+      await registrarEvento({
+        req,
+        usuario: null,
+        email,
+        accion: "login_fallido",
+        entidad: "auth",
+        detalles: { motivo: "usuario_no_encontrado", email },
+      });
       return res.status(401).json({
         exitoso: false,
         mensaje: "Credenciales inválidas",
@@ -171,6 +189,13 @@ exports.login = async (req, res) => {
 
     const esPasswordCorrecta = await usuario.compararPassword(password);
     if (!esPasswordCorrecta) {
+      await registrarEvento({
+        req,
+        usuario,
+        accion: "login_fallido",
+        entidad: "auth",
+        detalles: { motivo: "password_incorrecta", email },
+      });
       return res.status(401).json({
         exitoso: false,
         mensaje: "Credenciales inválidas",
@@ -178,6 +203,14 @@ exports.login = async (req, res) => {
     }
 
     const token = generarToken(usuario);
+
+    await registrarEvento({
+      req,
+      usuario,
+      accion: "login",
+      entidad: "auth",
+      detalles: { email },
+    });
 
     res.status(200).json({
       exitoso: true,
@@ -268,6 +301,15 @@ exports.eliminarUsuario = async (req, res) => {
     }
 
     await User.findByIdAndDelete(id);
+
+    await registrarEvento({
+      req,
+      usuario: req.usuario,
+      accion: "eliminar_usuario",
+      entidad: "usuario",
+      entidadId: id,
+      detalles: { email: correo, rol },
+    });
 
     res.status(200).json({
       exitoso: true,
@@ -394,6 +436,15 @@ exports.actualizarMiPerfil = async (req, res) => {
           { $set: { Nombre: nombre.trim() } },
         ).exec();
       }
+
+      await registrarEvento({
+        req,
+        usuario,
+        accion: "actualizar_perfil",
+        entidad: "perfil",
+        entidadId: usuario._id,
+        detalles: { campos: Object.keys(req.body) },
+      });
     }
 
     if (telefono && (rol === "paciente" || rol === "usuario")) {

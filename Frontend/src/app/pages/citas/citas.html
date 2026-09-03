@@ -20,8 +20,23 @@
     </div>
   </div>
 
+  <div *ngIf="!cargando" class="mb-3">
+    <div class="input-group">
+      <span class="input-group-text bg-light text-secondary">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar por paciente, médico, motivo, estado, fecha u hora..."
+        [(ngModel)]="busqueda"
+        (input)="paginaActual = 1"
+      />
+    </div>
+  </div>
+
   <div *ngIf="!cargando" class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
+    <table class="table table-striped table-hover align-middle tabla-responsive">
       <thead class="table-dark">
         <tr>
           <th>#</th>
@@ -78,13 +93,13 @@
               <option value="Disponible">Disponible</option>
               <option value="Reservada">Reservada</option>
               <option value="Confirmada">Confirmada</option>
-              <option value="Completada">Completada</option>
+              <option value="Atendida">Atendida</option>
               <option value="Cancelada">Cancelada</option>
             </select>
           </th>
           <th *ngIf="mostrarColumnaAcciones" class="text-center">
             <button
-              *ngIf="medicoFiltro || pacienteFiltro || estadoFiltro || fechaFiltro"
+              *ngIf="medicoFiltro || pacienteFiltro || estadoFiltro || fechaFiltro || busqueda"
               class="btn btn-outline-secondary btn-sm"
               title="Limpiar filtros"
               (click)="limpiarFiltros()"
@@ -95,10 +110,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let cita of citasFiltradas; let i = index">
-          <td>{{ i + 1 }}</td>
+        <tr *ngFor="let cita of citasPaginadas; let i = index">
+          <td data-label="#">{{ inicioRegistro + i }}</td>
 
-          <td>
+          <td data-label="Paciente">
             {{
               cita.paciente?.Nombre ||
                 cita.paciente?.nombre ||
@@ -108,7 +123,7 @@
             }}
           </td>
 
-          <td>
+          <td data-label="Médico">
             {{
               cita.medico?.Nombre ||
                 cita.medico?.nombre ||
@@ -118,15 +133,15 @@
             }}
           </td>
 
-          <td>{{ cita.fecha | date: 'shortDate' }}</td>
-          <td>{{ cita.hora }}</td>
-          <td>
+          <td data-label="Fecha">{{ cita.fecha | date: 'shortDate' }}</td>
+          <td data-label="Hora">{{ cita.hora }}</td>
+          <td data-label="Motivo">
             {{ cita.motivo }}
             <div *ngIf="cita.diagnostico" class="small text-muted mt-1">
               <strong>Diagnóstico:</strong> {{ cita.diagnostico }}
             </div>
           </td>
-          <td>
+          <td data-label="Estado">
             <span
               class="badge align-middle"
               [ngClass]="{
@@ -149,7 +164,7 @@
             </span>
           </td>
 
-          <td *ngIf="mostrarColumnaAcciones" class="text-center">
+          <td *ngIf="mostrarColumnaAcciones" class="text-center" data-label="Acciones">
             <div class="btn-group btn-group-sm" role="group">
               <ng-container *ngIf="puedeEditarCita(cita)">
                 <button
@@ -160,8 +175,9 @@
                   Editar
                 </button>
                 <button
+                  *ngIf="puedeEliminarCita(cita)"
                   class="btn btn-outline-danger"
-                  title="Eliminar cita"
+                  title="Eliminar cita permanentemente"
                   (click)="eliminarCita(cita._id)"
                 >
                   Eliminar
@@ -180,13 +196,32 @@
           </td>
         </tr>
 
-        <tr *ngIf="citasFiltradas.length === 0">
+        <tr *ngIf="citasPaginadas.length === 0">
           <td [attr.colspan]="mostrarColumnaAcciones ? 8 : 7" class="text-center py-4 text-muted">
-            No se encontraron citas programadas.
+            No se encontraron citas que coincidan con la búsqueda.
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div *ngIf="!cargando && citasFiltradas.length > 0" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <small class="text-muted">
+      Mostrando {{ inicioRegistro }}-{{ finRegistro }} de {{ citasFiltradas.length }} citas
+    </small>
+    <nav *ngIf="totalPaginas > 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="paginaActual === 1">
+          <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&laquo;</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPaginas); let idx = index" class="page-item" [class.active]="paginaActual === idx + 1">
+          <button class="page-link" (click)="cambiarPagina(idx + 1)">{{ idx + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+          <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&raquo;</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 

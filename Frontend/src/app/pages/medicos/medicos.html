@@ -1,10 +1,25 @@
 ﻿<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h2>Médicos</h2>
 
     <button *ngIf="esPersonalMedico" class="btn btn-primary" (click)="abrirModal()">
       + Nuevo Médico
     </button>
+  </div>
+
+  <div class="mb-3">
+    <div class="input-group">
+      <span class="input-group-text bg-light text-secondary">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar por nombre o registro médico..."
+        [(ngModel)]="busqueda"
+        (input)="paginaActual = 1"
+      />
+    </div>
   </div>
 
   <div *ngIf="cargando" class="d-flex justify-content-center my-5">
@@ -14,7 +29,7 @@
   </div>
 
   <div *ngIf="!cargando" class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
+    <table class="table table-striped table-hover align-middle tabla-responsive">
       <thead class="table-dark">
         <tr>
           <th>#</th>
@@ -24,22 +39,46 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let medico of medicos; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ medico.Registromedico }}</td>
-          <td>{{ medico.Nombre }}</td>
-          <td class="text-center">
+        <tr *ngFor="let medico of medicosPaginados; let i = index">
+          <td data-label="#">{{ inicioRegistro + i }}</td>
+          <td data-label="Registro Médico">{{ medico.Registromedico || medico.registroMedico }}</td>
+          <td data-label="Nombre Completo">{{ medico.Nombre || medico.nombre }}</td>
+          <td class="text-center" data-label="Acciones">
             <button
               class="btn btn-outline-danger btn-sm"
               title="Eliminar médico y sus datos"
-              (click)="eliminarMedico(medico._id, medico.Nombre)"
+              (click)="eliminarMedico(medico._id, medico.Nombre || medico.nombre)"
             >
               <i class="bi bi-trash me-1"></i>Eliminar
             </button>
           </td>
         </tr>
+        <tr *ngIf="medicosPaginados.length === 0">
+          <td colspan="4" class="text-center py-4 text-muted">
+            No hay médicos que coincidan con la búsqueda.
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <div *ngIf="!cargando && medicosFiltrados.length > 0" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <small class="text-muted">
+      Mostrando {{ inicioRegistro }}-{{ finRegistro }} de {{ medicosFiltrados.length }} médicos
+    </small>
+    <nav *ngIf="totalPaginas > 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="paginaActual === 1">
+          <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&laquo;</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPaginas); let idx = index" class="page-item" [class.active]="paginaActual === idx + 1">
+          <button class="page-link" (click)="cambiarPagina(idx + 1)">{{ idx + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+          <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&raquo;</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 

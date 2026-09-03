@@ -1,8 +1,23 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h2>Pacientes</h2>
 
     <button class="btn btn-primary" (click)="abrirModal()">+ Nuevo Paciente</button>
+  </div>
+
+  <div class="mb-3">
+    <div class="input-group">
+      <span class="input-group-text bg-light text-secondary">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar por nombre, documento, tipo o correo..."
+        [(ngModel)]="busqueda"
+        (input)="paginaActual = 1"
+      />
+    </div>
   </div>
 
   <div *ngIf="cargando" class="d-flex justify-content-center my-5">
@@ -12,7 +27,7 @@
   </div>
 
   <div *ngIf="!cargando" class="table-responsive">
-    <table class="table table-striped table-hover align-middle">
+    <table class="table table-striped table-hover align-middle tabla-responsive">
       <thead class="table-dark">
         <tr>
           <th>#</th>
@@ -24,24 +39,48 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let paciente of pacientes; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td>{{ paciente.TipoDocumento }} {{ paciente.Documento }}</td>
-          <td>{{ paciente.Nombre }}</td>
-          <td>{{ paciente.Correo }}</td>
-          <td>{{ paciente.Telefono }}</td>
-          <td class="text-center">
+        <tr *ngFor="let paciente of pacientesPaginados; let i = index">
+          <td data-label="#">{{ inicioRegistro + i }}</td>
+          <td data-label="Documento">{{ paciente.TipoDocumento || '' }} {{ paciente.Documento || paciente.documento }}</td>
+          <td data-label="Nombre">{{ paciente.Nombre || paciente.nombre }}</td>
+          <td data-label="Correo">{{ paciente.Correo || paciente.correo || paciente.email }}</td>
+          <td data-label="Teléfono">{{ paciente.Telefono || paciente.telefono }}</td>
+          <td class="text-center" data-label="Acciones">
             <button
               class="btn btn-outline-danger btn-sm"
               title="Eliminar paciente y sus datos"
-              (click)="eliminarPaciente(paciente._id, paciente.Nombre)"
+              (click)="eliminarPaciente(paciente._id, paciente.Nombre || paciente.nombre)"
             >
               <i class="bi bi-trash me-1"></i>Eliminar
             </button>
           </td>
         </tr>
+        <tr *ngIf="pacientesPaginados.length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">
+            No hay pacientes que coincidan con la búsqueda.
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <div *ngIf="!cargando && pacientesFiltrados.length > 0" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+    <small class="text-muted">
+      Mostrando {{ inicioRegistro }}-{{ finRegistro }} de {{ pacientesFiltrados.length }} pacientes
+    </small>
+    <nav *ngIf="totalPaginas > 1">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="paginaActual === 1">
+          <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&laquo;</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPaginas); let idx = index" class="page-item" [class.active]="paginaActual === idx + 1">
+          <button class="page-link" (click)="cambiarPagina(idx + 1)">{{ idx + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+          <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&raquo;</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 

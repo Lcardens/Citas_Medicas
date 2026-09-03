@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicoService } from '../../core/services/medico.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-medicos',
@@ -14,11 +15,16 @@ import { AuthService } from '../../core/services/auth.service';
 export class MedicosComponent implements OnInit {
   private medicoService = inject(MedicoService);
   private authService = inject(AuthService);
+  private dialogService = inject(DialogService);
   private cdr = inject(ChangeDetectorRef);
 
   medicos: any[] = [];
   cargando = true;
   mostrarModal = false;
+
+  busqueda = '';
+  paginaActual = 1;
+  elementosPorPagina = 10;
 
   esPersonalMedico = false;
 
@@ -30,6 +36,41 @@ export class MedicosComponent implements OnInit {
   ngOnInit(): void {
     this.esPersonalMedico = this.authService.esPersonalMedico();
     this.obtenerMedicos();
+  }
+
+  get medicosFiltrados(): any[] {
+    let lista = this.medicos;
+    if (this.busqueda.trim()) {
+      const q = this.busqueda.trim().toLowerCase();
+      lista = lista.filter((m) => {
+        const nombre = (m.Nombre || m.nombre || '').toLowerCase();
+        const registro = (m.Registromedico || m.registroMedico || '').toLowerCase();
+        return nombre.includes(q) || registro.includes(q);
+      });
+    }
+    return lista;
+  }
+
+  get totalPaginas(): number {
+    return Math.max(1, Math.ceil(this.medicosFiltrados.length / this.elementosPorPagina));
+  }
+
+  get medicosPaginados(): any[] {
+    const inicio = (this.paginaActual - 1) * this.elementosPorPagina;
+    return this.medicosFiltrados.slice(inicio, inicio + this.elementosPorPagina);
+  }
+
+  get inicioRegistro(): number {
+    return this.medicosFiltrados.length === 0 ? 0 : (this.paginaActual - 1) * this.elementosPorPagina + 1;
+  }
+
+  get finRegistro(): number {
+    return Math.min(this.paginaActual * this.elementosPorPagina, this.medicosFiltrados.length);
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPaginas) return;
+    this.paginaActual = pagina;
   }
 
   obtenerMedicos(): void {
@@ -78,21 +119,27 @@ export class MedicosComponent implements OnInit {
   }
 
   eliminarMedico(id: string, nombre: string): void {
-    if (!confirm(
-      `¿Eliminar al médico "${nombre || ''}"? Se borrará también su usuario y sus citas. Esta acción no se puede deshacer.`
-    )) {
-      return;
-    }
+    this.dialogService
+      .confirmar({
+        titulo: 'Eliminar médico',
+        mensaje: `¿Eliminar al médico "${nombre || ''}"? Se borrará también su usuario y sus citas. Esta acción no se puede deshacer.`,
+        textoConfirmar: 'Eliminar',
+        textoCancelar: 'Cancelar',
+        tipo: 'peligro',
+      })
+      .then((confirmado) => {
+        if (!confirmado) return;
 
-    this.medicoService.eliminarMedico(id).subscribe({
-      next: (res: any) => {
-        alert(res?.mensaje || 'Médico eliminado.');
-        this.obtenerMedicos();
-      },
-      error: (err) => {
-        console.error('Error al eliminar médico:', err);
-        alert(err.error?.mensaje || 'Ocurrió un error al eliminar el médico.');
-      },
-    });
+        this.medicoService.eliminarMedico(id).subscribe({
+          next: (res: any) => {
+            this.cdr.detectChanges();
+            this.obtenerMedicos();
+          },
+          error: (err) => {
+            console.error('Error al eliminar médico:', err);
+            this.cdr.detectChanges();
+          },
+        });
+      });
   }
 }
