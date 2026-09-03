@@ -235,7 +235,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
-          {{ rolUsuario === 'paciente' ? 'Solicitar Cita' : 'Agendar Nueva Cita' }}
+          {{ rolUsuario === 'paciente' ? 'Agendar Cita' : 'Agendar Nueva Cita' }}
         </h5>
         <button type="button" class="btn-close" (click)="cerrarModal()"></button>
       </div>
@@ -371,7 +371,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
           <button type="submit" class="btn btn-success">
-            {{ rolUsuario === 'paciente' ? 'Solicitar Cita' : 'Agendar' }}
+            {{ rolUsuario === 'paciente' ? 'Agendar Cita' : 'Agendar' }}
           </button>
         </div>
       </form>

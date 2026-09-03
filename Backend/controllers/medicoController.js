@@ -27,7 +27,8 @@ exports.crearMedico = async (req, res) => {
     const fechaHoy = new Date().toISOString().split("T")[0];
 
     // Generar las 10 citas automáticas asociadas a su _id
-    const citasIniciales = horarios.map((hora) => ({      medico: medicoGuardado._id,
+    const citasIniciales = horarios.map((hora) => ({
+      medico: medicoGuardado._id,
       fecha: fechaHoy,
       hora,
       motivo: `Cita médica - ${hora}`,

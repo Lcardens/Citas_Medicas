@@ -397,8 +397,8 @@ exports.actualizarMiPerfil = async (req, res) => {
         });
       }
 
-    // Exige la contraseña actual antes de cambiarla
-    if (!passwordActual) {
+// Exige la contraseña actual antes de cambiarla
+      if (!passwordActual) {
         return res.status(400).json({
           exitoso: false,
           mensaje: "Debes ingresar tu contraseña actual para cambiarla",

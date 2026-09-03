@@ -28,6 +28,10 @@ export class LoginComponent {
   cargando = false;
   anioActual = new Date().getFullYear();
 
+  emailValido(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
   registro = {
     nombre: '',
     email: '',
@@ -41,7 +45,22 @@ export class LoginComponent {
 
   iniciarSesion(): void {
     this.error = '';
+    this.exito = '';
     this.cargando = true;
+
+    if (!this.email || !this.password) {
+      this.cargando = false;
+      this.error = 'Ingresa tu correo y contraseña';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.emailValido(this.email)) {
+      this.cargando = false;
+      this.error = 'Ingresa un correo electrónico válido';
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.authService.login(this.email, this.password).subscribe({
       next: (res: any) => {
@@ -81,6 +100,18 @@ export class LoginComponent {
 
     if (!this.registro.nombre || !this.registro.email || !this.registro.password) {
       this.error = 'Nombre, email y contraseña son obligatorios';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.emailValido(this.registro.email)) {
+      this.error = 'Ingresa un correo electrónico válido';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.registro.password.length < 6) {
+      this.error = 'La contraseña debe tener al menos 6 caracteres';
       this.cdr.detectChanges();
       return;
     }

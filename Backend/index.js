@@ -14,7 +14,9 @@ const auditRoutes = require("./routes/auditRoutes");
 const app = express();
 app.set("etag", false);
 // Conexión a la base de datos
-conectarDB();app.use(cors());
+conectarDB();
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

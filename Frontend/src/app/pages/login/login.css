@@ -46,11 +46,6 @@
   max-width: 420px;
 }
 
-.login-brand-logo {
-  font-size: 3rem;
-  margin-bottom: 1.5rem;
-}
-
 .login-brand-title {
   font-weight: 700;
   font-size: 2rem;
@@ -68,15 +63,17 @@
 .login-brand-feature {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
   font-size: 0.95rem;
   font-weight: 500;
   margin-bottom: 0.8rem;
   opacity: 0.95;
 }
 
-.login-brand-feature i {
-  font-size: 1.2rem;
+.login-brand-feature::before {
+  content: '•';
+  font-size: 1.1rem;
+  margin-right: 0.6rem;
+  color: #ffffff;
 }
 
 /* Panel derecho con el formulario */
@@ -91,13 +88,6 @@
 .login-form-inner {
   width: 100%;
   max-width: 420px;
-}
-
-.login-form-logo {
-  color: var(--primary-color, #27b7f5);
-  text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 0.5rem;
 }
 
 .login-form-heading {
@@ -158,12 +148,6 @@
   font-weight: 600;
   font-size: 0.85rem;
   margin-bottom: 0.4rem;
-}
-
-.input-group-text {
-  background-color: #faf9fd;
-  border: 1px solid #dcd4ed;
-  color: #8c75c4;
 }
 
 .login-card button[type='submit'],
@@ -254,6 +238,7 @@
   text-align: center;
   font-size: 0.82rem;
   color: #8c75c4;
+  margin-top: 0.5rem;
 }
 
 /* Responsive: ambas columnas apiladas */

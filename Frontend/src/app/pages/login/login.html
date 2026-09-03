@@ -2,7 +2,6 @@
   <!-- Panel izquierdo: branding -->
   <div class="login-brand">
     <div class="login-brand-content">
-      <i class="bi bi-heart-pulse-fill login-brand-logo"></i>
       <h1 class="login-brand-title">Sistema de Citas Médicas</h1>
       <p class="login-brand-desc">
         Plataforma integral para la gestión de citas médicas. Conectamos pacientes,
@@ -10,15 +9,12 @@
       </p>
 
       <div class="login-brand-feature">
-        <i class="bi bi-calendar-check-fill"></i>
         <span>Agenda y administra tus citas fácilmente</span>
       </div>
       <div class="login-brand-feature">
-        <i class="bi bi-person-badge-fill"></i>
         <span>Consulta tu estado y tu historial médico</span>
       </div>
       <div class="login-brand-feature">
-        <i class="bi bi-shield-lock-fill"></i>
         <span>Acceso seguro y confidencial</span>
       </div>
     </div>
@@ -27,7 +23,6 @@
   <!-- Panel derecho: formulario -->
   <div class="login-form-panel">
     <div class="login-form-inner">
-      <i class="bi bi-heart-pulse-fill login-form-logo"></i>
       <h2 class="login-form-heading">Bienvenido</h2>
       <p class="login-form-sub">Inicia sesión o crea una cuenta para continuar</p>
 
@@ -56,23 +51,19 @@
         <form (ngSubmit)="iniciarSesion()" novalidate>
           <div class="mb-3">
             <label class="form-label">Correo electrónico</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input
-                type="email"
-                class="form-control"
-                [(ngModel)]="email"
-                name="email"
-                placeholder="usuario@ejemplo.com"
-                autocomplete="email"
-              />
-            </div>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="usuario@ejemplo.com"
+              autocomplete="email"
+            />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Contraseña</label>
             <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-lock"></i></span>
               <input
                 [type]="mostrarPassword ? 'text' : 'password'"
                 class="form-control"
@@ -85,6 +76,7 @@
                 type="button"
                 class="btn btn-outline-secondary"
                 (click)="mostrarPassword = !mostrarPassword"
+                aria-label="Mostrar u ocultar contraseña"
                 title="Mostrar u ocultar contraseña"
                 tabindex="-1"
               >
@@ -94,11 +86,11 @@
           </div>
 
           <div class="alert alert-danger login-alert" *ngIf="error" role="alert">
-            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+            {{ error }}
           </div>
 
           <div class="alert alert-success login-alert" *ngIf="exito" role="alert">
-            <i class="bi bi-check-circle me-1"></i>{{ exito }}
+            {{ exito }}
           </div>
 
           <button class="btn btn-primary" [disabled]="cargando">
@@ -113,50 +105,45 @@
         <form (ngSubmit)="registrar()" novalidate>
           <div class="mb-3">
             <label class="form-label">Nombre completo</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-person"></i></span>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="registro.nombre"
-                name="regNombre"
-                placeholder="Ej: Luisa Cárdenas"
-                required
-              />
-            </div>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="registro.nombre"
+              name="regNombre"
+              placeholder="Ej: Luisa Cárdenas"
+              required
+            />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Correo electrónico</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input
-                type="email"
-                class="form-control"
-                [(ngModel)]="registro.email"
-                name="regEmail"
-                placeholder="usuario@ejemplo.com"
-                required
-              />
-            </div>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="registro.email"
+              name="regEmail"
+              placeholder="usuario@ejemplo.com"
+              required
+            />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Contraseña</label>
             <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-lock"></i></span>
               <input
                 [type]="mostrarPassword ? 'text' : 'password'"
                 class="form-control"
                 [(ngModel)]="registro.password"
                 name="regPassword"
                 placeholder="Mínimo 6 caracteres"
+                autocomplete="new-password"
                 required
               />
               <button
                 type="button"
                 class="btn btn-outline-secondary"
                 (click)="mostrarPassword = !mostrarPassword"
+                aria-label="Mostrar u ocultar contraseña"
                 title="Mostrar u ocultar contraseña"
                 tabindex="-1"
               >
@@ -167,25 +154,19 @@
 
           <div class="mb-3">
             <label class="form-label">Rol</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-              <select class="form-control" [(ngModel)]="registro.rol" name="regRol" required>
-                <option value="paciente">Paciente</option>
-                <option value="medico">Médico</option>
-              </select>
-            </div>
+            <select class="form-control" [(ngModel)]="registro.rol" name="regRol" required>
+              <option value="paciente">Paciente</option>
+              <option value="medico">Médico</option>
+            </select>
           </div>
 
           <div class="mb-3" *ngIf="registro.rol === 'paciente'">
             <label class="form-label">Tipo de Documento</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
-              <select class="form-control" [(ngModel)]="registro.TipoDocumento" name="regTipoDoc">
-                <option value="CC">Cédula de Ciudadanía (CC)</option>
-                <option value="TI">Tarjeta de Identidad (TI)</option>
-                <option value="CE">Cédula de Extranjería (CE)</option>
-              </select>
-            </div>
+            <select class="form-control" [(ngModel)]="registro.TipoDocumento" name="regTipoDoc">
+              <option value="CC">Cédula de Ciudadanía (CC)</option>
+              <option value="TI">Tarjeta de Identidad (TI)</option>
+              <option value="CE">Cédula de Extranjería (CE)</option>
+            </select>
           </div>
 
           <div class="mb-3" *ngIf="registro.rol === 'paciente'">
@@ -201,42 +182,36 @@
 
           <div class="mb-3" *ngIf="registro.rol === 'paciente'">
             <label class="form-label">Teléfono</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="registro.Telefono"
-                name="regTelefono"
-                placeholder="+57 300 000 0000"
-              />
-            </div>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="registro.Telefono"
+              name="regTelefono"
+              placeholder="+57 300 000 0000"
+            />
           </div>
 
           <div class="mb-3" *ngIf="registro.rol === 'medico'">
             <label class="form-label">Registro Médico</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-patch-check"></i></span>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="registro.Registromedico"
-                name="regRegistroMedico"
-                required
-                placeholder="Ej: 123456"
-              />
-            </div>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="registro.Registromedico"
+              name="regRegistroMedico"
+              required
+              placeholder="Ej: 123456"
+            />
             <small class="form-text text-muted">
               Tu registro médico debe estar creado previamente por un administrador.
             </small>
           </div>
 
           <div class="alert alert-danger login-alert" *ngIf="error" role="alert">
-            <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+            {{ error }}
           </div>
 
           <div class="alert alert-success login-alert" *ngIf="exito" role="alert">
-            <i class="bi bi-check-circle me-1"></i>{{ exito }}
+            {{ exito }}
           </div>
 
           <button class="btn btn-primary" [disabled]="cargando">
