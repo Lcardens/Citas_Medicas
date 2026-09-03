@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../core/services/dialog.service';
 
@@ -8,7 +8,7 @@ import { DialogService } from '../../core/services/dialog.service';
   imports: [CommonModule],
   template: `
     <div
-      *ngIf="dialog.visible"
+      *ngIf="(dialog.state$ | async)?.visible"
       class="modal fade show d-block"
       tabindex="-1"
       style="background-color: rgba(0,0,0,0.5)"
@@ -47,11 +47,6 @@ import { DialogService } from '../../core/services/dialog.service';
 })
 export class ConfirmDialogComponent {
   dialog = inject(DialogService);
-  private cdr = inject(ChangeDetectorRef);
-
-  constructor() {
-    this.dialog.state$.subscribe(() => this.cdr.detectChanges());
-  }
 
   get headerClass(): string {
     const tipo = this.dialog.config?.tipo || 'peligro';
