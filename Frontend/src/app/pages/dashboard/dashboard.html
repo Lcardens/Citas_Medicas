@@ -31,7 +31,7 @@
         <i class="bi bi-list fs-3"></i>
       </button>
       <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarMenuDropdown">
-        <a class="dropdown-item" routerLink="/dashboard/citas" routerLinkActive="active">
+        <a *ngIf="!esMedico" class="dropdown-item" routerLink="/dashboard/citas" routerLinkActive="active">
           <i class="bi bi-calendar-check-fill me-2"></i>Citas
         </a>
         <a *ngIf="esMedico" class="dropdown-item" routerLink="/dashboard/misturnos" routerLinkActive="active">

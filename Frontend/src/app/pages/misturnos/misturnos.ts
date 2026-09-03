@@ -2,6 +2,8 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CitaService } from '../../core/services/cita.service';
+import { PacienteService } from '../../core/services/paciente.service';
+import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
   selector: 'app-misturnos',
@@ -12,6 +14,8 @@ import { CitaService } from '../../core/services/cita.service';
 })
 export class MisturnosComponent implements OnInit {
   private citaService = inject(CitaService);
+  private pacienteService = inject(PacienteService);
+  private dialogService = inject(DialogService);
   private cdr = inject(ChangeDetectorRef);
 
   citas: any[] = [];
@@ -30,7 +34,33 @@ export class MisturnosComponent implements OnInit {
     notasConsulta: '',
   };
   mostrarModal = false;
+  mostrarModalAsignar = false;
   guardando = false;
+
+  pacientes: any[] = [];
+  nuevaCita: any = {
+    paciente: '',
+    medico: '',
+    fecha: '',
+    hora: '',
+    motivo: '',
+  };
+  horasDisponibles: string[] = [];
+  horariosAtencion: string[] = [
+    '08:00 AM',
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '01:00 PM',
+    '02:00 PM',
+    '03:00 PM',
+    '04:00 PM',
+    '05:00 PM',
+    '06:00 PM',
+  ];
+  cargandoHoras = false;
+  minFecha = new Date().toISOString().split('T')[0];
 
   ngOnInit(): void {
     this.cargarAgenda();
@@ -97,6 +127,134 @@ export class MisturnosComponent implements OnInit {
         this.error = err?.error?.mensaje || 'No se pudo cargar tu agenda.';
         this.cargando = false;
         this.cdr.detectChanges();
+      },
+    });
+  }
+
+  abrirModalAsignar(): void {
+    this.nuevaCita = {
+      paciente: '',
+      medico: this.medicoId,
+      fecha: '',
+      hora: '',
+      motivo: '',
+    };
+    this.horasDisponibles = [];
+    this.mostrarModalAsignar = true;
+
+    if (this.pacientes.length === 0) {
+      this.pacienteService.obtenerPacientes().subscribe({
+        next: (res: any) => {
+          const data = res?.datos || res || [];
+          this.pacientes = data;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.pacientes = [];
+          this.cdr.detectChanges();
+        },
+      });
+    }
+  }
+
+  cerrarModalAsignar(): void {
+    this.mostrarModalAsignar = false;
+    this.horasDisponibles = [];
+  }
+
+  cambioFechaAsignar(): void {
+    this.nuevaCita.hora = '';
+    this.horasDisponibles = [];
+    if (!this.nuevaCita.fecha) return;
+
+    this.cargandoHoras = true;
+    this.citaService
+      .obtenerHorasDisponibles(this.medicoId, this.nuevaCita.fecha)
+      .subscribe({
+        next: (res: any) => {
+          const horasDevueltas: string[] = res?.horas || [];
+          let horasOrdenadas = this.horariosAtencion.filter((h) =>
+            horasDevueltas.includes(h),
+          );
+          if (this.nuevaCita.fecha === this.minFecha) {
+            const ahora = new Date();
+            const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
+            horasOrdenadas = horasOrdenadas.filter((h) => {
+              return this.horaAMinutos(h) > minutosActuales;
+            });
+          }
+          this.horasDisponibles = horasOrdenadas;
+          this.cargandoHoras = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.horasDisponibles = [];
+          this.cargandoHoras = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  guardarCitaAsignada(): void {
+    if (!this.nuevaCita.paciente || !this.nuevaCita.fecha || !this.nuevaCita.hora) {
+      this.dialogService.confirmar({
+        titulo: 'Datos incompletos',
+        mensaje: 'Selecciona un paciente, una fecha y una hora.',
+        textoConfirmar: 'Entendido',
+        textoCancelar: '',
+        tipo: 'advertencia',
+      });
+      return;
+    }
+
+    const payload = {
+      paciente: this.nuevaCita.paciente,
+      medico: this.medicoId,
+      fecha: this.nuevaCita.fecha,
+      hora: this.nuevaCita.hora,
+      motivo: this.nuevaCita.motivo,
+    };
+
+    this.guardando = true;
+    this.citaService.crearCita(payload).subscribe({
+      next: (res: any) => {
+        this.guardando = false;
+        this.cerrarModalAsignar();
+
+        const datos = res.datos || {};
+        const fecha = datos.fecha || this.nuevaCita.fecha || '';
+        const hora = datos.hora || this.nuevaCita.hora || '';
+        const pacienteN =
+          datos.paciente?.Nombre ||
+          datos.paciente?.nombre ||
+          this.nombrePaciente({ paciente: this.nuevaCita.paciente }) ||
+          'el paciente';
+
+        let mensaje = `Cita asignada con éxito a ${pacienteN}`;
+        if (fecha) mensaje += ` para el día ${fecha}`;
+        if (hora) mensaje += ` a las ${hora}`;
+        mensaje += '.';
+
+        this.dialogService.confirmar({
+          titulo: 'Cita asignada',
+          mensaje,
+          textoConfirmar: 'Aceptar',
+          textoCancelar: '',
+          tipo: 'info',
+        });
+
+        this.cargarAgenda();
+      },
+      error: (err) => {
+        this.guardando = false;
+        const detalle = err?.error?.mensaje || 'No se pudo asignar la cita.';
+        this.dialogService.confirmar({
+          titulo: 'Error',
+          mensaje: detalle,
+          textoConfirmar: 'Entendido',
+          textoCancelar: '',
+          tipo: 'peligro',
+        });
       },
     });
   }

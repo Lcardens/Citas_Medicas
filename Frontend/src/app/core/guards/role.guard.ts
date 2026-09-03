@@ -7,7 +7,13 @@ export const roleGuard: CanActivateFn = (route, state) => {
 
   const rol = normalizarRol(rolDesdeToken());
 
-  const rolesPermitidos = ['admin', 'medico', 'paciente'];
+  // El médico usa "Mi agenda" para agendar sus citas
+  if (rol === 'medico') {
+    router.navigate(['/dashboard/misturnos']);
+    return false;
+  }
+
+  const rolesPermitidos = ['admin', 'paciente'];
 
   if (rolesPermitidos.includes(rol)) {
     return true;

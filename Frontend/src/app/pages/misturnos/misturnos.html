@@ -1,9 +1,14 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h2>Mi Agenda</h2>
-    <button class="btn btn-outline-secondary btn-sm" (click)="cargarAgenda()">
-      <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
-    </button>
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-primary" (click)="abrirModalAsignar()">
+        <i class="bi bi-plus-circle me-1"></i>Asignar cita
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="cargarAgenda()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+      </button>
+    </div>
   </div>
 
   <div *ngIf="mensaje" class="alert alert-success d-flex align-items-center">
@@ -169,6 +174,98 @@
             role="status"
           ></span>
           Marcar como atendida
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModalAsignar"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary-subtle">
+        <h5 class="modal-title">
+          <i class="bi bi-plus-circle me-1"></i>Asignar cita
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModalAsignar()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Paciente</label>
+          <select
+            class="form-select"
+            [(ngModel)]="nuevaCita.paciente"
+            name="asigPaciente"
+            required
+          >
+            <option value="" disabled>Seleccione un paciente</option>
+            <option
+              *ngFor="let p of pacientes"
+              [value]="p._id"
+            >
+              {{ p.Nombre || p.nombre || p.nombres }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Fecha</label>
+          <input
+            type="date"
+            class="form-control"
+            [min]="minFecha"
+            [(ngModel)]="nuevaCita.fecha"
+            name="asigFecha"
+            (change)="cambioFechaAsignar()"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Hora</label>
+          <select
+            class="form-select"
+            [(ngModel)]="nuevaCita.hora"
+            name="asigHora"
+            [disabled]="cargandoHoras || horasDisponibles.length === 0"
+            required
+          >
+            <option value="" disabled>
+              {{ cargandoHoras ? 'Cargando...' : 'Hora disponible' }}
+            </option>
+            <option *ngFor="let h of horasDisponibles" [value]="h">{{ h }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Motivo</label>
+          <textarea
+            class="form-control"
+            [(ngModel)]="nuevaCita.motivo"
+            name="asigMotivo"
+            rows="2"
+            placeholder="Motivo de la consulta (opcional)"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalAsignar()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="guardando"
+          (click)="guardarCitaAsignada()"
+        >
+          <span
+            *ngIf="guardando"
+            class="spinner-border spinner-border-sm me-1"
+            role="status"
+          ></span>
+          Asignar
         </button>
       </div>
     </div>

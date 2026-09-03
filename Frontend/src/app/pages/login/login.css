@@ -173,14 +173,30 @@
   box-shadow: 0 6px 16px rgba(39, 183, 245, 0.35);
 }
 
-.login-card .btn-outline-secondary {
-  border: 1px solid #dcd4ed;
-  color: #8c75c4;
+/* Campo de contraseña con el icono del ojo integrado */
+.login-password-field {
+  position: relative;
 }
 
-.login-card .btn-outline-secondary:hover {
-  background-color: rgba(184, 166, 222, 0.15);
-  color: #5a4b7c;
+.login-password-field .form-control {
+  padding-right: 2.6rem;
+}
+
+.login-eye-btn {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.25rem;
+  color: #a092c9;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.login-eye-btn:hover {
+  color: #27b7f5;
 }
 
 .login-toggle {
