@@ -79,7 +79,7 @@ export class PacientesComponent implements OnInit {
 
   eliminarPaciente(id: string, nombre: string): void {
     if (!confirm(
-      `Â¿Eliminar al paciente "${nombre || ''}"? Se borrarÃ¡ tambiÃ©n su usuario y sus citas. Esta acciÃ³n no se puede deshacer.`
+      `¿Eliminar al paciente "${nombre || ''}"? Se borrará también su usuario y sus citas. Esta acción no se puede deshacer.`
     )) {
       return;
     }
@@ -91,7 +91,7 @@ export class PacientesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al eliminar paciente:', err);
-        alert(err.error?.mensaje || 'OcurriÃ³ un error al eliminar el paciente.');
+        alert(err.error?.mensaje || 'Ocurrió un error al eliminar el paciente.');
       },
     });
   }

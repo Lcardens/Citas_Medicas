@@ -1,6 +1,6 @@
 ﻿<div class="container py-2">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-primary mb-0">GestiÃ³n de Usuarios</h2>
+    <h2 class="fw-bold text-primary mb-0">Gestión de Usuarios</h2>
     <button class="btn btn-primary rounded-pill px-4" (click)="abrirModal()">
       + Crear Usuario
     </button>
@@ -13,7 +13,7 @@
         <select class="form-select" [(ngModel)]="rolFiltro">
           <option value="">-- Todos los roles --</option>
           <option value="admin">Administradores</option>
-          <option value="medico">MÃ©dicos</option>
+          <option value="medico">Médicos</option>
           <option value="paciente">Pacientes</option>
         </select>
       </div>
@@ -65,7 +65,7 @@
               >
                 <i class="bi bi-trash me-1"></i>Eliminar
               </button>
-              <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tÃº</span>
+              <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tú</span>
             </td>
           </tr>
           <tr *ngIf="usuariosFiltrados.length === 0">
@@ -107,13 +107,13 @@
               class="form-control"
               [(ngModel)]="nuevoUsuario.nombre"
               name="nombre"
-              placeholder="Ej: Juan PÃ©rez"
+              placeholder="Ej: Juan Pérez"
               required
             />
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-semibold">Correo ElectrÃ³nico</label>
+            <label class="form-label fw-semibold">Correo Electrónico</label>
             <input
               type="email"
               class="form-control"
@@ -125,7 +125,7 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-semibold">ContraseÃ±a</label>
+            <label class="form-label fw-semibold">Contraseña</label>
             <input
               type="password"
               class="form-control"
@@ -140,7 +140,7 @@
             <label class="form-label fw-semibold">Rol del Usuario</label>
             <select class="form-select" [(ngModel)]="nuevoUsuario.rol" name="rol" required>
               <option value="paciente">Paciente</option>
-              <option value="medico">MÃ©dico</option>
+              <option value="medico">Médico</option>
               <option value="admin">Administrador</option>
             </select>
           </div>

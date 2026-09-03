@@ -1,10 +1,10 @@
 ﻿<div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-    <h2>Citas MÃ©dicas</h2>
+    <h2>Citas Médicas</h2>
 
     <div class="d-flex gap-2">
       <button *ngIf="rolUsuario === 'paciente'" class="btn btn-success" (click)="asignacionRapida()">
-        <i class="bi bi-magic me-1"></i>Asignarme automÃ¡ticamente
+        <i class="bi bi-magic me-1"></i>Asignarme automáticamente
       </button>
 
       <button *ngIf="puedeAgendar" class="btn btn-primary" (click)="abrirModal()">
@@ -26,7 +26,7 @@
         <tr>
           <th>#</th>
           <th>Paciente</th>
-          <th>MÃ©dico</th>
+          <th>Médico</th>
           <th>Fecha</th>
           <th>Hora</th>
           <th>Motivo</th>
@@ -54,7 +54,7 @@
               class="form-select form-select-sm"
               [(ngModel)]="medicoFiltro"
             >
-              <option value="">MÃ©dico</option>
+              <option value="">Médico</option>
               <option *ngFor="let m of medicos" [value]="m._id">
                 {{ m.Nombre || m.nombre }}
               </option>
@@ -123,7 +123,7 @@
           <td>
             {{ cita.motivo }}
             <div *ngIf="cita.diagnostico" class="small text-muted mt-1">
-              <strong>DiagnÃ³stico:</strong> {{ cita.diagnostico }}
+              <strong>Diagnóstico:</strong> {{ cita.diagnostico }}
             </div>
           </td>
           <td>
@@ -151,7 +151,7 @@
 
           <td *ngIf="mostrarColumnaAcciones" class="text-center">
             <div class="btn-group btn-group-sm" role="group">
-              <ng-container *ngIf="esPersonalMedico">
+              <ng-container *ngIf="puedeEditarCita(cita)">
                 <button
                   class="btn btn-outline-warning"
                   title="Editar cita"
@@ -208,7 +208,7 @@
         <div class="modal-body">
           <div *ngIf="rolUsuario === 'paciente'" class="alert alert-info py-2">
             <i class="bi bi-person-check me-1"></i>
-            Te asignarÃ¡s la cita a tu propio perfil.
+            Te asignarás la cita a tu propio perfil.
           </div>
 
           <div class="mb-3" *ngIf="rolUsuario !== 'paciente'">
@@ -221,8 +221,8 @@
             </select>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">MÃ©dico</label>
+          <div class="mb-3" *ngIf="rolUsuario !== 'medico'">
+            <label class="form-label">Médico</label>
             <select
               class="form-select"
               [(ngModel)]="nuevaCita.medico"
@@ -230,7 +230,7 @@
               required
               (change)="onMedicoChange()"
             >
-              <option value="" disabled selected>Seleccione un mÃ©dico</option>
+              <option value="" disabled selected>Seleccione un médico</option>
               <option *ngFor="let m of medicos" [value]="m._id">
                 {{ m.Nombre || m.nombre }} - {{ m.Registromedico || m.registroMedico }}
               </option>

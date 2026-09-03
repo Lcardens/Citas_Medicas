@@ -45,7 +45,7 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label fw-semibold" for="email">Correo electrÃ³nico</label>
+              <label class="form-label fw-semibold" for="email">Correo electrónico</label>
               <input
                 id="email"
                 type="email"
@@ -57,7 +57,7 @@
             </div>
 
             <div class="col-md-6" *ngIf="puedeActualizarTelefono">
-              <label class="form-label fw-semibold" for="telefono">TelÃ©fono</label>
+              <label class="form-label fw-semibold" for="telefono">Teléfono</label>
               <input
                 id="telefono"
                 type="text"
@@ -73,7 +73,7 @@
             </div>
 
             <div class="col-md-6" *ngIf="!puedeActualizarTelefono">
-              <label class="form-label fw-semibold">Registro mÃ©dico</label>
+              <label class="form-label fw-semibold">Registro médico</label>
               <input type="text" class="form-control" [value]="registroMedico ? registroMedico : 'â€”'" disabled />
             </div>
 
@@ -86,13 +86,13 @@
                 class="btn btn-outline-primary"
                 (click)="abrirCambioPassword()"
               >
-                <i class="bi bi-shield-lock me-1"></i>Cambiar contraseÃ±a
+                <i class="bi bi-shield-lock me-1"></i>Cambiar contraseña
               </button>
 
               <div *ngIf="mostrarCambioPassword">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <h6 class="fw-bold mb-0">
-                    <i class="bi bi-shield-lock me-1"></i>Cambiar contraseÃ±a
+                    <i class="bi bi-shield-lock me-1"></i>Cambiar contraseña
                   </h6>
                   <button
                     type="button"
@@ -103,12 +103,12 @@
                   </button>
                 </div>
                 <small class="text-muted d-block mb-2">
-                  Escribe la contraseÃ±a actual y la nueva (mÃ­nimo 6 caracteres).
+                  Escribe la contraseña actual y la nueva (mínimo 6 caracteres).
                 </small>
 
                 <div class="row g-3">
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold" for="passwordActual">ContraseÃ±a actual</label>
+                    <label class="form-label fw-semibold" for="passwordActual">Contraseña actual</label>
                     <input
                       id="passwordActual"
                       type="password"
@@ -120,7 +120,7 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold" for="passwordNueva">Nueva contraseÃ±a</label>
+                    <label class="form-label fw-semibold" for="passwordNueva">Nueva contraseña</label>
                     <input
                       id="passwordNueva"
                       type="password"
@@ -133,7 +133,7 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold" for="confirmarPassword">Confirmar contraseÃ±a</label>
+                    <label class="form-label fw-semibold" for="confirmarPassword">Confirmar contraseña</label>
                     <input
                       id="confirmarPassword"
                       type="password"

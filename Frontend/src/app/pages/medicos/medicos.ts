@@ -41,7 +41,7 @@ export class MedicosComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error al obtener mÃ©dicos:', error);
+        console.error('Error al obtener médicos:', error);
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -66,7 +66,7 @@ export class MedicosComponent implements OnInit {
         this.cerrarModal();
         this.obtenerMedicos();
       },
-      error: (err) => console.error('Error al crear mÃ©dico:', err),
+      error: (err) => console.error('Error al crear médico:', err),
     });
   }
 
@@ -79,19 +79,19 @@ export class MedicosComponent implements OnInit {
 
   eliminarMedico(id: string, nombre: string): void {
     if (!confirm(
-      `Â¿Eliminar al mÃ©dico "${nombre || ''}"? Se borrarÃ¡ tambiÃ©n su usuario y sus citas. Esta acciÃ³n no se puede deshacer.`
+      `¿Eliminar al médico "${nombre || ''}"? Se borrará también su usuario y sus citas. Esta acción no se puede deshacer.`
     )) {
       return;
     }
 
     this.medicoService.eliminarMedico(id).subscribe({
       next: (res: any) => {
-        alert(res?.mensaje || 'MÃ©dico eliminado.');
+        alert(res?.mensaje || 'Médico eliminado.');
         this.obtenerMedicos();
       },
       error: (err) => {
-        console.error('Error al eliminar mÃ©dico:', err);
-        alert(err.error?.mensaje || 'OcurriÃ³ un error al eliminar el mÃ©dico.');
+        console.error('Error al eliminar médico:', err);
+        alert(err.error?.mensaje || 'Ocurrió un error al eliminar el médico.');
       },
     });
   }

@@ -38,6 +38,7 @@ export class CitasComponent implements OnInit {
 
   rolUsuario: string = '';
   usuarioId: string = '';
+  medicoId: string = '';
   medicoFiltro: string = '';
   pacienteFiltro: string = '';
   estadoFiltro: string = '';
@@ -107,7 +108,7 @@ export class CitasComponent implements OnInit {
   }
 
   get esPersonalMedico(): boolean {
-    return this.esAdmin || this.rolUsuario === 'medico' || this.rolUsuario === 'mÃ©dico';
+    return this.esAdmin || this.rolUsuario === 'medico' || this.rolUsuario === 'médico';
   }
 
   get mostrarColumnaAcciones(): boolean {
@@ -115,7 +116,7 @@ export class CitasComponent implements OnInit {
   }
 
   get puedeAgendar(): boolean {
-    return this.esAdmin || this.rolUsuario === 'medico' || this.rolUsuario === 'mÃ©dico' || this.rolUsuario === 'paciente';
+    return this.esAdmin || this.rolUsuario === 'medico' || this.rolUsuario === 'médico' || this.rolUsuario === 'paciente';
   }
 
   get citasFiltradas(): any[] {
@@ -124,6 +125,13 @@ export class CitasComponent implements OnInit {
     if (this.rolUsuario === 'paciente') {
       const emailUsuario = localStorage.getItem('emailUsuario');
       lista = lista.filter((cita) => cita.paciente?.Correo === emailUsuario);
+    }
+
+    if (this.rolUsuario === 'medico' && this.medicoId) {
+      lista = lista.filter((cita) => {
+        const citaMedicoId = typeof cita.medico === 'object' ? cita.medico?._id : cita.medico;
+        return String(citaMedicoId) === String(this.medicoId);
+      });
     }
 
     if (this.medicoFiltro) {
@@ -226,11 +234,21 @@ export class CitasComponent implements OnInit {
           return cita;
         });
 
+        if (this.rolUsuario === 'medico' && !this.medicoId) {
+          const emailUsuario = localStorage.getItem('emailUsuario');
+          const medicoEncontrado = this.medicos.find(
+            (m: any) => m.email?.toLowerCase() === emailUsuario?.toLowerCase(),
+          );
+          if (medicoEncontrado) {
+            this.medicoId = medicoEncontrado._id;
+          }
+        }
+
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error crÃ­tico al cargar los datos de la vista:', err);
+        console.error('Error crítico al cargar los datos de la vista:', err);
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -244,6 +262,9 @@ export class CitasComponent implements OnInit {
     this.fechaSinDisponibilidad = false;
     this.mesCalendario = new Date();
     this.fechaSeleccionada = '';
+    if (this.rolUsuario === 'medico' && this.medicoId) {
+      this.nuevaCita.medico = this.medicoId;
+    }
     this.construirCalendario();
   }
 
@@ -419,7 +440,7 @@ export class CitasComponent implements OnInit {
     }
 
     if (!datosEnviar.medico || !datosEnviar.fecha || !datosEnviar.hora) {
-      alert('Por favor complete todos los campos obligatorios (mÃ©dico, fecha, hora).');
+      alert('Por favor complete todos los campos obligatorios (médico, fecha, hora).');
       return;
     }
 
@@ -431,25 +452,25 @@ export class CitasComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al agendar cita:', err);
-        alert('OcurriÃ³ un error al agendar la cita');
+        alert('Ocurrió un error al agendar la cita');
       },
     });
   }
 
   asignacionRapida(): void {
-    if (!confirm('Â¿Deseas que el sistema te asigne automÃ¡ticamente el primer mÃ©dico con cupo disponible?')) {
+    if (!confirm('¿Deseas que el sistema te asigne automáticamente el primer médico con cupo disponible?')) {
       return;
     }
 
     this.citaService.asignarCitaRapida({}).subscribe({
       next: (res: any) => {
-        alert(res.mensaje || 'Cita asignada automÃ¡ticamente');
+        alert(res.mensaje || 'Cita asignada automáticamente');
         this.cargarDatosGlobales();
       },
       error: (err) => {
-        console.error('Error en asignaciÃ³n rÃ¡pida:', err);
+        console.error('Error en asignación rápida:', err);
         const detalle = err.error?.error || err.error?.mensaje;
-        alert(detalle || 'OcurriÃ³ un error al asignar la cita automÃ¡ticamente');
+        alert(detalle || 'Ocurrió un error al asignar la cita automáticamente');
       },
     });
   }
@@ -486,7 +507,7 @@ export class CitasComponent implements OnInit {
   eliminarCita(id: string): void {
     if (!id) return;
 
-    if (confirm('Â¿EstÃ¡s seguro de que deseas eliminar esta cita?')) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
       this.citaService.eliminarCita(id).subscribe({
         next: () => {
           alert('Cita eliminada exitosamente');
@@ -494,7 +515,7 @@ export class CitasComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al eliminar cita:', err);
-          alert('OcurriÃ³ un error al intentar eliminar la cita.');
+          alert('Ocurrió un error al intentar eliminar la cita.');
         },
       });
     }
@@ -507,10 +528,23 @@ export class CitasComponent implements OnInit {
     return cita.paciente?.Correo === emailUsuario || cita.paciente?.email === emailUsuario;
   }
 
+  esCitaDelMedicoLogueado(cita: any): boolean {
+    if (this.rolUsuario !== 'medico') return false;
+    if (!this.medicoId) return false;
+    const citaMedicoId = typeof cita.medico === 'object' ? cita.medico?._id : cita.medico;
+    return String(citaMedicoId) === String(this.medicoId);
+  }
+
+  puedeEditarCita(cita: any): boolean {
+    if (this.esAdmin) return true;
+    if (this.rolUsuario === 'medico') return this.esCitaDelMedicoLogueado(cita);
+    return false;
+  }
+
   cancelarCita(id: string): void {
     if (!id) return;
 
-    if (confirm('Â¿EstÃ¡s seguro de que deseas cancelar esta cita?')) {
+    if (confirm('¿Estás seguro de que deseas cancelar esta cita?')) {
       this.citaService.actualizarCita(id, { estado: 'Cancelada' }).subscribe({
         next: () => {
           alert('Cita cancelada exitosamente');
@@ -518,7 +552,7 @@ export class CitasComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cancelar cita:', err);
-          alert('OcurriÃ³ un error al intentar cancelar la cita.');
+          alert('Ocurrió un error al intentar cancelar la cita.');
         },
       });
     }

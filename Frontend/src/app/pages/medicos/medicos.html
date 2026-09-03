@@ -1,9 +1,9 @@
 ﻿<div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>MÃ©dicos</h2>
+    <h2>Médicos</h2>
 
     <button *ngIf="esPersonalMedico" class="btn btn-primary" (click)="abrirModal()">
-      + Nuevo MÃ©dico
+      + Nuevo Médico
     </button>
   </div>
 
@@ -18,7 +18,7 @@
       <thead class="table-dark">
         <tr>
           <th>#</th>
-          <th>Registro MÃ©dico</th>
+          <th>Registro Médico</th>
           <th>Nombre Completo</th>
           <th class="text-center">Acciones</th>
         </tr>
@@ -31,7 +31,7 @@
           <td class="text-center">
             <button
               class="btn btn-outline-danger btn-sm"
-              title="Eliminar mÃ©dico y sus datos"
+              title="Eliminar médico y sus datos"
               (click)="eliminarMedico(medico._id, medico.Nombre)"
             >
               <i class="bi bi-trash me-1"></i>Eliminar
@@ -52,13 +52,13 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Registrar MÃ©dico</h5>
+        <h5 class="modal-title">Registrar Médico</h5>
         <button type="button" class="btn-close" (click)="cerrarModal()"></button>
       </div>
       <form (ngSubmit)="guardarMedico()">
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Registro MÃ©dico</label>
+            <label class="form-label">Registro Médico</label>
             <input
               type="text"
               class="form-control"
