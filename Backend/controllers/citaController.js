@@ -63,6 +63,50 @@ const resolverPacientePorUsuario = async (usuarioLogueado) => {
   return paciente;
 };
 
+const estadosOcupados = ["Confirmada", "Reservada"];
+
+const existeConflictoHora = async (medico, fecha, hora, ignorarId) => {
+  const query = { medico, fecha, hora, estado: { $in: estadosOcupados } };
+  if (ignorarId) query._id = { $ne: ignorarId };
+  return Cita.findOne(query);
+};
+
+const pacienteTieneCitaEseDia = async (paciente, fecha, ignorarId) => {
+  const query = {
+    paciente,
+    fecha,
+    estado: { $in: [...estadosOcupados, "Disponible"] },
+  };
+  if (ignorarId) query._id = { $ne: ignorarId };
+  return Cita.findOne(query);
+};
+
+const validarCitaNueva = async ({
+  paciente,
+  medico,
+  fecha,
+  hora,
+  ignorarId,
+}) => {
+  const conflicto = await existeConflictoHora(medico, fecha, hora, ignorarId);
+  if (conflicto) {
+    return {
+      error: `Ya existe una cita ocupada para este médico a las ${hora} el día ${fecha}.`,
+    };
+  }
+
+  if (paciente) {
+    const yaCitaDia = await pacienteTieneCitaEseDia(paciente, fecha, ignorarId);
+    if (yaCitaDia) {
+      return {
+        error: "El paciente ya tiene una cita asignada para esta fecha (máximo 1 por día).",
+      };
+    }
+  }
+
+  return { error: null };
+};
+
 // Crear una cita manual
 exports.crearCita = async (req, res) => {
   try {
@@ -120,17 +164,17 @@ exports.crearCita = async (req, res) => {
       });
     }
 
-    // Cita Confirmada en esa hora (ocupada)
-    const citaConfirmada = await Cita.findOne({
+    // Validar conflictos de horario y máximo una cita por día por paciente
+    const { error: errorValidacion } = await validarCitaNueva({
+      paciente,
       medico,
       fecha,
       hora,
-      estado: "Confirmada",
     });
-    if (citaConfirmada) {
+    if (errorValidacion) {
       return res.status(400).json({
         exitoso: false,
-        mensaje: `Ya existe una cita confirmada para este médico a las ${hora} el día ${fecha}.`,
+        mensaje: errorValidacion,
       });
     }
 
@@ -235,17 +279,15 @@ exports.asignarCita = async (req, res) => {
       });
     }
 
-    // Evitar doble asignación el mismo día
-    const yaTieneCita = await Cita.findOne({
-      medico: medicoId,
-      paciente: pacienteId,
-      fecha: fechaConsulta,
-      estado: { $in: ["Confirmada", "Disponible"] },
-    });
-    if (yaTieneCita) {
+    // Evitar que el paciente tenga más de una cita el mismo día
+    const yaTieneCitaDia = await pacienteTieneCitaEseDia(
+      pacienteId,
+      fechaConsulta,
+    );
+    if (yaTieneCitaDia) {
       return res.status(400).json({
         exitoso: false,
-        mensaje: "Ya tienes una cita con este médico en esta fecha.",
+        mensaje: "El paciente ya tiene una cita asignada para esta fecha (máximo 1 por día).",
       });
     }
 
@@ -332,6 +374,15 @@ exports.asignarCitaRapida = async (req, res) => {
     }
 
     const fechaDesde = fecha || new Date().toISOString().split("T")[0];
+
+    // Evitar que el paciente tenga más de una cita el mismo día
+    const yaTieneCitaDia = await pacienteTieneCitaEseDia(pacienteId, fechaDesde);
+    if (yaTieneCitaDia) {
+      return res.status(400).json({
+        exitoso: false,
+        mensaje: "El paciente ya tiene una cita asignada para esta fecha (máximo 1 por día).",
+      });
+    }
 
     // Primer cupo disponible (cualquier médico, desde hoy)
     let cupoEncontrado = await Cita.findOne({
@@ -842,6 +893,35 @@ exports.actualizarCita = async (req, res) => {
           exitoso: false,
           mensaje: "Solo puedes modificar citas que te pertenezcan.",
         });
+      }
+    }
+
+    // Admin: validar conflictos al cambiar fecha/hora/paciente/medico
+    if (esAdmin) {
+      const esEdicionAdmin = ["fecha", "hora", "paciente", "medico"].some(
+        (c) => camposActualizar[c] !== undefined,
+      );
+      if (esEdicionAdmin) {
+        const citaActual = await Cita.findById(id);
+        if (citaActual) {
+          const nuevaFecha = camposActualizar.fecha ?? citaActual.fecha;
+          const nuevaHora = camposActualizar.hora ?? citaActual.hora;
+          const nuevoPaciente = camposActualizar.paciente ?? citaActual.paciente;
+          const nuevoMedico = camposActualizar.medico ?? citaActual.medico;
+          const { error: errorValidacion } = await validarCitaNueva({
+            paciente: nuevoPaciente,
+            medico: nuevoMedico,
+            fecha: nuevaFecha,
+            hora: nuevaHora,
+            ignorarId: id,
+          });
+          if (errorValidacion) {
+            return res.status(400).json({
+              exitoso: false,
+              mensaje: errorValidacion,
+            });
+          }
+        }
       }
     }
 
