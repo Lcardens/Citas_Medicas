@@ -108,22 +108,16 @@
       </div>
     </div>
     <hr />
-    <div class="row align-items-center">
-      <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
-        <small
-          >&copy; {{ currentYear }} Sistema de Citas Médicas. Todos los derechos reservados.</small
-        >
-      </div>
-      <div class="col-md-4 text-center mb-2 mb-md-0">
-        <a routerLink="/dashboard/ayuda" class="text-decoration-none footer-help">
-          <small>
-            <i class="bi bi-question-circle-fill me-1"></i>Centro de Ayuda
-          </small>
-        </a>
-      </div>
-      <div class="col-md-4 text-center text-md-end">
-        <small>Desarrollado por <strong>Luisa Cárdenas</strong> &mdash; Bootcamp BIT</small>
-      </div>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center text-center text-md-start gap-2">
+      <small class="order-1 order-md-1">
+        &copy; {{ currentYear }} Sistema de Citas Médicas. Todos los derechos reservados.
+      </small>
+      <a routerLink="/dashboard/ayuda" class="text-decoration-none footer-help order-3 order-md-2">
+        <small>
+          <i class="bi bi-question-circle-fill me-1"></i>¿Necesitás ayuda? Guía y preguntas frecuentes
+        </small>
+      </a>
+      <small class="order-2 order-md-3">Desarrollado por <strong>Luisa Cárdenas</strong> &mdash; Bootcamp BIT</small>
     </div>
   </div>
 </footer>
