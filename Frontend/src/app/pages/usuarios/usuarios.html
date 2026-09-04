@@ -89,7 +89,7 @@
                   title="Eliminar usuario y sus datos"
                   (click)="eliminarUsuario(usuario._id, usuario.nombre || usuario.Nombre)"
                 >
-                  <i class="bi bi-trash me-1"></i>Eliminar
+                  Eliminar
                 </button>
                 <span *ngIf="esUsuarioActual(usuario._id)" class="badge bg-secondary">Eres tú</span>
               </td>
