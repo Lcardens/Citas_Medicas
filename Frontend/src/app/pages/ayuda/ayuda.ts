@@ -80,7 +80,7 @@ export class AyudaComponent implements OnInit {
           pasos: [
             'Entrá a "Usuarios" desde el menú.',
             'Filtrá por nombre, email o rol.',
-            'Solo podés crear usuarios con rol Médico o Paciente.',
+            'Solo puedes crear usuarios con rol Médico o Paciente.',
             'Para editar el nombre de un usuario, hacé clic en "Editar".',
             'Para eliminar, se borran todos los datos vinculados.',
           ],
@@ -171,7 +171,7 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-calendar-check',
           color: '#27b7f5',
           pregunta: '¿Cómo sé qué citas tengo pendientes?',
-          respuesta: 'En "Mi Agenda", las citas pendientes aparecen listadas con la hora y el nombre del paciente. También podés usar el buscador por fecha.',
+          respuesta: 'En "Mi Agenda", las citas pendientes aparecen listadas con la hora y el nombre del paciente. También puedes usar el buscador por fecha.',
         },
         {
           icono: 'bi-clock',
@@ -236,7 +236,7 @@ export class AyudaComponent implements OnInit {
           pasos: [
             'Accedé a "Mi Perfil" desde el menú.',
             'Podés actualizar tu nombre y teléfono.',
-            'También podés cambiar tu contraseña.',
+            'También puedes cambiar tu contraseña.',
             'Los campos de documento y correo son de solo lectura.',
           ],
         },
@@ -252,7 +252,7 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-clock-history',
           color: '#27b7f5',
           pregunta: '¿Puedo cancelar una cita confirmada?',
-          respuesta: 'Sí, podés cancelar una cita mientras no haya sido atendida. En "Citas", hacé clic en "Cancelar". Si ya fue atendida, el botón no aparecerá.',
+          respuesta: 'Sí, puedes cancelar una cita mientras no haya sido atendida. En "Citas", hacé clic en "Cancelar". Si ya fue atendida, el botón no aparecerá.',
         },
         {
           icono: 'bi-search',
