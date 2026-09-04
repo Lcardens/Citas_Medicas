@@ -375,19 +375,21 @@ exports.asignarCitaRapida = async (req, res) => {
 
     const fechaDesde = fecha || new Date().toISOString().split("T")[0];
 
-    // Evitar que el paciente tenga más de una cita el mismo día
-    const yaTieneCitaDia = await pacienteTieneCitaEseDia(pacienteId, fechaDesde);
-    if (yaTieneCitaDia) {
-      return res.status(400).json({
-        exitoso: false,
-        mensaje: "El paciente ya tiene una cita asignada para esta fecha (máximo 1 por día).",
-      });
-    }
-
-    // Primer cupo disponible (cualquier médico, desde hoy)
-    let cupoEncontrado = await Cita.findOne({
-      estado: "Disponible",
+    // Días en los que el paciente ya tiene una cita ocupada (máximo 1 cita por día)
+    const diasOcupadosPaciente = await Cita.find({
+      paciente: pacienteId,
+      estado: { $in: ["Confirmada", "Reservada", "Disponible"] },
       fecha: { $gte: fechaDesde },
+    }).select("fecha");
+
+    const fechasOcupadas = [
+      ...new Set(diasOcupadosPaciente.map((c) => String(c.fecha).slice(0, 10))),
+    ];
+
+    // Busca el próximo cupo disponible en un día en que el paciente no tenga cita
+    let cupoFinal = await Cita.findOne({
+      estado: "Disponible",
+      fecha: { $gte: fechaDesde, $nin: fechasOcupadas },
       $or: [{ paciente: null }, { paciente: { $exists: false } }],
     })
       .sort({ fecha: 1, hora: 1 })
@@ -396,23 +398,25 @@ exports.asignarCitaRapida = async (req, res) => {
         "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
       );
 
-    if (!cupoEncontrado) {
-      // Generar cupos: desde hoy y hasta 30 días buscando disponibilidad
+    if (!cupoFinal) {
+      // Generar cupos desde hoy (o la fecha dada) hasta 30 días, saltando días ocupados
       const medicoReferencia = await Medico.findOne()
         .sort({ createdAt: 1 })
         .select("_id");
       if (medicoReferencia) {
         const fechaBase = new Date(`${fechaDesde}T00:00:00`);
-        for (let i = 0; i <= 30 && !cupoEncontrado; i++) {
+        for (let i = 0; i <= 30 && !cupoFinal; i++) {
           const fechaGenerar = new Date(fechaBase);
           fechaGenerar.setDate(fechaGenerar.getDate() + i);
           const fechaStr = fechaGenerar.toISOString().split("T")[0];
 
+          if (fechasOcupadas.includes(fechaStr)) continue;
+
           await crearCuposSiNoExisten(medicoReferencia._id, fechaStr);
 
-          cupoEncontrado = await Cita.findOne({
+          cupoFinal = await Cita.findOne({
             estado: "Disponible",
-            fecha: { $gte: fechaStr, $lte: fechaStr },
+            fecha: fechaStr,
             $or: [{ paciente: null }, { paciente: { $exists: false } }],
           })
             .sort({ fecha: 1, hora: 1 })
@@ -424,55 +428,10 @@ exports.asignarCitaRapida = async (req, res) => {
       }
     }
 
-    if (!cupoEncontrado) {
-      return res.status(400).json({
-        exitoso: false,
-        mensaje: "No hay cupos disponibles en este momento para ningún médico.",
-      });
-    }
-
-    // Obtener el id del médico (poblado o referencia)
-    const medicoId =
-      cupoEncontrado.medico && cupoEncontrado.medico._id
-        ? cupoEncontrado.medico._id
-        : cupoEncontrado.medico;
-
-    const nombreMedico =
-      cupoEncontrado.medico && typeof cupoEncontrado.medico === "object"
-        ? cupoEncontrado.medico.Nombre ||
-          cupoEncontrado.medico.nombre ||
-          "el médico"
-        : "el médico";
-
-    // Asegurar todos los cupos del médico para esa fecha
-    await crearCuposSiNoExisten(medicoId, cupoEncontrado.fecha);
-
-    // Cupos que el paciente ya tiene (no reasignables)
-    const idsYaAsignados = await Cita.find({
-      paciente: pacienteId,
-      estado: "Confirmada",
-    }).select("_id");
-
-    const arrayIdsExcluidos = idsYaAsignados.map((c) => c._id);
-    arrayIdsExcluidos.push(cupoEncontrado._id);
-
-    // Siguiente cupo sin chocar con citas del paciente
-    const cupoFinal = await Cita.findOne({
-      estado: "Disponible",
-      fecha: { $gte: fechaDesde },
-      _id: { $nin: arrayIdsExcluidos },
-      $or: [{ paciente: null }, { paciente: { $exists: false } }],
-    })
-      .sort({ fecha: 1, hora: 1 })
-      .populate(
-        "medico",
-        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
-      );
-
     if (!cupoFinal) {
       return res.status(400).json({
         exitoso: false,
-        mensaje: "No hay cupos disponibles que no choquen con tus citas existentes.",
+        mensaje: "No hay cupos disponibles en días libres para el paciente.",
       });
     }
 
