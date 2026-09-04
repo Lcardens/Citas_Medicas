@@ -80,7 +80,7 @@ export class AyudaComponent implements OnInit {
           pasos: [
             'Ingresa a "Usuarios" desde el menú.',
             'Filtra por nombre, email o rol.',
-            'Solo puedes crear usuarios con rol Médico o Paciente.',
+            'Puedes crear usuarios con rol Admin, Médico o Paciente.',
             'Para editar el nombre de un usuario, haz clic en "Editar".',
             'Para eliminar, se borran todos los datos vinculados.',
           ],
