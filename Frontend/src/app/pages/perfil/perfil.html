@@ -72,9 +72,19 @@
               <input type="text" class="form-control" [value]="documento" disabled />
             </div>
 
-            <div class="col-md-6" *ngIf="!puedeActualizarTelefono">
+            <div class="col-md-6" *ngIf="!puedeActualizarTelefono && rol === 'medico'">
               <label class="form-label fw-semibold">Registro médico</label>
-              <input type="text" class="form-control" [value]="registroMedico ? registroMedico : 'â€”'" disabled />
+              <input type="text" class="form-control" [value]="registroMedico ? registroMedico : '—'" disabled />
+            </div>
+
+            <div class="col-md-6" *ngIf="!puedeActualizarTelefono && rol !== 'medico'">
+              <label class="form-label fw-semibold">Tipo de documento</label>
+              <input type="text" class="form-control" [value]="tipoDocumento" disabled />
+            </div>
+
+            <div class="col-md-6" *ngIf="!puedeActualizarTelefono && rol !== 'medico'">
+              <label class="form-label fw-semibold">Número de documento</label>
+              <input type="text" class="form-control" [value]="documento" disabled />
             </div>
 
             <hr class="mt-4" />
