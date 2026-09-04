@@ -210,10 +210,10 @@ export class AyudaComponent implements OnInit {
         {
           icono: 'bi-clipboard2-pulse',
           color: '#27b7f5',
-          titulo: 'Ver Mis Turnos',
+          titulo: 'Ver Mis Citas',
           pasos: [
-            'En el menú, seleccioná "Mis Turnos".',
-            'Verás tus citas con su estado: Pendiente, Confirmada o Atendida.',
+            'En el menú, seleccioná "Citas".',
+            'Verás tus citas con su estado: Confirmada o Atendida.',
             'Podés buscar por nombre del médico.',
             'Si necesitás cancelar, hacé clic en "Cancelar".',
           ],
@@ -246,13 +246,13 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-calendar-check',
           color: '#6fbf8f',
           pregunta: '¿Cómo sé si mi cita fue confirmada?',
-          respuesta: 'Cuando agendás una cita, queda confirmada automáticamente. Podés ver el estado en "Mis Turnos".',
+          respuesta: 'Cuando agendás una cita, queda confirmada automáticamente. Podés ver el estado en "Citas".',
         },
         {
           icono: 'bi-clock-history',
           color: '#27b7f5',
           pregunta: '¿Puedo cancelar una cita confirmada?',
-          respuesta: 'Sí, podés cancelar una cita mientras no haya sido atendida. En "Mis Turnos", hacé clic en "Cancelar". Si ya fue atendida, el botón no aparecerá.',
+          respuesta: 'Sí, podés cancelar una cita mientras no haya sido atendida. En "Citas", hacé clic en "Cancelar". Si ya fue atendida, el botón no aparecerá.',
         },
         {
           icono: 'bi-search',
