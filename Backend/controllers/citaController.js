@@ -19,15 +19,46 @@ const HORARIOS = [
 
 // Genera los cupos que faltan para un médico/fecha
 const crearCuposSiNoExisten = async (medicoId, fecha) => {
-  const citasExistentes = await Cita.find({ medico: medicoId, fecha });
+  const medico = await Medico.findById(medicoId).select(
+    "diasAtencion horasAtencion diasBloqueados",
+  );
+  if (!medico) return { creados: 0 };
+
+  const fechaStr = String(fecha || "").slice(0, 10);
+  const fechaObj = new Date(`${fechaStr}T00:00:00`);
+  const diaSemana = fechaObj.getDay();
+
+  const diasAtencion = Array.isArray(medico.diasAtencion)
+    ? medico.diasAtencion
+    : [];
+  const horasAtencion = Array.isArray(medico.horasAtencion)
+    ? medico.horasAtencion
+    : HORARIOS;
+  const diasBloqueados = Array.isArray(medico.diasBloqueados)
+    ? medico.diasBloqueados.map((d) => String(d).slice(0, 10))
+    : [];
+
+  if (diasBloqueados.includes(fechaStr)) {
+    return { creados: 0, bloqueado: true };
+  }
+  if (!diasAtencion.includes(diaSemana)) {
+    return { creados: 0, bloqueado: true };
+  }
+
+  const citasExistentes = await Cita.find({ medico: medicoId, fecha: fechaStr });
 
   const horasOcupadas = new Set(
     citasExistentes
-      .filter((cita) => cita.estado === "Confirmada" || cita.estado === "Disponible")
+      .filter(
+        (cita) =>
+          cita.estado === "Confirmada" || cita.estado === "Disponible",
+      )
       .map((cita) => cita.hora),
   );
 
-  const horasFaltantes = HORARIOS.filter((hora) => !horasOcupadas.has(hora));
+  const horasFaltantes = horasAtencion.filter(
+    (hora) => !horasOcupadas.has(hora),
+  );
 
   if (horasFaltantes.length === 0) {
     return { creados: 0 };
@@ -35,7 +66,7 @@ const crearCuposSiNoExisten = async (medicoId, fecha) => {
 
   const nuevasCitas = horasFaltantes.map((hora) => ({
     medico: medicoId,
-    fecha,
+    fecha: fechaStr,
     hora,
     motivo: `Cita médica - ${hora}`,
     estado: "Disponible",
