@@ -10,6 +10,7 @@ import { PerfilComponent } from './pages/perfil/perfil';
 import { MisturnosComponent } from './pages/misturnos/misturnos';
 import { ReportesComponent } from './pages/reportes/reportes';
 import { AuditoriaComponent } from './pages/auditoria/auditoria';
+import { AyudaComponent } from './pages/ayuda/ayuda';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
@@ -76,6 +77,10 @@ export const routes: Routes = [
         path: 'usuarios',
         component: UsuariosComponent,
         canActivate: [adminGuard],
+      },
+      {
+        path: 'ayuda',
+        component: AyudaComponent,
       },
     ],
   },
