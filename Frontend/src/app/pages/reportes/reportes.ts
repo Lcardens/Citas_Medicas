@@ -74,7 +74,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
 
     const labels = ['Disponible', 'Confirmada', 'Atendida', 'Cancelada'];
     const data = labels.map((e) => this.estados[e] || 0);
-    const colores = ['#6c757d', '#0d6efd', '#198754', '#dc3545'];
+    const colores = ['#fbbf24', '#93c5fd', '#86efac', '#fca5a5'];
 
     this.chartEstados = new Chart(this.chartEstadosRef.nativeElement, {
       type: 'doughnut',
