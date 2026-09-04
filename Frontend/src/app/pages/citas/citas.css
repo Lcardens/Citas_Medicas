@@ -109,6 +109,17 @@
   cursor: not-allowed;
 }
 
+.calendario-dia.con-disponibilidad {
+  color: #1e7e34;
+  background: #e8f5e9;
+  border-color: #c8e6c9;
+}
+
+.calendario-dia.con-disponibilidad:not(.pasado):not(.seleccionado):hover {
+  background: #d7f0da;
+  border-color: #4caf50;
+}
+
 .calendario-dia.seleccionado {
   background: #27b7f5;
   color: #fff;

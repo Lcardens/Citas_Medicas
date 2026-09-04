@@ -379,6 +379,7 @@ export class CitasComponent implements OnInit {
         pasada: fecha < hoy,
         seleccionada: fecha === this.fechaSeleccionada,
         disponible: this.disponibilidadMapa[fecha] !== false,
+        conDisponibilidad: this.disponibilidadMapa[fecha] === true,
       });
     }
     while (dias.length % 7 !== 0) {

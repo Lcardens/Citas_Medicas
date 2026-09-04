@@ -724,14 +724,15 @@ exports.obtenerDisponibilidadPorRango = async (req, res) => {
 
     while (cursorDate <= ultimoDate) {
       const fechaISO = cursorDate.toISOString().split("T")[0];
-      await crearCuposSiNoExisten(medicoId, fechaISO);
       const horasDisponibles = await Cita.countDocuments({
         medico: medicoId,
         fecha: fechaISO,
         estado: "Disponible",
         $or: [{ paciente: null }, { paciente: { $exists: false } }],
       });
-      resumen[fechaISO] = horasDisponibles > 0;
+      if (horasDisponibles > 0) {
+        resumen[fechaISO] = true;
+      }
       cursorDate.setDate(cursorDate.getDate() + 1);
     }
 

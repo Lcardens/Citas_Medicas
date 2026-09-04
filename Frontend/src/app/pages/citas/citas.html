@@ -310,6 +310,7 @@
                     class="calendario-dia"
                     [ngClass]="{
                       'sin-disponibilidad': !d.pasada && !d.disponible,
+                      'con-disponibilidad': d.conDisponibilidad,
                       'seleccionado': d.seleccionada,
                       'hoy': d.esHoy,
                       'pasado': d.pasada
@@ -324,6 +325,9 @@
               </div>
             </div>
             <div class="form-text text-muted mt-1">
+              <span class="d-inline-flex align-items-center gap-1 me-3">
+                <i class="bi bi-square-fill text-success"></i> Con disponibilidad
+              </span>
               <span class="d-inline-flex align-items-center gap-1">
                 <i class="bi bi-square-fill text-secondary"></i> Sin disponibilidad
               </span>
@@ -461,6 +465,7 @@
                     class="calendario-dia"
                     [ngClass]="{
                       'sin-disponibilidad': !d.pasada && !d.disponible,
+                      'con-disponibilidad': d.conDisponibilidad,
                       'seleccionado': d.seleccionada,
                       'hoy': d.esHoy,
                       'pasado': d.pasada
