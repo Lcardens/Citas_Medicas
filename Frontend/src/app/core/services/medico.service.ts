@@ -32,4 +32,10 @@ export class MedicoService {
   eliminarMedico(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/medicos/${id}`, { headers: this.getHeaders() });
   }
+
+  actualizarDisponibilidad(id: string, config: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/medicos/${id}/disponibilidad`, config, {
+      headers: this.getHeaders(),
+    });
+  }
 }

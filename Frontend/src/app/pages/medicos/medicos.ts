@@ -21,6 +21,7 @@ export class MedicosComponent implements OnInit {
   medicos: any[] = [];
   cargando = true;
   mostrarModal = false;
+  mostrarModalDisponibilidad = false;
 
   busqueda = '';
   paginaActual = 1;
@@ -32,6 +33,50 @@ export class MedicosComponent implements OnInit {
     Registromedico: '',
     Nombre: '',
   };
+
+  disponibilidad = {
+    medicoNombre: '',
+    diasAtencion: [1, 2, 3, 4, 5],
+    horasAtencion: [
+      '08:00 AM',
+      '09:00 AM',
+      '10:00 AM',
+      '11:00 AM',
+      '12:00 PM',
+      '02:00 PM',
+      '03:00 PM',
+      '04:00 PM',
+      '05:00 PM',
+      '06:00 PM',
+    ],
+    diasBloqueados: [] as string[],
+  };
+
+  medicoEnDisponibilidad: any = null;
+  nuevaFechaBloqueo: string = '';
+  diasDisponibles = [
+    { valor: 1, nombre: 'Lun' },
+    { valor: 2, nombre: 'Mar' },
+    { valor: 3, nombre: 'Mié' },
+    { valor: 4, nombre: 'Jue' },
+    { valor: 5, nombre: 'Vie' },
+    { valor: 0, nombre: 'Dom' },
+    { valor: 6, nombre: 'Sáb' },
+  ];
+  horasPosibles = [
+    '08:00 AM',
+    '09:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '02:00 PM',
+    '03:00 PM',
+    '04:00 PM',
+    '05:00 PM',
+    '06:00 PM',
+  ];
+  mensajeDisponibilidad = '';
+  guardandoDisponibilidad = false;
 
   ngOnInit(): void {
     this.esPersonalMedico = this.authService.esPersonalMedico();
@@ -116,6 +161,100 @@ export class MedicosComponent implements OnInit {
       Registromedico: '',
       Nombre: '',
     };
+  }
+
+  abrirDisponibilidad(medico: any): void {
+    if (!this.esPersonalMedico) return;
+    this.medicoEnDisponibilidad = medico;
+    this.disponibilidad.medicoNombre = medico.Nombre || medico.nombre || '';
+    this.disponibilidad.diasAtencion = Array.isArray(medico.diasAtencion) && medico.diasAtencion.length
+      ? [...medico.diasAtencion]
+      : [1, 2, 3, 4, 5];
+    this.disponibilidad.horasAtencion = Array.isArray(medico.horasAtencion) && medico.horasAtencion.length
+      ? [...medico.horasAtencion]
+      : [...this.horasPosibles];
+    this.disponibilidad.diasBloqueados = Array.isArray(medico.diasBloqueados)
+      ? medico.diasBloqueados.map((d: any) => String(d).slice(0, 10))
+      : [];
+    this.nuevaFechaBloqueo = '';
+    this.mensajeDisponibilidad = '';
+    this.mostrarModalDisponibilidad = true;
+  }
+
+  cerrarDisponibilidad(): void {
+    this.mostrarModalDisponibilidad = false;
+    this.medicoEnDisponibilidad = null;
+  }
+
+  toggleDia(dia: number): void {
+    const idx = this.disponibilidad.diasAtencion.indexOf(dia);
+    if (idx >= 0) {
+      this.disponibilidad.diasAtencion.splice(idx, 1);
+    } else {
+      this.disponibilidad.diasAtencion.push(dia);
+    }
+  }
+
+  toggleHora(hora: string): void {
+    const idx = this.disponibilidad.horasAtencion.indexOf(hora);
+    if (idx >= 0) {
+      this.disponibilidad.horasAtencion.splice(idx, 1);
+    } else {
+      this.disponibilidad.horasAtencion.push(hora);
+    }
+  }
+
+  agregarFechaBloqueo(): void {
+    const fecha = this.nuevaFechaBloqueo;
+    if (!fecha) return;
+    const normalizada = String(fecha).slice(0, 10);
+    if (!this.disponibilidad.diasBloqueados.includes(normalizada)) {
+      this.disponibilidad.diasBloqueados.push(normalizada);
+    }
+    this.nuevaFechaBloqueo = '';
+  }
+
+  quitarFechaBloqueo(fecha: string): void {
+    this.disponibilidad.diasBloqueados = this.disponibilidad.diasBloqueados.filter((f) => f !== fecha);
+  }
+
+  formatearFecha(fecha: string): string {
+    const partes = String(fecha || '').split('-');
+    if (partes.length !== 3) return fecha;
+    const [anio, mes, dia] = partes;
+    return `${dia}/${mes}/${anio}`;
+  }
+
+  guardarDisponibilidad(): void {
+    if (!this.medicoEnDisponibilidad) return;
+    this.guardandoDisponibilidad = true;
+    this.mensajeDisponibilidad = '';
+
+    this.medicoService.actualizarDisponibilidad(this.medicoEnDisponibilidad._id, {
+      diasAtencion: this.disponibilidad.diasAtencion,
+      horasAtencion: this.disponibilidad.horasAtencion,
+      diasBloqueados: this.disponibilidad.diasBloqueados,
+    }).subscribe({
+      next: (res: any) => {
+        this.mensajeDisponibilidad = res?.mensaje || 'Disponibilidad actualizada.';
+        const fechaMensaje = res?.datos?.cuposRetirados;
+        if (typeof fechaMensaje === 'number' && fechaMensaje > 0) {
+          this.mensajeDisponibilidad += ` Se retiraron ${fechaMensaje} cupo(s) sin reservar.`;
+        }
+        this.guardandoDisponibilidad = false;
+        if (this.medicoEnDisponibilidad) {
+          this.medicoEnDisponibilidad.diasAtencion = this.disponibilidad.diasAtencion;
+          this.medicoEnDisponibilidad.horasAtencion = this.disponibilidad.horasAtencion;
+          this.medicoEnDisponibilidad.diasBloqueados = [...this.disponibilidad.diasBloqueados];
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.mensajeDisponibilidad = err?.error?.mensaje || 'Error al actualizar la disponibilidad.';
+        this.guardandoDisponibilidad = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   eliminarMedico(id: string, nombre: string): void {

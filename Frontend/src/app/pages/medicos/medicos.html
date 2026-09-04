@@ -44,13 +44,23 @@
           <td data-label="Registro Médico">{{ medico.Registromedico || medico.registroMedico }}</td>
           <td data-label="Nombre Completo">{{ medico.Nombre || medico.nombre }}</td>
           <td class="text-center" data-label="Acciones">
-            <button
-              class="btn btn-outline-danger btn-sm"
-              title="Eliminar médico y sus datos"
-              (click)="eliminarMedico(medico._id, medico.Nombre || medico.nombre)"
-            >
-              <i class="bi bi-trash me-1"></i>Eliminar
-            </button>
+            <div class="d-flex justify-content-center gap-2">
+              <button
+                *ngIf="esPersonalMedico"
+                class="btn btn-outline-primary btn-sm"
+                title="Configurar disponibilidad"
+                (click)="abrirDisponibilidad(medico)"
+              >
+                <i class="bi bi-calendar2-check me-1"></i>Disponibilidad
+              </button>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                title="Eliminar médico y sus datos"
+                (click)="eliminarMedico(medico._id, medico.Nombre || medico.nombre)"
+              >
+                <i class="bi bi-trash me-1"></i>Eliminar
+              </button>
+            </div>
           </td>
         </tr>
         <tr *ngIf="medicosPaginados.length === 0">
@@ -124,6 +134,110 @@
           <button type="submit" class="btn btn-success">Guardar</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModalDisponibilidad && esPersonalMedico"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Disponibilidad de {{ disponibilidad.medicoNombre }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarDisponibilidad()"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Días de atención</label>
+          <div class="d-flex flex-wrap gap-2">
+            <button
+              *ngFor="let dia of diasDisponibles"
+              type="button"
+              class="btn btn-sm"
+              [class.btn-success]="disponibilidad.diasAtencion.includes(dia.valor)"
+              [class.btn-outline-secondary]="!disponibilidad.diasAtencion.includes(dia.valor)"
+              (click)="toggleDia(dia.valor)"
+            >
+              {{ dia.nombre }}
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Horas de atención</label>
+          <div class="d-flex flex-wrap gap-2">
+            <button
+              *ngFor="let hora of horasPosibles"
+              type="button"
+              class="btn btn-sm"
+              [class.btn-success]="disponibilidad.horasAtencion.includes(hora)"
+              [class.btn-outline-secondary]="!disponibilidad.horasAtencion.includes(hora)"
+              (click)="toggleHora(hora)"
+            >
+              {{ hora }}
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Días bloqueados (sin atención)</label>
+          <div class="input-group mb-2">
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="nuevaFechaBloqueo"
+              name="nuevaFechaBloqueo"
+            />
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              [disabled]="!nuevaFechaBloqueo"
+              (click)="agregarFechaBloqueo()"
+            >
+              <i class="bi bi-plus-lg me-1"></i>Bloquear
+            </button>
+          </div>
+          <div *ngIf="disponibilidad.diasBloqueados.length === 0" class="text-muted small">
+            No hay días bloqueados.
+          </div>
+          <span
+            *ngFor="let fecha of disponibilidad.diasBloqueados"
+            class="badge rounded-pill text-bg-danger me-2 mb-1"
+          >
+            {{ formatearFecha(fecha) }}
+            <button
+              type="button"
+              class="btn-close btn-close-white ms-1"
+              style="width: 0.5rem; height: 0.5rem"
+              title="Quitar bloqueo"
+              (click)="quitarFechaBloqueo(fecha)"
+            ></button>
+          </span>
+        </div>
+
+        <div *ngIf="mensajeDisponibilidad" class="alert alert-info py-2 small mb-0">
+          {{ mensajeDisponibilidad }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarDisponibilidad()">Cerrar</button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="guardandoDisponibilidad"
+          (click)="guardarDisponibilidad()"
+        >
+          <span *ngIf="guardandoDisponibilidad" class="spinner-border spinner-border-sm me-1"></span>
+          Guardar
+        </button>
+      </div>
     </div>
   </div>
 </div>
