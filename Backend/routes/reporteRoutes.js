@@ -5,8 +5,15 @@ const { proteger, autorizar } = require("../middleware/auth");
 const {
   citasPorMes,
   pacientesFrecuentes,
+  citasPorEstado,
 } = require("../controllers/reporteController");
 
+router.get(
+  "/estados",
+  proteger,
+  autorizar("admin", "administrador"),
+  citasPorEstado,
+);
 router.get(
   "/citas-por-mes",
   proteger,

@@ -26,4 +26,10 @@ export class ReporteService {
       headers: this.getHeaders(),
     });
   }
+
+  citasPorEstado(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/reportes/estados`, {
+      headers: this.getHeaders(),
+    });
+  }
 }

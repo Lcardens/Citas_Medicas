@@ -1,6 +1,46 @@
 const Cita = require("../models/cita");
 const Paciente = require("../models/Paciente");
 
+// Reporte: conteo de citas por estado
+exports.citasPorEstado = async (req, res) => {
+  try {
+    const citas = await Cita.find({}, { estado: 1, fecha: 1 });
+
+    const estados = { Disponible: 0, Confirmada: 0, Atendida: 0, Cancelada: 0 };
+    const porMes = {};
+
+    for (const cita of citas) {
+      const estado = cita.estado || "Disponible";
+      if (estados[estado] !== undefined) {
+        estados[estado]++;
+      } else {
+        estados[estado] = 1;
+      }
+
+      const mes = (cita.fecha || "").slice(0, 7);
+      if (mes) {
+        if (!porMes[mes]) porMes[mes] = { mes, Disponible: 0, Confirmada: 0, Atendida: 0, Cancelada: 0 };
+        if (porMes[mes][estado] !== undefined) {
+          porMes[mes][estado]++;
+        }
+      }
+    }
+
+    const historial = Object.values(porMes).sort((a, b) => a.mes.localeCompare(b.mes));
+
+    res.status(200).json({
+      exitoso: true,
+      datos: { estados, total: citas.length, historial },
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: "Error al obtener estados de citas",
+      error: error.message,
+    });
+  }
+};
+
 // Reporte: citas confirmadas/atendidas por mes
 exports.citasPorMes = async (req, res) => {
   try {

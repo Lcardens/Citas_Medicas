@@ -1,3 +1,12 @@
-.card-header h5 {
-  font-size: 1rem;
+.card-header h5,
+.card-header {
+  font-size: 0.9rem;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.card-body canvas {
+  max-height: 100%;
 }
