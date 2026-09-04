@@ -80,7 +80,8 @@ export class MedicosComponent implements OnInit {
     { valor: 'puntual', nombre: 'Puntual' },
   ];
 
-  nuevaFechaBloqueo: string = '';
+  fechaDesdeBloqueo: string = '';
+  fechaHastaBloqueo: string = '';
   tipoBloqueo = 'vacaciones';
   mensajeDisponibilidad = '';
   guardandoDisponibilidad = false;
@@ -189,7 +190,8 @@ export class MedicosComponent implements OnInit {
           .filter((x: any) => x.fecha)
       : [];
     this.tipoBloqueo = 'vacaciones';
-    this.nuevaFechaBloqueo = '';
+    this.fechaDesdeBloqueo = '';
+    this.fechaHastaBloqueo = '';
     this.mensajeDisponibilidad = '';
     this.mostrarModalDisponibilidad = true;
   }
@@ -218,15 +220,35 @@ export class MedicosComponent implements OnInit {
   }
 
   agregarFechaBloqueo(): void {
-    const fecha = String(this.nuevaFechaBloqueo || '').slice(0, 10);
-    if (!fecha) return;
-    const existente = this.disponibilidad.diasBloqueados.find((x) => x.fecha === fecha);
-    if (existente) {
-      existente.tipo = this.tipoBloqueo;
-    } else {
-      this.disponibilidad.diasBloqueados.push({ fecha, tipo: this.tipoBloqueo });
+    const desde = String(this.fechaDesdeBloqueo || '').slice(0, 10);
+    const hasta = String(this.fechaHastaBloqueo || '').slice(0, 10);
+    if (!desde || !hasta) return;
+
+    let ini = new Date(`${desde}T00:00:00`);
+    const fin = new Date(`${hasta}T00:00:00`);
+    if (ini > fin) {
+      const tmp = ini;
+      ini = fin;
+      fin.setTime(tmp.getTime());
     }
-    this.nuevaFechaBloqueo = '';
+
+    let agregados = 0;
+    const cursor = new Date(ini.getTime());
+    while (cursor <= fin) {
+      const fecha = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+      const existente = this.disponibilidad.diasBloqueados.find((x) => x.fecha === fecha);
+      if (existente) {
+        existente.tipo = this.tipoBloqueo;
+      } else {
+        this.disponibilidad.diasBloqueados.push({ fecha, tipo: this.tipoBloqueo });
+        agregados++;
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    this.mensajeDisponibilidad = `Se agregaron ${agregados} día(s) al bloqueo (${this.disponibilidad.diasBloqueados.length} bloqueado(s) en total).`;
+    this.fechaDesdeBloqueo = '';
+    this.fechaHastaBloqueo = '';
   }
 
   quitarFechaBloqueo(fecha: string): void {

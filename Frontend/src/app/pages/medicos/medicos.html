@@ -58,7 +58,7 @@
                 title="Eliminar médico y sus datos"
                 (click)="eliminarMedico(medico._id, medico.Nombre || medico.nombre)"
               >
-                <i class="bi bi-trash me-1"></i>Eliminar
+                Eliminar
               </button>
             </div>
           </td>
@@ -205,20 +205,31 @@
           </div>
 
           <div class="input-group mb-2">
+            <span class="input-group-text bg-light">Desde</span>
             <input
               type="date"
               class="form-control"
-              [(ngModel)]="nuevaFechaBloqueo"
-              name="nuevaFechaBloqueo"
+              [(ngModel)]="fechaDesdeBloqueo"
+              name="fechaDesdeBloqueo"
+            />
+            <span class="input-group-text bg-light">Hasta</span>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="fechaHastaBloqueo"
+              name="fechaHastaBloqueo"
             />
             <button
               type="button"
               class="btn btn-danger"
-              [disabled]="!nuevaFechaBloqueo"
+              [disabled]="!fechaDesdeBloqueo || !fechaHastaBloqueo"
               (click)="agregarFechaBloqueo()"
             >
-              Agregar día
+              Agregar rango
             </button>
+          </div>
+          <div class="text-muted small mb-1">
+            Para un solo día, usa la misma fecha en Desde y Hasta.
           </div>
 
           <div *ngIf="disponibilidad.diasBloqueados.length === 0" class="text-muted small">
