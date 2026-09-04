@@ -148,6 +148,15 @@ main.container {
   flex: 1;
 }
 
+.footer-help {
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.2s ease;
+}
+
+.footer-help:hover {
+  color: #ffffff;
+}
+
 /* ============= MENÚ DESPLEGABLE ============= */
 .dropdown-menu {
   border: none;

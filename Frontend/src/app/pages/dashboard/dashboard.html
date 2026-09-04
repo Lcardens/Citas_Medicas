@@ -18,10 +18,6 @@
   </div>
 
   <div class="d-flex align-items-center gap-3">
-    <a *ngIf="esPaciente" routerLink="/dashboard/ayuda" class="btn btn-outline-light p-2 d-flex align-items-center" title="Ayuda">
-      <i class="bi bi-question-circle-fill fs-5"></i>
-    </a>
-
     <div class="user-info-container text-end">
       <span class="user-name">
         <i class="bi bi-person-circle me-1"></i>Hola, <strong>{{ nombreUsuario }}</strong>
@@ -116,12 +112,19 @@
     </div>
     <hr />
     <div class="row align-items-center">
-      <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+      <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
         <small
           >&copy; {{ currentYear }} Sistema de Citas Médicas. Todos los derechos reservados.</small
         >
       </div>
-      <div class="col-md-6 text-center text-md-end">
+      <div class="col-md-4 text-center mb-2 mb-md-0">
+        <a *ngIf="esPaciente" routerLink="/dashboard/ayuda" class="text-decoration-none">
+          <small class="footer-help">
+            <i class="bi bi-question-circle-fill me-1"></i>¿Necesitás ayuda? Guía y preguntas frecuentes
+          </small>
+        </a>
+      </div>
+      <div class="col-md-4 text-center text-md-end">
         <small>Desarrollado por <strong>Luisa Cárdenas</strong> &mdash; Bootcamp BIT</small>
       </div>
     </div>
