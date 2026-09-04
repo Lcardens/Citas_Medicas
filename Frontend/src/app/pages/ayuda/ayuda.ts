@@ -246,12 +246,12 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-calendar-check',
           color: '#6fbf8f',
           pregunta: '¿Cómo sé si mi cita fue confirmada?',
-          respuesta: 'Cuando agendás una cita, el estado será "Pendiente". El médico o el administrador deberán confirmarla. Podés ver el estado en "Mis Turnos".',
+          respuesta: 'Cuando agendás una cita, queda confirmada automáticamente. Podés ver el estado en "Mis Turnos".',
         },
         {
           icono: 'bi-clock-history',
           color: '#27b7f5',
-          pregunta: '¿Puedo cancelar una cita ya confirmada?',
+          pregunta: '¿Puedo cancelar una cita confirmada?',
           respuesta: 'Sí, podés cancelar una cita mientras no haya sido atendida. En "Mis Turnos", hacé clic en "Cancelar". Si ya fue atendida, el botón no aparecerá.',
         },
         {
