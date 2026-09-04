@@ -82,17 +82,27 @@
             </span>
           </td>
           <td class="text-center" data-label="Acciones">
-            <button
-              *ngIf="cita.estado !== 'Atendida'"
-              class="btn btn-success btn-sm"
-              title="Marcar como atendida"
-              (click)="abrirModalAtender(cita)"
-            >
-              <i class="bi bi-check-lg me-1"></i>Atender
-            </button>
-            <span *ngIf="cita.estado === 'Atendida'" class="text-muted small">
-              Registrada
-            </span>
+            <div class="d-flex justify-content-center gap-2">
+              <button
+                *ngIf="idPaciente(cita)"
+                class="btn btn-outline-primary btn-sm"
+                title="Ver historial del paciente"
+                (click)="abrirHistorial(cita)"
+              >
+                Historial
+              </button>
+              <button
+                *ngIf="cita.estado !== 'Atendida'"
+                class="btn btn-success btn-sm"
+                title="Marcar como atendida"
+                (click)="abrirModalAtender(cita)"
+              >
+                <i class="bi bi-check-lg me-1"></i>Atender
+              </button>
+              <span *ngIf="cita.estado === 'Atendida'" class="text-muted small">
+                Registrada
+              </span>
+            </div>
           </td>
         </tr>
         <tr *ngIf="citasPaginadas.length === 0">
@@ -258,6 +268,62 @@
           ></span>
           Asignar
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarHistorial"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-clipboard2-pulse me-1"></i>
+          Historial clínico de {{ pacienteHistorial?.Nombre || 'Paciente' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarHistorial()"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="cargandoHistorial" class="d-flex justify-content-center my-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <div *ngIf="!cargandoHistorial && historialCitas.length === 0" class="text-center py-4 text-muted">
+          El paciente aún no tiene citas atendidas.
+        </div>
+
+        <div *ngIf="!cargandoHistorial && historialCitas.length > 0">
+          <div *ngFor="let cita of historialCitas" class="card mb-3 border-start">
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <strong>{{ formatearFechaHistorial(cita.fecha) }} · {{ cita.hora }}</strong>
+                <span class="badge text-bg-secondary">{{ cita.estado }}</span>
+              </div>
+              <div class="small text-muted mt-1">
+                Médico: {{ nombreMedicoHistorial(cita) }}
+              </div>
+              <div *ngIf="cita.motivo" class="small mt-1">
+                <strong>Motivo:</strong> {{ cita.motivo }}
+              </div>
+              <div *ngIf="cita.diagnostico" class="small mt-1 text-success">
+                <strong>Diagnóstico:</strong> {{ cita.diagnostico }}
+              </div>
+              <div *ngIf="cita.notasConsulta" class="small mt-1">
+                <strong>Notas de la consulta:</strong> {{ cita.notasConsulta }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarHistorial()">Cerrar</button>
       </div>
     </div>
   </div>

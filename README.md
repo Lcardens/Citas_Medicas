@@ -78,6 +78,7 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 - **Estados de cita**: Confirmada, Disponible, Atendida (con diagnóstico) y Cancelada, diferenciadas con colores.
 - **Agenda del médico**: vista de turnos propia para el médico logueado.
 - **Filtros por columna**: la tabla de citas permite filtrar por médico, estado y fecha (estilo filtros de Excel), con botón para limpiar. Los pacientes solo ven sus propias citas.
+- **Historial clínico**: cada cita atendida guarda su diagnóstico y notas de consulta. El administrador puede ver el historial completo de un paciente desde "Pacientes" y el médico desde "Mi Agenda" (botón "Historial").
 
 ### Disponibilidad de citas
 - **Modelo por día, bajo demanda**: los cupos se generan solamente cuando un paciente selecciona un día concreto en el calendario, no por adelantado para meses enteros.
@@ -318,6 +319,7 @@ Base URL (entorno local): `http://localhost:3000/api`
 | POST | `/citas/asignar-rapido` | Asignación rápida para pacientes | Autenticado |
 | GET | `/citas` | Listar citas (filtrando por rol) | Autenticado |
 | GET | `/citas/agenda` | Agenda del médico logueado | Médico |
+| GET | `/citas/historial/:pacienteId` | Historial clínico del paciente (citas atendidas) | Administrador, Médico |
 | GET | `/citas/medico/:medicoId` | Citas de un médico | Autenticado |
 | GET | `/citas/disponibles/:medicoId` | Cupos disponibles por médico | Autenticado |
 | GET | `/citas/disponibles/:medicoId/:fecha` | Horas libres de un médico en una fecha | Autenticado |
@@ -363,7 +365,6 @@ La aplicación cuenta con una base sólida, pero por el alcance actual quedan va
 
 ### Gestión de médicos y citas
 - **Selección de médico por especialidad**: asignar una especialidad a cada médico y permitir a los pacientes filtrar y agendar según la especialidad que necesiten.
-- **Historial clínico del paciente**: registrar diagnósticos y notas de las consultas atendidas, visibles para el médico y el administrador.
 - **Reprogramación automática**: al bloquear días de un médico, ofrecer al paciente la opción de mover automáticamente su cita a otro día disponible.
 
 ### Plataforma

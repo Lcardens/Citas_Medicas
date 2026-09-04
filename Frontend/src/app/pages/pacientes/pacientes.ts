@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PacienteService } from '../../core/services/paciente.service';
+import { CitaService } from '../../core/services/cita.service';
 import { DialogService } from '../../core/services/dialog.service';
 
 @Component({
@@ -13,6 +14,7 @@ import { DialogService } from '../../core/services/dialog.service';
 })
 export class PacientesComponent implements OnInit {
   private pacienteService = inject(PacienteService);
+  private citaService = inject(CitaService);
   private dialogService = inject(DialogService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -24,6 +26,11 @@ export class PacientesComponent implements OnInit {
   busqueda = '';
   paginaActual = 1;
   elementosPorPagina = 10;
+
+  mostrarHistorial = false;
+  cargandoHistorial = false;
+  pacienteHistorial: any = null;
+  historialCitas: any[] = [];
 
   nuevoPaciente = {
     TipoDocumento: 'CC',
@@ -144,5 +151,52 @@ export class PacientesComponent implements OnInit {
           },
         });
       });
+  }
+
+  abrirHistorial(paciente: any): void {
+    this.pacienteHistorial = paciente;
+    this.historialCitas = [];
+    this.mostrarHistorial = true;
+    this.cargandoHistorial = true;
+    this.cdr.detectChanges();
+
+    const id = paciente._id || paciente.id;
+    if (!id) {
+      this.cargandoHistorial = false;
+      return;
+    }
+
+    this.citaService.obtenerHistorialClinico(id).subscribe({
+      next: (res: any) => {
+        this.historialCitas = res?.datos || [];
+        this.cargandoHistorial = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.historialCitas = [];
+        this.cargandoHistorial = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  cerrarHistorial(): void {
+    this.mostrarHistorial = false;
+    this.pacienteHistorial = null;
+    this.historialCitas = [];
+  }
+
+  nombreMedicoHistorial(cita: any): string {
+    const m = cita?.medico;
+    if (!m) return '—';
+    if (typeof m === 'string') return 'ID: ' + m;
+    return m.Nombre || m.nombre || m.nombres || m.nombreCompleto || 'Médico';
+  }
+
+  formatearFechaHistorial(fecha: string): string {
+    const partes = String(fecha || '').split('-');
+    if (partes.length !== 3) return fecha;
+    const [anio, mes, dia] = partes;
+    return `${dia}/${mes}/${anio}`;
   }
 }

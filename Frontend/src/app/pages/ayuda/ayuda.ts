@@ -197,7 +197,7 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-person',
           color: '#8f7bd8',
           pregunta: '¿Puedo ver el historial de un paciente?',
-          respuesta: 'Actualmente no está disponible desde la vista del médico. Solo el administrador puede ver el historial completo desde "Pacientes".',
+          respuesta: 'Sí. En "Mi Agenda", cada cita tiene el botón "Historial", que abre la lista de citas atendidas del paciente con su diagnóstico y notas de consulta. El administrador también puede verlo desde "Pacientes".',
         },
       ];
     } else {

@@ -34,6 +34,12 @@ export class CitaService {
     });
   }
 
+  obtenerHistorialClinico(pacienteId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/historial/${pacienteId}`, {
+      headers: this.obtenerHeaders(),
+    });
+  }
+
   asignarCita(datos: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/asignar`, datos, {
       headers: this.obtenerHeaders(),

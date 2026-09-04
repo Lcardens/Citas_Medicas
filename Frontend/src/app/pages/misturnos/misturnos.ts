@@ -63,6 +63,11 @@ export class MisturnosComponent implements OnInit {
   cargandoHoras = false;
   minFecha = new Date().toISOString().split('T')[0];
 
+  mostrarHistorial = false;
+  cargandoHistorial = false;
+  pacienteHistorial: any = null;
+  historialCitas: any[] = [];
+
   ngOnInit(): void {
     this.cargarAgenda();
   }
@@ -311,6 +316,58 @@ export class MisturnosComponent implements OnInit {
       p?.nombreCompleto ||
       'Paciente'
     );
+  }
+
+  idPaciente(cita: any): string {
+    const p = cita?.paciente;
+    if (!p) return '';
+    return typeof p === 'string' ? p : p?._id || p?.id || '';
+  }
+
+  abrirHistorial(cita: any): void {
+    const id = this.idPaciente(cita);
+    if (!id) return;
+
+    this.pacienteHistorial = {
+      Nombre: this.nombrePaciente(cita),
+    };
+    this.historialCitas = [];
+    this.mostrarHistorial = true;
+    this.cargandoHistorial = true;
+    this.cdr.detectChanges();
+
+    this.citaService.obtenerHistorialClinico(id).subscribe({
+      next: (res: any) => {
+        this.historialCitas = res?.datos || [];
+        this.cargandoHistorial = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.historialCitas = [];
+        this.cargandoHistorial = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  cerrarHistorial(): void {
+    this.mostrarHistorial = false;
+    this.pacienteHistorial = null;
+    this.historialCitas = [];
+  }
+
+  nombreMedicoHistorial(cita: any): string {
+    const m = cita?.medico;
+    if (!m) return '—';
+    if (typeof m === 'string') return 'ID: ' + m;
+    return m.Nombre || m.nombre || m.nombres || m.nombreCompleto || 'Médico';
+  }
+
+  formatearFechaHistorial(fecha: string): string {
+    const partes = String(fecha || '').split('-');
+    if (partes.length !== 3) return fecha;
+    const [anio, mes, dia] = partes;
+    return `${dia}/${mes}/${anio}`;
   }
 
   horaAMinutos(hora: string): number {
