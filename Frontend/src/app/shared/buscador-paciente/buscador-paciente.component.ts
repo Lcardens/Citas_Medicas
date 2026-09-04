@@ -71,6 +71,7 @@ export class BuscadorPacienteComponent implements ControlValueAccessor {
   }
 
   seleccionar(p: any): void {
+    this.valor = p._id;
     this.abierto = false;
     this.onChange(p._id);
   }
