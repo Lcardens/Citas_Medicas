@@ -3,125 +3,203 @@
     <h2 class="fw-bold text-primary mb-0">
       <i class="bi bi-shield-lock me-2"></i>Auditoría del Sistema
     </h2>
+    <button *ngIf="vista === 'detalle'" class="btn btn-outline-secondary btn-sm" (click)="volverResumen()">
+      <i class="bi bi-arrow-left me-1"></i>Volver
+    </button>
   </div>
 
-  <!-- Filtros -->
-  <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
-    <div class="row g-3 align-items-end">
-      <div class="col-md-4 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Usuario:</label>
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          placeholder="Buscar por nombre o email..."
-          [(ngModel)]="filtros.usuario"
-          (keyup.enter)="buscar()"
-        />
-      </div>
-      <div class="col-md-4 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Acción:</label>
-        <select class="form-select form-select-sm" [(ngModel)]="filtros.accion">
-          <option *ngFor="let op of accionOpciones" [value]="op.valor">{{ op.etiqueta }}</option>
-        </select>
-      </div>
-      <div class="col-md-4 col-sm-6 d-flex gap-1">
-        <button class="btn btn-primary btn-sm flex-grow-1" (click)="buscar()" title="Buscar">
-          <i class="bi bi-search"></i> Buscar
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" (click)="limpiarFiltros()" title="Limpiar">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading -->
-  <div *ngIf="cargando" class="d-flex justify-content-center my-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-  </div>
-
-  <!-- Tabla desktop -->
-  <div *ngIf="!cargando" class="card border-0 shadow-sm d-none d-md-block">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>
-              <th>Acción</th>
-              <th>Detalles</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let log of logs">
-              <td class="text-nowrap small">{{ log.createdAt | date: 'dd/MM/yy HH:mm' }}</td>
-              <td>
-                <div class="fw-semibold small">{{ log.usuario?.nombre || 'Sistema' }}</div>
-                <div class="text-muted" style="font-size: 0.75rem">{{ log.email }}</div>
-              </td>
-              <td>
-                <span class="badge rounded-pill" [ngClass]="claseAccion(log.accion)">
-                  {{ formatearAccion(log.accion) }}
-                </span>
-              </td>
-              <td class="small text-muted" style="max-width: 200px">
-                <span *ngIf="log.detalles && (log.detalles.estado || log.detalles.mensaje || log.detalles.motivo)">
-                  {{ log.detalles.estado || log.detalles.mensaje || log.detalles.motivo || '' }}
-                </span>
-              </td>
-            </tr>
-            <tr *ngIf="logs.length === 0">
-              <td colspan="4" class="text-center py-4 text-muted">No hay registros de auditoría.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cards mobile -->
-  <div *ngIf="!cargando" class="d-md-none">
-    <div *ngFor="let log of logs" class="card border-0 shadow-sm mb-3">
-      <div class="card-body py-3">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <span class="badge rounded-pill" [ngClass]="claseAccion(log.accion)">
-            {{ formatearAccion(log.accion) }}
-          </span>
-          <small class="text-muted">{{ log.createdAt | date: 'dd/MM/yy HH:mm' }}</small>
+  <!-- ========== VISTA RESUMEN ========== -->
+  <ng-container *ngIf="vista === 'resumen'">
+    <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Usuario:</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Buscar por nombre o email..."
+            [(ngModel)]="filtrosResumen.usuario"
+            (keyup.enter)="buscarResumen()"
+          />
         </div>
-        <div class="fw-semibold small">{{ log.usuario?.nombre || 'Sistema' }}</div>
-        <div class="text-muted" style="font-size: 0.75rem">{{ log.email }}</div>
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Desde:</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtrosResumen.fechaInicio" />
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Hasta:</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtrosResumen.fechaFin" />
+        </div>
+        <div class="col-md-2 col-sm-6 d-flex gap-1">
+          <button class="btn btn-primary btn-sm flex-grow-1" (click)="buscarResumen()">
+            <i class="bi bi-search"></i> Buscar
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="limpiarResumen()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
       </div>
     </div>
-    <div *ngIf="logs.length === 0" class="text-center py-4 text-muted">
-      No hay registros de auditoría.
-    </div>
-  </div>
 
-  <!-- Paginación -->
-  <div *ngIf="!cargando && totalPaginas > 1" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-    <small class="text-muted">
-      Mostrando {{ inicioRegistro }}-{{ finRegistro }} de {{ totalRegistros }} registros
-    </small>
-    <nav>
-      <ul class="pagination pagination-sm mb-0">
-        <li class="page-item" [class.disabled]="paginaActual === 1">
-          <button class="page-link" (click)="cambiarPagina(paginaActual - 1)">&laquo;</button>
-        </li>
-        <li
-          *ngFor="let p of paginasVisibles"
-          class="page-item"
-          [class.active]="p === paginaActual"
+    <div *ngIf="cargando" class="d-flex justify-content-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!cargando && usuariosResumen.length === 0" class="text-center py-5 text-muted">
+      <i class="bi bi-inbox" style="font-size: 2rem"></i>
+      <p class="mt-2">No hay registros de auditoría.</p>
+    </div>
+
+    <div *ngIf="!cargando" class="row g-3">
+      <div *ngFor="let u of usuariosResumen" class="col-md-6 col-lg-4">
+        <div
+          class="card border-0 shadow-sm h-100 cursor-pointer hover-shadow"
+          style="cursor: pointer"
+          (click)="abrirDetalle(u)"
         >
-          <button class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
-        </li>
-        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
-          <button class="page-link" (click)="cambiarPagina(paginaActual + 1)">&raquo;</button>
-        </li>
-      </ul>
-    </nav>
-  </div>
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 42px; height: 42px">
+                <i class="bi bi-person-fill text-primary"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-bold">{{ u.nombre }}</div>
+                <div class="text-muted" style="font-size: 0.8rem">{{ u.email }}</div>
+              </div>
+              <span class="badge bg-primary rounded-pill">{{ u.total }}</span>
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+              <span *ngFor="let acc of objectKeys(u.acciones)" class="badge rounded-pill" [ngClass]="claseAccion(acc)" style="font-size: 0.7rem">
+                {{ formatearAccion(acc) }}: {{ u.acciones[acc] }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ========== VISTA DETALLE ========== -->
+  <ng-container *ngIf="vista === 'detalle' && usuarioSeleccionado">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body py-3">
+        <div class="d-flex align-items-center">
+          <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px">
+            <i class="bi bi-person-fill text-primary fs-5"></i>
+          </div>
+          <div>
+            <div class="fw-bold">{{ usuarioSeleccionado.nombre }}</div>
+            <div class="text-muted" style="font-size: 0.85rem">{{ usuarioSeleccionado.email }} — {{ usuarioSeleccionado.total }} acciones registradas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Acción:</label>
+          <select class="form-select form-select-sm" [(ngModel)]="filtrosDetalle.accion">
+            <option *ngFor="let op of accionOpciones" [value]="op.valor">{{ op.etiqueta }}</option>
+          </select>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Desde:</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtrosDetalle.fechaInicio" />
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label fw-semibold text-secondary mb-1">Hasta:</label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="filtrosDetalle.fechaFin" />
+        </div>
+        <div class="col-md-3 col-sm-6 d-flex gap-1">
+          <button class="btn btn-primary btn-sm flex-grow-1" (click)="buscarDetalle()">
+            <i class="bi bi-search"></i> Buscar
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="limpiarDetalle()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" class="d-flex justify-content-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!cargando" class="card border-0 shadow-sm d-none d-md-block">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha</th>
+                <th>Acción</th>
+                <th>Detalles</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let log of logsDetalle">
+                <td class="text-nowrap small">{{ log.createdAt | date: 'dd/MM/yy HH:mm' }}</td>
+                <td>
+                  <span class="badge rounded-pill" [ngClass]="claseAccion(log.accion)">
+                    {{ formatearAccion(log.accion) }}
+                  </span>
+                </td>
+                <td class="small text-muted" style="max-width: 200px">
+                  <span *ngIf="log.detalles && (log.detalles.estado || log.detalles.mensaje || log.detalles.motivo)">
+                    {{ log.detalles.estado || log.detalles.mensaje || log.detalles.motivo || '' }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="logsDetalle.length === 0">
+                <td colspan="3" class="text-center py-4 text-muted">No hay registros para este usuario.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!cargando" class="d-md-none">
+      <div *ngFor="let log of logsDetalle" class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="badge rounded-pill" [ngClass]="claseAccion(log.accion)">
+              {{ formatearAccion(log.accion) }}
+            </span>
+            <small class="text-muted">{{ log.createdAt | date: 'dd/MM/yy HH:mm' }}</small>
+          </div>
+          <span *ngIf="log.detalles && (log.detalles.estado || log.detalles.mensaje || log.detalles.motivo)" class="text-muted small">
+            {{ log.detalles.estado || log.detalles.mensaje || log.detalles.motivo }}
+          </span>
+        </div>
+      </div>
+      <div *ngIf="logsDetalle.length === 0" class="text-center py-4 text-muted">
+        No hay registros para este usuario.
+      </div>
+    </div>
+
+    <div *ngIf="!cargando && totalPagDetalle > 1" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+      <small class="text-muted">
+        Mostrando registros de {{ usuarioSeleccionado.nombre }}
+      </small>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" [class.disabled]="pagDetalle === 1">
+            <button class="page-link" (click)="cambiarPagDetalle(pagDetalle - 1)">&laquo;</button>
+          </li>
+          <li *ngFor="let p of paginasVisiblesDetalle" class="page-item" [class.active]="p === pagDetalle">
+            <button class="page-link" (click)="cambiarPagDetalle(p)">{{ p }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="pagDetalle === totalPagDetalle">
+            <button class="page-link" (click)="cambiarPagDetalle(pagDetalle + 1)">&raquo;</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </ng-container>
 </div>

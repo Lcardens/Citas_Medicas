@@ -14,18 +14,27 @@ export class AuditoriaComponent implements OnInit {
   private auditService = inject(AuditService);
   private cdr = inject(ChangeDetectorRef);
 
-  logs: any[] = [];
-  cargando = true;
-  totalPaginas = 1;
-  totalRegistros = 0;
+  vista: 'resumen' | 'detalle' = 'resumen';
 
-  filtros = {
-    accion: '',
+  cargando = true;
+
+  filtrosResumen = {
     usuario: '',
+    fechaInicio: '',
+    fechaFin: '',
   };
 
-  paginaActual = 1;
-  limitePorPagina = 20;
+  usuarioSeleccionado: any = null;
+  logsDetalle: any[] = [];
+  pagDetalle = 1;
+  totalPagDetalle = 1;
+  totalDetalle = 0;
+
+  filtrosDetalle = {
+    accion: '',
+    fechaInicio: '',
+    fechaFin: '',
+  };
 
   accionOpciones = [
     { valor: '', etiqueta: 'Todas las acciones' },
@@ -41,55 +50,99 @@ export class AuditoriaComponent implements OnInit {
     { valor: 'actualizar_perfil', etiqueta: 'Actualizar perfil' },
   ];
 
+  usuariosResumen: any[] = [];
+
   ngOnInit(): void {
-    this.cargarLogs();
+    this.cargarResumen();
   }
 
-  cargarLogs(): void {
+  cargarResumen(): void {
     this.cargando = true;
     this.auditService
-      .listarLogs({
-        ...this.filtros,
-        pagina: this.paginaActual,
-        limite: this.limitePorPagina,
-      })
+      .listarLogs({ ...this.filtrosResumen, resumen: true })
       .subscribe({
         next: (res: any) => {
-          this.logs = res?.datos || [];
-          this.totalPaginas = res?.totalPaginas || 1;
-          this.totalRegistros = res?.total || 0;
+          this.usuariosResumen = res?.datos || [];
           this.cargando = false;
           this.cdr.detectChanges();
         },
-        error: (err) => {
-          console.error('Error al cargar auditoría:', err);
+        error: () => {
           this.cargando = false;
           this.cdr.detectChanges();
         },
       });
   }
 
-  buscar(): void {
-    this.paginaActual = 1;
-    this.cargarLogs();
+  abrirDetalle(usuario: any): void {
+    this.usuarioSeleccionado = usuario;
+    this.vista = 'detalle';
+    this.pagDetalle = 1;
+    this.filtrosDetalle = { accion: '', fechaInicio: '', fechaFin: '' };
+    this.cargarDetalle();
   }
 
-  limpiarFiltros(): void {
-    this.filtros = { accion: '', usuario: '' };
-    this.paginaActual = 1;
-    this.cargarLogs();
+  cargarDetalle(): void {
+    this.cargando = true;
+    const filtros: any = {
+      usuarioId: this.usuarioSeleccionado.usuarioId,
+      pagina: this.pagDetalle,
+      limite: 20,
+    };
+    if (this.filtrosDetalle.accion) filtros.accion = this.filtrosDetalle.accion;
+    if (this.filtrosDetalle.fechaInicio) filtros.fechaInicio = this.filtrosDetalle.fechaInicio;
+    if (this.filtrosDetalle.fechaFin) filtros.fechaFin = this.filtrosDetalle.fechaFin;
+    this.auditService.listarLogs(filtros).subscribe({
+      next: (res: any) => {
+        this.logsDetalle = res?.datos || [];
+        this.totalPagDetalle = res?.totalPaginas || 1;
+        this.totalDetalle = res?.total || 0;
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.cargando = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
-  cambiarPagina(pagina: number): void {
-    if (pagina < 1 || pagina > this.totalPaginas) return;
-    this.paginaActual = pagina;
-    this.cargarLogs();
+  volverResumen(): void {
+    this.vista = 'resumen';
+    this.usuarioSeleccionado = null;
+    this.logsDetalle = [];
+    this.cargarResumen();
   }
 
-  get paginasVisibles(): number[] {
+  buscarResumen(): void {
+    this.cargarResumen();
+  }
+
+  limpiarResumen(): void {
+    this.filtrosResumen = { usuario: '', fechaInicio: '', fechaFin: '' };
+    this.cargarResumen();
+  }
+
+  buscarDetalle(): void {
+    this.pagDetalle = 1;
+    this.cargarDetalle();
+  }
+
+  limpiarDetalle(): void {
+    this.filtrosDetalle = { accion: '', fechaInicio: '', fechaFin: '' };
+    this.pagDetalle = 1;
+    this.cargarDetalle();
+  }
+
+  cambiarPagDetalle(pagina: number): void {
+    if (pagina < 1 || pagina > this.totalPagDetalle) return;
+    this.pagDetalle = pagina;
+    this.cargarDetalle();
+  }
+
+  get paginasVisiblesDetalle(): number[] {
     const paginas: number[] = [];
-    let inicio = Math.max(1, this.paginaActual - 2);
-    let fin = Math.min(this.totalPaginas, inicio + 4);
+    let inicio = Math.max(1, this.pagDetalle - 2);
+    let fin = Math.min(this.totalPagDetalle, inicio + 4);
     inicio = Math.max(1, fin - 4);
     for (let i = inicio; i <= fin; i++) paginas.push(i);
     return paginas;
@@ -121,11 +174,7 @@ export class AuditoriaComponent implements OnInit {
     return 'bg-secondary-subtle text-secondary';
   }
 
-  get inicioRegistro(): number {
-    return (this.paginaActual - 1) * this.limitePorPagina + 1;
-  }
-
-  get finRegistro(): number {
-    return Math.min(this.paginaActual * this.limitePorPagina, this.totalRegistros);
+  objectKeys(obj: any): string[] {
+    return obj ? Object.keys(obj) : [];
   }
 }

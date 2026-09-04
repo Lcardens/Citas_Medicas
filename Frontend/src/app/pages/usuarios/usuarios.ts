@@ -159,8 +159,6 @@ export class UsuariosComponent implements OnInit {
     this.usuarioEditando = {
       _id: usuario._id,
       nombre: usuario.nombre || usuario.Nombre || '',
-      email: usuario.email || '',
-      rol: usuario.rol || 'paciente',
     };
     this.usuarioEditandoBackup = { ...this.usuarioEditando };
     this.mostrarModalEditar = true;
@@ -174,25 +172,15 @@ export class UsuariosComponent implements OnInit {
 
   guardarEdicion(): void {
     this.mensajeError = '';
-    if (!this.usuarioEditando?.nombre || !this.usuarioEditando?.email) {
-      this.mensajeError = 'Nombre y correo son obligatorios.';
+    if (!this.usuarioEditando?.nombre?.trim()) {
+      this.mensajeError = 'El nombre es obligatorio.';
       return;
     }
-    const campos: any = {};
-    if (this.usuarioEditando.nombre !== this.usuarioEditandoBackup.nombre) {
-      campos.nombre = this.usuarioEditando.nombre;
-    }
-    if (this.usuarioEditando.email !== this.usuarioEditandoBackup.email) {
-      campos.email = this.usuarioEditando.email;
-    }
-    if (this.usuarioEditando.rol !== this.usuarioEditandoBackup.rol) {
-      campos.rol = this.usuarioEditando.rol;
-    }
-    if (Object.keys(campos).length === 0) {
+    if (this.usuarioEditando.nombre === this.usuarioEditandoBackup.nombre) {
       this.cerrarModalEditar();
       return;
     }
-    this.usuarioService.editarUsuario(this.usuarioEditando._id, campos).subscribe({
+    this.usuarioService.editarUsuario(this.usuarioEditando._id, { nombre: this.usuarioEditando.nombre.trim() }).subscribe({
       next: () => {
         this.cerrarModalEditar();
         this.obtenerUsuarios();

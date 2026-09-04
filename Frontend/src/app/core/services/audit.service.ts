@@ -20,6 +20,10 @@ export class AuditService {
     const params: string[] = [];
     if (filtros.accion) params.push(`accion=${filtros.accion}`);
     if (filtros.usuario) params.push(`usuario=${filtros.usuario}`);
+    if (filtros.usuarioId) params.push(`usuarioId=${filtros.usuarioId}`);
+    if (filtros.fechaInicio) params.push(`fechaInicio=${filtros.fechaInicio}`);
+    if (filtros.fechaFin) params.push(`fechaFin=${filtros.fechaFin}`);
+    if (filtros.resumen) params.push(`resumen=1`);
     params.push(`pagina=${filtros.pagina || 1}`);
     params.push(`limite=${filtros.limite || 20}`);
 

@@ -42,6 +42,10 @@ exports.listarLogs = async (req, res) => {
     const {
       accion,
       usuario: usuarioBusqueda,
+      usuarioId,
+      fechaInicio,
+      fechaFin,
+      resumen,
       pagina = 1,
       limite = 20,
     } = req.query;
@@ -50,7 +54,9 @@ exports.listarLogs = async (req, res) => {
 
     if (accion) filtro.accion = accion;
 
-    if (usuarioBusqueda) {
+    if (usuarioId) {
+      filtro.usuario = usuarioId;
+    } else if (usuarioBusqueda) {
       const usuariosEncontrados = await User.find({
         $or: [
           { nombre: { $regex: usuarioBusqueda, $options: "i" } },
@@ -66,6 +72,53 @@ exports.listarLogs = async (req, res) => {
       } else {
         filtro.email = { $regex: usuarioBusqueda, $options: "i" };
       }
+    }
+
+    if (fechaInicio || fechaFin) {
+      filtro.createdAt = {};
+      if (fechaInicio) filtro.createdAt.$gte = new Date(fechaInicio);
+      if (fechaFin) {
+        const fin = new Date(fechaFin);
+        fin.setHours(23, 59, 59, 999);
+        filtro.createdAt.$lte = fin;
+      }
+    }
+
+    if (resumen === "1") {
+      const todos = await AuditLog.find(filtro)
+        .sort({ createdAt: -1 })
+        .populate("usuario", "nombre email rol");
+
+      const agrupados = {};
+      for (const log of todos) {
+        const clave = log.usuario
+          ? String(log.usuario._id)
+          : log.email || "sistema";
+        if (!agrupados[clave]) {
+          agrupados[clave] = {
+            usuarioId: log.usuario ? log.usuario._id : null,
+            nombre: log.usuario?.nombre || "Sistema",
+            email: log.email,
+            rol: log.usuario?.rol || "",
+            total: 0,
+            acciones: {},
+            ultimaAccion: log.createdAt,
+          };
+        }
+        agrupados[clave].total++;
+        agrupados[clave].acciones[log.accion] =
+          (agrupados[clave].acciones[log.accion] || 0) + 1;
+      }
+
+      const lista = Object.values(agrupados).sort(
+        (a, b) => new Date(b.ultimaAccion).getTime() - new Date(a.ultimaAccion).getTime(),
+      );
+
+      return res.status(200).json({
+        exitoso: true,
+        datos: lista,
+        total: lista.length,
+      });
     }
 
     const total = await AuditLog.countDocuments(filtro);
