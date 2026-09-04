@@ -59,9 +59,6 @@
         <a *ngIf="esAdmin" class="dropdown-item" routerLink="/dashboard/auditoria" routerLinkActive="active">
           <i class="bi bi-shield-lock me-2"></i>Auditoría
         </a>
-        <a *ngIf="esPaciente" class="dropdown-item" routerLink="/dashboard/ayuda" routerLinkActive="active">
-          <i class="bi bi-question-circle-fill me-2"></i>Ayuda
-        </a>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" routerLink="/dashboard/perfil" routerLinkActive="active">
           <i class="bi bi-person-gear me-2"></i>Mi perfil
@@ -118,9 +115,9 @@
         >
       </div>
       <div class="col-md-4 text-center mb-2 mb-md-0">
-        <a *ngIf="esPaciente" routerLink="/dashboard/ayuda" class="text-decoration-none">
-          <small class="footer-help">
-            <i class="bi bi-question-circle-fill me-1"></i>¿Necesitás ayuda? Guía y preguntas frecuentes
+        <a routerLink="/dashboard/ayuda" class="text-decoration-none footer-help">
+          <small>
+            <i class="bi bi-question-circle-fill me-1"></i>Centro de Ayuda
           </small>
         </a>
       </div>

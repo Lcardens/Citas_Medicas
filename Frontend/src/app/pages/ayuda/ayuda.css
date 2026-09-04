@@ -7,40 +7,6 @@
   background: linear-gradient(135deg, #27b7f5 0%, #7fd0f3 100%) !important;
 }
 
-.guia-card {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  background: #f8f9fa;
-  height: 100%;
-  transition: transform 0.2s ease;
-}
-
-.guia-card:hover {
-  transform: translateY(-2px);
-}
-
-.guia-icon {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-}
-
-.guia-texto h6 {
-  font-size: 0.95rem;
-}
-
-.guia-texto ol {
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-
 .accordion-button {
   font-size: 0.92rem;
   font-weight: 500;
@@ -62,4 +28,14 @@
   font-size: 0.88rem;
   line-height: 1.6;
   padding: 0.5rem 1rem 1rem;
+}
+
+.guia-pasos {
+  padding-left: 1.2rem;
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+
+.guia-pasos li {
+  margin-bottom: 0.3rem;
 }

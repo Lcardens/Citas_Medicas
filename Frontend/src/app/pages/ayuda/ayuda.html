@@ -11,76 +11,23 @@
         <i class="bi bi-book me-1"></i>Guía Rápida
       </h6>
 
-      <div class="row g-3 mb-4">
-        <!-- Agendar cita -->
-        <div class="col-md-6">
-          <div class="guia-card">
-            <div class="guia-icon bg-primary bg-opacity-10 text-primary">
-              <i class="bi bi-calendar-plus"></i>
-            </div>
-            <div class="guia-texto">
-              <h6 class="fw-bold mb-1">Agendar una Cita</h6>
-              <ol class="mb-0 ps-3">
-                <li>Dirígete a <strong>Citas</strong> desde el menú.</li>
-                <li>Haz clic en el botón <strong>"Agendar Cita"</strong>.</li>
-                <li>Selecciona la <strong>fecha</strong> del calendario.</li>
-                <li>Elige un médico y la <strong>hora disponible</strong>.</li>
-                <li>Escribe el motivo de la consulta.</li>
-                <li>Presiona <strong>"Agendar"</strong> y listo.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ver mis turnos -->
-        <div class="col-md-6">
-          <div class="guia-card">
-            <div class="guia-icon bg-success bg-opacity-10 text-success">
-              <i class="bi bi-clipboard2-pulse"></i>
-            </div>
-            <div class="guia-texto">
-              <h6 class="fw-bold mb-1">Ver Mis Turnos</h6>
-              <ol class="mb-0 ps-3">
-                <li>En el menú, selecciona <strong>"Mis Turnos"</strong>.</li>
-                <li>Verás tus citas con su estado: Pendiente, Confirmada o Atendida.</li>
-                <li>Puedes <strong>buscar</strong> por nombre del médico o especialidad.</li>
-                <li>Si necesitas cancelar, haz clic en <strong>"Cancelar"</strong> en la columna de acciones.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cancelar cita -->
-        <div class="col-md-6">
-          <div class="guia-card">
-            <div class="guia-icon bg-danger bg-opacity-10 text-danger">
-              <i class="bi bi-x-circle"></i>
-            </div>
-            <div class="guia-texto">
-              <h6 class="fw-bold mb-1">Cancelar una Cita</h6>
-              <ol class="mb-0 ps-3">
-                <li>En <strong>"Mis Turnos"</strong>, busca la cita que deseas cancelar.</li>
-                <li>Haz clic en el botón <strong>"Cancelar"</strong>.</li>
-                <li>Confirma la cancelación en la ventana emergente.</li>
-                <li>La cita cambiará a estado <strong>"Cancelada"</strong>.</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mi perfil -->
-        <div class="col-md-6">
-          <div class="guia-card">
-            <div class="guia-icon bg-warning bg-opacity-10 text-warning">
-              <i class="bi bi-person-gear"></i>
-            </div>
-            <div class="guia-texto">
-              <h6 class="fw-bold mb-1">Mi Perfil</h6>
-              <ol class="mb-0 ps-3">
-                <li>Accede a <strong>"Mi Perfil"</strong> desde el menú.</li>
-                <li>Puedes actualizar tu <strong>nombre</strong> y <strong>teléfono</strong>.</li>
-                <li>También puedes <strong>cambiar tu contraseña</strong>.</li>
-                <li>Los campos de documento y correo son de solo lectura.</li>
+      <div class="accordion mb-4" id="guiaAccordion">
+        <div *ngFor="let paso of guia; let i = index" class="accordion-item border-0 mb-2">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button"
+              [class.collapsed]="guiaAbierto !== i"
+              type="button"
+              (click)="toggleGuia(i)"
+            >
+              <i class="me-2" [ngClass]="paso.icono" [style.color]="paso.color"></i>
+              {{ paso.titulo }}
+            </button>
+          </h2>
+          <div class="accordion-collapse" [class.show]="guiaAbierto === i" [class.collapse]="guiaAbierto !== i">
+            <div class="accordion-body">
+              <ol class="guia-pasos mb-0">
+                <li *ngFor="let p of paso.pasos">{{ p }}</li>
               </ol>
             </div>
           </div>
@@ -93,123 +40,21 @@
       </h6>
 
       <div class="accordion" id="faqAccordion">
-        <div class="accordion-item border-0 mb-2">
+        <div *ngFor="let item of faq; let i = index" class="accordion-item border-0 mb-2">
           <h2 class="accordion-header">
             <button
               class="accordion-button"
-              [class.collapsed]="faqAbierto !== 0"
+              [class.collapsed]="faqAbierto !== i"
               type="button"
-              (click)="toggleFaq(0)"
+              (click)="toggleFaq(i)"
             >
-              <i class="bi bi-calendar-check text-primary me-2"></i>
-              ¿Cómo sé si mi cita fue confirmada?
+              <i class="me-2" [ngClass]="item.icono" [style.color]="item.color"></i>
+              {{ item.pregunta }}
             </button>
           </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 0" [class.collapse]="faqAbierto !== 0">
+          <div class="accordion-collapse" [class.show]="faqAbierto === i" [class.collapse]="faqAbierto !== i">
             <div class="accordion-body text-muted">
-              Cuando agendes una cita, el estado será <strong>"Pendiente"</strong>. El médico o el administrador deberán confirmarla. 
-              Podés ver el estado actualizado en la sección <strong>"Mis Turnos"</strong>. Si el estado cambia a <strong>"Confirmada"</strong>, tu cita está lista.
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item border-0 mb-2">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="faqAbierto !== 1"
-              type="button"
-              (click)="toggleFaq(1)"
-            >
-              <i class="bi bi-clock-history text-success me-2"></i>
-              ¿Puedo cancelar una cita ya confirmada?
-            </button>
-          </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 1" [class.collapse]="faqAbierto !== 1">
-            <div class="accordion-body text-muted">
-              Sí, podés cancelar una cita mientras no haya sido <strong>atendida</strong>. En "Mis Turnos", hacé clic en el botón 
-              <strong>"Cancelar"</strong> de la cita que deseas anular. Si la cita ya fue atendida, el botón no aparecerá.
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item border-0 mb-2">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="faqAbierto !== 2"
-              type="button"
-              (click)="toggleFaq(2)"
-            >
-              <i class="bi bi-search text-info me-2"></i>
-              ¿Cómo busco un médico específico?
-            </button>
-          </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 2" [class.collapse]="faqAbierto !== 2">
-            <div class="accordion-body text-muted">
-              Al agendar una cita, usá el <strong>buscador</strong> que aparece en la parte superior. Podés escribir el nombre del médico 
-              o su especialidad para filtrar los resultados rápidamente.
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item border-0 mb-2">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="faqAbierto !== 3"
-              type="button"
-              (click)="toggleFaq(3)"
-            >
-              <i class="bi bi-shield-lock text-warning me-2"></i>
-              ¿Cómo cambio mi contraseña?
-            </button>
-          </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 3" [class.collapse]="faqAbierto !== 3">
-            <div class="accordion-body text-muted">
-              Entrá a <strong>"Mi Perfil"</strong> desde el menú. Hacé clic en <strong>"Cambiar contraseña"</strong>, escribí tu contraseña actual 
-              y la nueva (mínimo 6 caracteres). Confirmala y presiona <strong>"Guardar cambios"</strong>.
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item border-0 mb-2">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="faqAbierto !== 4"
-              type="button"
-              (click)="toggleFaq(4)"
-            >
-              <i class="bi bi-exclamation-triangle text-danger me-2"></i>
-              ¿Qué pasa si me desconecto por inactividad?
-            </button>
-          </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 4" [class.collapse]="faqAbierto !== 4">
-            <div class="accordion-body text-muted">
-              Por seguridad, el sistema cierra tu sesión automáticamente después de un período de inactividad. 
-              Si esto ocurre, solo tenés que <strong>iniciar sesión nuevamente</strong> con tu correo y contraseña. 
-              Tus citas y datos se mantienen guardados.
-            </div>
-          </div>
-        </div>
-
-        <div class="accordion-item border-0 mb-2">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button"
-              [class.collapsed]="faqAbierto !== 5"
-              type="button"
-              (click)="toggleFaq(5)"
-            >
-              <i class="bi bi-phone text-secondary me-2"></i>
-              ¿Puedo usar el sistema desde el celular?
-            </button>
-          </h2>
-          <div class="accordion-collapse" [class.show]="faqAbierto === 5" [class.collapse]="faqAbierto !== 5">
-            <div class="accordion-body text-muted">
-              Sí, el sistema es <strong>100% responsive</strong>. Podés acceder desde el navegador de tu celular 
-              sin necesidad de instalar nada. Todos los botones y formularios se adaptan a la pantalla de tu dispositivo.
+              {{ item.respuesta }}
             </div>
           </div>
         </div>
@@ -219,7 +64,12 @@
       <div class="mt-4 p-3 bg-light rounded-3 text-center">
         <i class="bi bi-headset text-primary" style="font-size: 1.5rem"></i>
         <h6 class="fw-bold mt-2 mb-1">¿Necesitás más ayuda?</h6>
-        <p class="text-muted mb-0 small">Contactá al administrador del sistema para soporte adicional.</p>
+        <ul class="list-unstyled mb-0 small text-muted">
+          <li><i class="bi bi-envelope-fill me-1"></i>contacto@citamedica.co</li>
+          <li><i class="bi bi-telephone-fill me-1"></i>+57 300 123 4567</li>
+          <li><i class="bi bi-geo-alt-fill me-1"></i>Medellín, Colombia</li>
+          <li><i class="bi bi-clock-fill me-1"></i>Lun - Vie: 8:00 AM - 6:00 PM</li>
+        </ul>
       </div>
     </div>
   </div>
