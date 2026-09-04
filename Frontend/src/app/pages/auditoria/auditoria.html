@@ -8,39 +8,25 @@
   <!-- Filtros -->
   <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
     <div class="row g-3 align-items-end">
-      <div class="col-md-3 col-sm-6">
+      <div class="col-md-4 col-sm-6">
+        <label class="form-label fw-semibold text-secondary mb-1">Usuario:</label>
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Buscar por nombre o email..."
+          [(ngModel)]="filtros.usuario"
+          (keyup.enter)="buscar()"
+        />
+      </div>
+      <div class="col-md-4 col-sm-6">
         <label class="form-label fw-semibold text-secondary mb-1">Acción:</label>
         <select class="form-select form-select-sm" [(ngModel)]="filtros.accion">
           <option *ngFor="let op of accionOpciones" [value]="op.valor">{{ op.etiqueta }}</option>
         </select>
       </div>
-      <div class="col-md-2 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Entidad:</label>
-        <select class="form-select form-select-sm" [(ngModel)]="filtros.entidad">
-          <option *ngFor="let op of entidadOpciones" [value]="op.valor">{{ op.etiqueta }}</option>
-        </select>
-      </div>
-      <div class="col-md-2 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Email:</label>
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          placeholder="Buscar por email..."
-          [(ngModel)]="filtros.email"
-          (keyup.enter)="buscar()"
-        />
-      </div>
-      <div class="col-md-2 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Desde:</label>
-        <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaInicio" />
-      </div>
-      <div class="col-md-2 col-sm-6">
-        <label class="form-label fw-semibold text-secondary mb-1">Hasta:</label>
-        <input type="date" class="form-control form-control-sm" [(ngModel)]="filtros.fechaFin" />
-      </div>
-      <div class="col-md-1 col-sm-6 d-flex gap-1">
+      <div class="col-md-4 col-sm-6 d-flex gap-1">
         <button class="btn btn-primary btn-sm flex-grow-1" (click)="buscar()" title="Buscar">
-          <i class="bi bi-search"></i>
+          <i class="bi bi-search"></i> Buscar
         </button>
         <button class="btn btn-outline-secondary btn-sm" (click)="limpiarFiltros()" title="Limpiar">
           <i class="bi bi-x-lg"></i>
@@ -66,8 +52,6 @@
               <th>Fecha</th>
               <th>Usuario</th>
               <th>Acción</th>
-              <th>Entidad</th>
-              <th>IP</th>
               <th>Detalles</th>
             </tr>
           </thead>
@@ -83,8 +67,6 @@
                   {{ formatearAccion(log.accion) }}
                 </span>
               </td>
-              <td class="text-capitalize small">{{ log.entidad }}</td>
-              <td class="small text-muted">{{ log.ip }}</td>
               <td class="small text-muted" style="max-width: 200px">
                 <span *ngIf="log.detalles && (log.detalles.estado || log.detalles.mensaje || log.detalles.motivo)">
                   {{ log.detalles.estado || log.detalles.mensaje || log.detalles.motivo || '' }}
@@ -92,7 +74,7 @@
               </td>
             </tr>
             <tr *ngIf="logs.length === 0">
-              <td colspan="6" class="text-center py-4 text-muted">No hay registros de auditoría.</td>
+              <td colspan="4" class="text-center py-4 text-muted">No hay registros de auditoría.</td>
             </tr>
           </tbody>
         </table>
@@ -112,12 +94,6 @@
         </div>
         <div class="fw-semibold small">{{ log.usuario?.nombre || 'Sistema' }}</div>
         <div class="text-muted" style="font-size: 0.75rem">{{ log.email }}</div>
-        <div class="mt-1 small">
-          <span class="text-muted">Entidad:</span>
-          <span class="text-capitalize">{{ log.entidad }}</span>
-          <span class="text-muted ms-2">IP:</span>
-          <span>{{ log.ip }}</span>
-        </div>
       </div>
     </div>
     <div *ngIf="logs.length === 0" class="text-center py-4 text-muted">

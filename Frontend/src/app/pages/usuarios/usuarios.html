@@ -78,6 +78,14 @@
               <td data-label="Acciones" class="text-center">
                 <button
                   *ngIf="!esUsuarioActual(usuario._id)"
+                  class="btn btn-outline-primary btn-sm me-1"
+                  title="Editar usuario"
+                  (click)="abrirModalEditar(usuario)"
+                >
+                  <i class="bi bi-pencil me-1"></i>Editar
+                </button>
+                <button
+                  *ngIf="!esUsuarioActual(usuario._id)"
                   class="btn btn-outline-danger btn-sm"
                   title="Eliminar usuario y sus datos"
                   (click)="eliminarUsuario(usuario._id, usuario.nombre || usuario.Nombre)"
@@ -190,6 +198,72 @@
             Cancelar
           </button>
           <button type="submit" class="btn btn-primary px-4">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="mostrarModalEditar && usuarioEditando"
+  class="modal fade show d-block"
+  tabindex="-1"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">Editar Usuario</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModalEditar()"></button>
+      </div>
+
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="modal-body p-4">
+          <div
+            *ngIf="mensajeError"
+            class="alert alert-danger py-2 px-3 mb-3 text-center small"
+            role="alert"
+          >
+            {{ mensajeError }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre Completo</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="usuarioEditando.nombre"
+              name="editNombre"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Correo Electrónico</label>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="usuarioEditando.email"
+              name="editEmail"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Rol del Usuario</label>
+            <select class="form-select" [(ngModel)]="usuarioEditando.rol" name="editRol" required>
+              <option value="paciente">Paciente</option>
+              <option value="medico">Médico</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-outline-secondary" (click)="cerrarModalEditar()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary px-4">Guardar Cambios</button>
         </div>
       </form>
     </div>

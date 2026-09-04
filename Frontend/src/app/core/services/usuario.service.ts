@@ -32,4 +32,8 @@ export class UsuarioService {
   eliminarUsuario(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/auth/usuarios/${id}`, { headers: this.getHeaders() });
   }
+
+  editarUsuario(id: string, datos: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/auth/usuarios/${id}`, datos, { headers: this.getHeaders() });
+  }
 }

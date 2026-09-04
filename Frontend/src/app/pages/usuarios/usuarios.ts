@@ -14,6 +14,7 @@ import { DialogService } from '../../core/services/dialog.service';
 export class UsuariosComponent implements OnInit {
   usuarios: any[] = [];
   mostrarModalCrear: boolean = false;
+  mostrarModalEditar: boolean = false;
   mensajeError: string = '';
   usuarioIdActual: string = '';
   rolFiltro: string = '';
@@ -29,6 +30,9 @@ export class UsuariosComponent implements OnInit {
     password: '',
     rol: 'paciente',
   };
+
+  usuarioEditando: any = null;
+  usuarioEditandoBackup: any = null;
 
   constructor(private usuarioService: UsuarioService) {}
 
@@ -148,6 +152,55 @@ export class UsuariosComponent implements OnInit {
 
   esUsuarioActual(id: string): boolean {
     return this.usuarioIdActual === id;
+  }
+
+  abrirModalEditar(usuario: any): void {
+    this.mensajeError = '';
+    this.usuarioEditando = {
+      _id: usuario._id,
+      nombre: usuario.nombre || usuario.Nombre || '',
+      email: usuario.email || '',
+      rol: usuario.rol || 'paciente',
+    };
+    this.usuarioEditandoBackup = { ...this.usuarioEditando };
+    this.mostrarModalEditar = true;
+  }
+
+  cerrarModalEditar(): void {
+    this.mostrarModalEditar = false;
+    this.mensajeError = '';
+    this.usuarioEditando = null;
+  }
+
+  guardarEdicion(): void {
+    this.mensajeError = '';
+    if (!this.usuarioEditando?.nombre || !this.usuarioEditando?.email) {
+      this.mensajeError = 'Nombre y correo son obligatorios.';
+      return;
+    }
+    const campos: any = {};
+    if (this.usuarioEditando.nombre !== this.usuarioEditandoBackup.nombre) {
+      campos.nombre = this.usuarioEditando.nombre;
+    }
+    if (this.usuarioEditando.email !== this.usuarioEditandoBackup.email) {
+      campos.email = this.usuarioEditando.email;
+    }
+    if (this.usuarioEditando.rol !== this.usuarioEditandoBackup.rol) {
+      campos.rol = this.usuarioEditando.rol;
+    }
+    if (Object.keys(campos).length === 0) {
+      this.cerrarModalEditar();
+      return;
+    }
+    this.usuarioService.editarUsuario(this.usuarioEditando._id, campos).subscribe({
+      next: () => {
+        this.cerrarModalEditar();
+        this.obtenerUsuarios();
+      },
+      error: (err: any) => {
+        this.mensajeError = err.error?.mensaje || 'Error al guardar los cambios.';
+      },
+    });
   }
 
   eliminarUsuario(id: string, nombre: string): void {

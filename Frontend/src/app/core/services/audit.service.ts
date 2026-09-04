@@ -19,10 +19,7 @@ export class AuditService {
   listarLogs(filtros: any = {}): Observable<any> {
     const params: string[] = [];
     if (filtros.accion) params.push(`accion=${filtros.accion}`);
-    if (filtros.entidad) params.push(`entidad=${filtros.entidad}`);
-    if (filtros.email) params.push(`email=${filtros.email}`);
-    if (filtros.fechaInicio) params.push(`fechaInicio=${filtros.fechaInicio}`);
-    if (filtros.fechaFin) params.push(`fechaFin=${filtros.fechaFin}`);
+    if (filtros.usuario) params.push(`usuario=${filtros.usuario}`);
     params.push(`pagina=${filtros.pagina || 1}`);
     params.push(`limite=${filtros.limite || 20}`);
 

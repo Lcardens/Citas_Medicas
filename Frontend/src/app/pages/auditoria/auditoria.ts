@@ -21,10 +21,7 @@ export class AuditoriaComponent implements OnInit {
 
   filtros = {
     accion: '',
-    entidad: '',
-    email: '',
-    fechaInicio: '',
-    fechaFin: '',
+    usuario: '',
   };
 
   paginaActual = 1;
@@ -42,14 +39,6 @@ export class AuditoriaComponent implements OnInit {
     { valor: 'login_fallido', etiqueta: 'Login fallido' },
     { valor: 'registro', etiqueta: 'Registro' },
     { valor: 'actualizar_perfil', etiqueta: 'Actualizar perfil' },
-  ];
-
-  entidadOpciones = [
-    { valor: '', etiqueta: 'Todas las entidades' },
-    { valor: 'cita', etiqueta: 'Cita' },
-    { valor: 'usuario', etiqueta: 'Usuario' },
-    { valor: 'perfil', etiqueta: 'Perfil' },
-    { valor: 'auth', etiqueta: 'Autenticación' },
   ];
 
   ngOnInit(): void {
@@ -86,7 +75,7 @@ export class AuditoriaComponent implements OnInit {
   }
 
   limpiarFiltros(): void {
-    this.filtros = { accion: '', entidad: '', email: '', fechaInicio: '', fechaFin: '' };
+    this.filtros = { accion: '', usuario: '' };
     this.paginaActual = 1;
     this.cargarLogs();
   }
