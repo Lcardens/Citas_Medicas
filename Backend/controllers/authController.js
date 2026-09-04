@@ -54,6 +54,7 @@ exports.registrar = async (req, res) => {
 
     // Detecta si quien crea el usuario es un admin autenticado
     let solicitanteAdmin = false;
+    let usuarioSolicitante = null;
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -67,6 +68,7 @@ exports.registrar = async (req, res) => {
             .toLowerCase()
             .trim();
           solicitanteAdmin = rolSolicitante === "admin" || rolSolicitante === "administrador";
+          if (solicitante) usuarioSolicitante = solicitante;
         }
       } catch {
         solicitanteAdmin = false;
@@ -113,11 +115,12 @@ exports.registrar = async (req, res) => {
 
     await registrarEvento({
       req,
-      usuario,
-      accion: "registro",
+      usuario: usuarioSolicitante || usuario,
+      email: usuarioSolicitante?.email || email,
+      accion: "registro_usuario",
       entidad: "auth",
       entidadId: usuario._id,
-      detalles: { email, rol: rolNormalizado },
+      detalles: { email, rol: rolNormalizado, creadoPor: usuarioSolicitante?.email },
     });
 
     if (rolNormalizado === "paciente" || rolNormalizado === "usuario") {
