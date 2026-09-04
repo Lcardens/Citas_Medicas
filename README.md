@@ -12,6 +12,7 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 - [Despliegue en producción](#despliegue-en-producción)
 - [Endpoints de la API](#endpoints-de-la-api)
 - [Roles y permisos](#roles-y-permisos)
+- [Mejoras futuras](#mejoras-futuras)
 - [Autor](#autor)
 
 ---
@@ -24,6 +25,7 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 | Backend | Node.js, Express |
 | Base de datos | MongoDB Atlas (Mongoose) |
 | Autenticación | JWT + bcryptjs |
+| Gráficos | Chart.js |
 | Despliegue | Ubuntu, Nginx, PM2 |
 
 ---
@@ -44,12 +46,29 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 
 ### Gestión de médicos (administrador)
 - Crear médicos con registro médico y nombre.
-- Al crear un médico se generan automáticamente sus cupos diarios de atención.
 - Eliminar médicos con borrado en cascada de datos asociados.
+- **Configurar disponibilidad** (botón "Disponibilidad" en la tabla): seleccionar días de la semana (Lun-Dom) y horas de atención de un médico, además de bloquear días puntuales usando Vacaciones o Licencia (rangos de fechas). Al guardar, se retiran automáticamente los cupos "Disponible" sin reservar que ya no coinciden con la nueva configuración.
 
 ### Gestión de usuarios (administrador)
 - Listar todos los usuarios del sistema.
 - Eliminar usuarios con borrado en cascada de datos asociados.
+- Crear usuarios con rol Administrador, Médico o Paciente.
+
+### Auditoría (administrador)
+- Registro automático de acciones relevantes en el sistema (creación de usuarios, login, registro de médicos, etc.).
+- Página de Auditoría con vista resumen (acciones por usuario) y vista detallada (log cronológico) con filtros por usuario y fecha.
+
+### Centro de ayuda (todos los roles)
+- Página de ayuda accesible desde el menú hamburguesa y el footer del panel.
+- Guía paso a paso por rol (Administrador, Médico, Paciente) con acordeón desplegable.
+- Preguntas frecuentes con información relevante por rol.
+- Sección de contacto institucional.
+
+### Perfil y estilos por rol
+- Barra de navegación, perfil, avatar y etiquetas con degradados según el rol: administrador (lavanda), médico (azul) y paciente (verde).
+- El perfil del administrador muestra el cargo "Administrador de Sistema" y oculta los campos de documento y registro médico.
+- Perfil del médico conserva el registro médico y teléfono de solo lectura; el paciente conserva documento y correo de solo lectura.
+- Cambio de contraseña con validación de la contraseña actual.
 
 ### Gestión de citas médicas
 - **Agendar cita**: el paciente elige médico, fecha y hora entre los cupos realmente disponibles.
@@ -61,13 +80,15 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 - **Filtros por columna**: la tabla de citas permite filtrar por médico, estado y fecha (estilo filtros de Excel), con botón para limpiar. Los pacientes solo ven sus propias citas.
 
 ### Disponibilidad de citas
-- El sistema genera cupos de forma automática y devuelve únicamente las horas libres para un médico y una fecha concretos.
-- Las horas ya vencidas del día actual se descartan.
-- **Calendario mensual**: al agendar una cita se muestra un calendario del mes que consulta la disponibilidad por rango de fechas y resalta los días sin cupos disponibles como bloqueados (no seleccionables); el día actual se marca y la selección de fecha queda resaltada.
+- **Modelo por día, bajo demanda**: los cupos se generan solamente cuando un paciente selecciona un día concreto en el calendario, no por adelantado para meses enteros.
+- Las horas vencidas del día actual se descartan.
+- **Configuración por médico**: el administrador define los días de la semana y horas de atención de cada médico; también puede bloquear rangos de días con motivo Vacaciones o Licencia.
+- **Calendario mensual**: los días que ya tienen cupos creados se muestran en verde ("Con disponibilidad"); los días sin cupos quedan seleccionables y generan los slots bajo demanda al elegirlos. Los días pasados quedan bloqueados.
 
 ### Reportes (administrador)
-- **Citas por mes**: total de citas confirmadas/atendidas agrupadas por mes.
-- **Pacientes frecuentes**: pacientes con más citas confirmadas/atendidas.
+- **Distribución por estado**: gráfico de dona (Confirmada, Disponible, Atendida, Cancelada) con colores pastel.
+- **Pacientes frecuentes**: tabla de pacientes con más citas.
+- **Resumen**: total de citas, disponibles, confirmadas, atendidas y canceladas.
 
 ---
 
@@ -80,19 +101,22 @@ Proyecto_Final/
 │   │   └── db.js                    # Conexión a MongoDB
 │   ├── controllers/
 │   │   ├── authController.js        # Registro, login, perfil propio, usuarios
+│   │   ├── auditController.js       # Registro y lista de logs de auditoría
 │   │   ├── citaController.js        # CRUD de citas, asignación y disponibilidad
-│   │   ├── medicoController.js      # CRUD de médicos y generación de cupos
+│   │   ├── medicoController.js      # CRUD de médicos y disponibilidad
 │   │   ├── pacienteController.js    # CRUD de pacientes
-│   │   └── reporteController.js     # Reportes (citas por mes, pacientes frecuentes)
+│   │   └── reporteController.js     # Reportes (distribución, pacientes frecuentes)
 │   ├── middleware/
 │   │   └── auth.js                  # Protección (JWT) y autorización por roles
 │   ├── models/
 │   │   ├── user.js                  # Usuario de autenticación
 │   │   ├── cita.js                  # Cita (referencia a Paciente y Medico)
-│   │   ├── medico.js                # Médico
-│   │   └── Paciente.js              # Paciente
+│   │   ├── medico.js                # Médico (con disponibilidad configurable)
+│   │   ├── Paciente.js              # Paciente
+│   │   └── auditLog.js              # Registro de acciones de auditoría
 │   ├── routes/
 │   │   ├── authRoutes.js            # /api/auth/*
+│   │   ├── auditRoutes.js           # /api/audit/*
 │   │   ├── citaRoutes.js            # /api/citas/*
 │   │   ├── medicoRoutes.js          # /api/medicos/*
 │   │   ├── pacienteRoutes.js        # /api/pacientes/*
@@ -117,8 +141,10 @@ Proyecto_Final/
 │   │       │   ├── citas/           # Gestión de citas (con calendario y filtros)
 │   │       │   ├── misturnos/       # Agenda del médico
 │   │       │   ├── pacientes/       # Gestión de pacientes
-│   │       │   ├── medicos/         # Gestión de médicos
+│   │       │   ├── medicos/         # Gestión de médicos y disponibilidad
 │   │       │   ├── usuarios/        # Lista de usuarios
+│   │       │   ├── auditoria/       # Log de auditoría (admin)
+│   │       │   ├── ayuda/           # Centro de ayuda (todos los roles)
 │   │       │   ├── reportes/        # Reportes (admin)
 │   │       │   └── perfil/          # Perfil del usuario logueado
 │   │       ├── app.config.ts        # Proveedores (router e interceptor)
@@ -278,8 +304,9 @@ Base URL (entorno local): `http://localhost:3000/api`
 
 | Método | Ruta | Descripción | Acceso |
 |--------|------|-------------|--------|
-| POST | `/medicos` | Crear médico y generar cupos | Administrador |
+| POST | `/medicos` | Crear médico | Administrador |
 | GET | `/medicos` | Listar médicos | Público |
+| PUT | `/medicos/:id/disponibilidad` | Configurar días, horas y bloqueos del médico | Administrador |
 | DELETE | `/medicos/:id` | Eliminar un médico y sus datos | Administrador |
 
 ### Citas
@@ -298,6 +325,12 @@ Base URL (entorno local): `http://localhost:3000/api`
 | PATCH | `/citas/:id` | Actualizar una cita | Autenticado |
 | DELETE | `/citas/:id` | Eliminar una cita | Autenticado |
 
+### Auditoría
+
+| Método | Ruta | Descripción | Acceso |
+|--------|------|-------------|--------|
+| GET | `/audit` | Listar logs (resumen o detallado por filtros) | Administrador |
+
 ### Reportes
 
 | Método | Ruta | Descripción | Acceso |
@@ -311,9 +344,33 @@ Base URL (entorno local): `http://localhost:3000/api`
 
 | Rol | Puede ver | Puede crear | Puede editar/eliminar |
 |-----|-----------|-------------|----------------------|
-| Administrador | Todo | Pacientes, médicos, citas | Todo |
+| Administrador | Todo, Auditoría, Reportes | Pacientes, médicos, usuarios, citas | Todo |
 | Médico | Citas asignadas (agenda) | Citas | Citas |
 | Paciente | Solo sus citas | Citas | Cancela sus propias citas |
+
+Disponibilidad de médicos (días, horas y bloqueos por vacaciones/licencia) y auditoría están restringidos al rol Administrador. El Centro de Ayuda está disponible para los tres roles.
+
+---
+
+## Mejoras futuras
+
+La aplicación cuenta con una base sólida, pero por el alcance actual quedan varias funcionalidades pendientes que se pueden incorporar en una siguiente etapa:
+
+### Asistencia al paciente
+- **Chat bot de ayuda**: un asistente conversacional que responda dudas frecuentes de los pacientes (agendar, cancelar, estados de la cita) y agilice la atención, reduciendo la dependencia del administrador.
+- **Recuperación de contraseña**: restablecer la contraseña por correo electrónico (enlace o código de verificación) cuando el usuario la olvide, en lugar de depender del administrador.
+- **Notificaciones y recordatorios**: avisos por correo o WhatsApp antes de la cita y confirmación de cambios de estado.
+
+### Gestión de médicos y citas
+- **Selección de médico por especialidad**: asignar una especialidad a cada médico y permitir a los pacientes filtrar y agendar según la especialidad que necesiten.
+- **Historial clínico del paciente**: registrar diagnósticos y notas de las consultas atendidas, visibles para el médico y el administrador.
+- **Reprogramación automática**: al bloquear días de un médico, ofrecer al paciente la opción de mover automáticamente su cita a otro día disponible.
+
+### Plataforma
+- **Video consulta / telemedicina**: agenda con encuentros remotos por videollamada.
+- **Exportación de reportes**: descargar reportes en PDF o Excel.
+- **Multi-sede y multi-horario**: definir sedes para cada médico con horarios propios.
+- **Aplicación móvil**: versión para Android/iOS o PWA para mejorar la experiencia de los pacientes.
 
 ---
 
