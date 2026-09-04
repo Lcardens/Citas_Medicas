@@ -13,6 +13,7 @@ const {
   obtenerHorasDisponiblesPorMedicoYFecha,
   obtenerDisponibilidadPorRango,
   agendaDelMedico,
+  obtenerHistorialClinico,
 } = require("../controllers/citaController");
 
 router.get("/", proteger, listarCitas);
@@ -21,6 +22,13 @@ router.post("/asignar", proteger, asignarCita);
 router.post("/asignar-rapido", proteger, asignarCitaRapida);
 
 router.get("/agenda", proteger, agendaDelMedico);
+
+router.get(
+  "/historial/:pacienteId",
+  proteger,
+  autorizar("admin", "administrador", "medico"),
+  obtenerHistorialClinico,
+);
 
 router.get("/medico/:medicoId", proteger, obtenerCitasPorMedico);
 router.get(

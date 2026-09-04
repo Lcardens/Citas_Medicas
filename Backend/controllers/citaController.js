@@ -964,3 +964,38 @@ exports.actualizarCita = async (req, res) => {
     });
   }
 };
+
+exports.obtenerHistorialClinico = async (req, res) => {
+  try {
+    const { pacienteId } = req.params;
+
+    const historial = await Cita.find({
+      paciente: pacienteId,
+      estado: "Atendida",
+    })
+      .populate(
+        "medico",
+        "Nombre nombre nombres nombreCompleto Registromedico registroMedico email",
+      )
+      .populate(
+        "paciente",
+        "Nombre nombre nombres nombreCompleto documento Documento email Correo",
+      )
+      .sort({ fecha: -1, hora: -1 })
+      .lean();
+
+    res.status(200).json({
+      exitoso: true,
+      mensaje: historial.length
+        ? "Historial clínico obtenido exitosamente"
+        : "El paciente aún no tiene citas atendidas",
+      datos: historial,
+    });
+  } catch (error) {
+    res.status(500).json({
+      exitoso: false,
+      mensaje: "Error al obtener el historial clínico",
+      error: error.message,
+    });
+  }
+};
