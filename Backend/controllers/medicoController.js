@@ -99,9 +99,17 @@ exports.actualizarDisponibilidad = async (req, res) => {
       medico.horasAtencion = [...new Set(horasAtencionBody)];
     }
     if (Array.isArray(diasBloqueadosBody)) {
-      medico.diasBloqueados = [
-        ...new Set(diasBloqueadosBody.map((d) => String(d).slice(0, 10))),
-      ];
+      const mapaBloqueos = new Map();
+      for (const item of diasBloqueadosBody) {
+        const fecha = typeof item === "string" ? item : item?.fecha || "";
+        const tipo = typeof item === "string" ? "puntual" : item?.tipo || "puntual";
+        const fechaNorm = String(fecha).slice(0, 10);
+        if (fechaNorm) mapaBloqueos.set(fechaNorm, tipo);
+      }
+      medico.diasBloqueados = Array.from(mapaBloqueos, ([fecha, tipo]) => ({
+        fecha,
+        tipo,
+      }));
     }
 
     await medico.save();
@@ -121,7 +129,10 @@ exports.actualizarDisponibilidad = async (req, res) => {
     for (const cupo of cupos) {
       const fechaStr = String(cupo.fecha || "").slice(0, 10);
       const diaSemana = new Date(`${fechaStr}T00:00:00`).getDay();
-      const esBloqueado = diasBloqueados.includes(fechaStr);
+      const esBloqueado = diasBloqueados.some((d) => {
+        const f = typeof d === "string" ? d : d?.fecha;
+        return String(f || "").slice(0, 10) === fechaStr;
+      });
       const esDiaValido = diasAtencion.includes(diaSemana);
       const esHoraValida = horasAtencion.includes(cupo.hora);
       if (esBloqueado || !esDiaValido || !esHoraValida) {

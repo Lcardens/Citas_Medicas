@@ -35,10 +35,15 @@ const crearCuposSiNoExisten = async (medicoId, fecha) => {
     ? medico.horasAtencion
     : HORARIOS;
   const diasBloqueados = Array.isArray(medico.diasBloqueados)
-    ? medico.diasBloqueados.map((d) => String(d).slice(0, 10))
+    ? medico.diasBloqueados
     : [];
 
-  if (diasBloqueados.includes(fechaStr)) {
+  const esBloqueado = diasBloqueados.some((d) => {
+    const f = typeof d === "string" ? d : d?.fecha;
+    return String(f || "").slice(0, 10) === fechaStr;
+  });
+
+  if (esBloqueado) {
     return { creados: 0, bloqueado: true };
   }
   if (!diasAtencion.includes(diaSemana)) {

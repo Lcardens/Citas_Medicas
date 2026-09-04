@@ -42,7 +42,12 @@ const medicoSchema = new mongoose.Schema(
     },
 
     diasBloqueados: {
-      type: [String],
+      type: [
+        {
+          fecha: { type: String, trim: true },
+          tipo: { type: String, default: "puntual" },
+        },
+      ],
       default: [],
     },
   },
