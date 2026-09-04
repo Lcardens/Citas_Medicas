@@ -3,19 +3,58 @@
   margin: 0 auto;
 }
 
+/* Header por rol */
+.header-admin {
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%) !important;
+}
+
+.header-medico {
+  background: linear-gradient(135deg, #27b7f5 0%, #7fd0f3 100%) !important;
+}
+
+.header-paciente {
+  background: linear-gradient(135deg, #6fbf8f 0%, #9ed8b2 100%) !important;
+}
+
+/* Avatar por rol */
 .avatar-circle {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: #27b7f5;
   color: #fff;
   font-size: 2.6rem;
 }
 
+.avatar-admin {
+  background: linear-gradient(135deg, #8f7bd8, #b8a6de);
+}
+
+.avatar-medico {
+  background: linear-gradient(135deg, #27b7f5, #7fd0f3);
+}
+
+.avatar-paciente {
+  background: linear-gradient(135deg, #6fbf8f, #9ed8b2);
+}
+
+/* Badge por rol */
 .role-badge {
-  background: #b8a6de;
-  color: #fff;
   font-weight: 600;
   padding: 0.4em 0.9em;
   border-radius: 8px;
+}
+
+.badge-admin {
+  background: #8f7bd8;
+  color: #fff;
+}
+
+.badge-medico {
+  background: #27b7f5;
+  color: #fff;
+}
+
+.badge-paciente {
+  background: #6fbf8f;
+  color: #fff;
 }
