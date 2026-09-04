@@ -59,6 +59,17 @@ export class CitasComponent implements OnInit {
   cargandoDisponibilidad: boolean = false;
   fechaSeleccionada: string = '';
 
+  motivosCita: string[] = [
+    'Control médico general',
+    'Consulta por síntomas',
+    'Revisión / seguimiento',
+    'Exámenes de laboratorio',
+    'Vacunación',
+    'Autorización médica',
+    'Cita de urgencia',
+    'Otro',
+  ];
+
   nuevaCita = {
     paciente: '',
     medico: '',

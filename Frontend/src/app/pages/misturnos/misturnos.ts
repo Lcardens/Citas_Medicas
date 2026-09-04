@@ -39,6 +39,16 @@ export class MisturnosComponent implements OnInit {
   guardando = false;
 
   pacientes: any[] = [];
+  motivosCita: string[] = [
+    'Control médico general',
+    'Consulta por síntomas',
+    'Revisión / seguimiento',
+    'Exámenes de laboratorio',
+    'Vacunación',
+    'Autorización médica',
+    'Cita de urgencia',
+    'Otro',
+  ];
   nuevaCita: any = {
     paciente: '',
     medico: '',
