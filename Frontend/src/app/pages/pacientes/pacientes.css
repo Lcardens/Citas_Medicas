@@ -1,0 +1,17 @@
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.btn-historial {
+  color: #5f3dc4;
+  border: 1px solid #c9c4f0;
+  background: #f5f3ff;
+}
+
+.btn-historial:hover {
+  color: #ffffff;
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%);
+  border-color: transparent;
+}
