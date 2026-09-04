@@ -65,23 +65,13 @@
             <label class="form-label">Contraseña</label>
             <div class="login-password-field">
               <input
-                [type]="mostrarPassword ? 'text' : 'password'"
+                type="password"
                 class="form-control"
                 [(ngModel)]="password"
                 name="password"
                 placeholder="••••••••"
                 autocomplete="current-password"
               />
-              <button
-                type="button"
-                class="login-eye-btn"
-                (click)="mostrarPassword = !mostrarPassword"
-                aria-label="Mostrar u ocultar contraseña"
-                title="Mostrar u ocultar contraseña"
-                tabindex="-1"
-              >
-                <i [class]="mostrarPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </button>
             </div>
           </div>
 
@@ -131,7 +121,7 @@
             <label class="form-label">Contraseña</label>
             <div class="login-password-field">
               <input
-                [type]="mostrarPassword ? 'text' : 'password'"
+                type="password"
                 class="form-control"
                 [(ngModel)]="registro.password"
                 name="regPassword"
@@ -139,16 +129,6 @@
                 autocomplete="new-password"
                 required
               />
-              <button
-                type="button"
-                class="login-eye-btn"
-                (click)="mostrarPassword = !mostrarPassword"
-                aria-label="Mostrar u ocultar contraseña"
-                title="Mostrar u ocultar contraseña"
-                tabindex="-1"
-              >
-                <i [class]="mostrarPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </button>
             </div>
           </div>
 

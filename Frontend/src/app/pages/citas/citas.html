@@ -181,7 +181,7 @@
               </ng-container>
 
               <button
-                *ngIf="esCitaDelPacienteLogueado(cita) && cita.estado !== 'Cancelada'"
+                *ngIf="esCitaDelPacienteLogueado(cita) && cita.estado !== 'Cancelada' && cita.estado !== 'Atendida'"
                 class="btn btn-outline-danger"
                 title="Cancelar mi cita"
                 (click)="cancelarCita(cita._id)"

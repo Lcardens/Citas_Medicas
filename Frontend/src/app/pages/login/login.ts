@@ -24,7 +24,6 @@ export class LoginComponent {
   error = '';
   exito = '';
   mostrarRegistro = false;
-  mostrarPassword = false;
   cargando = false;
   anioActual = new Date().getFullYear();
 
