@@ -72,6 +72,7 @@ Aplicación web fullstack para la gestión integral de citas médicas. Permite a
 
 ### Gestión de citas médicas
 - **Agendar cita**: el paciente elige médico, fecha y hora entre los cupos realmente disponibles.
+- **Motivo de consulta desplegable**: al agendar, editar o asignar una cita, el motivo se elige de una lista predefinida (Control médico general, Consulta por síntomas, Revisión / seguimiento, Exámenes de laboratorio, Vacunación, Autorización médica, Cita de urgencia) o se escribe manualmente seleccionando "Otro".
 - **Asignación automática**: el sistema asigna el próximo cupo disponible.
 - **Asignación rápida**: el propio paciente solicita que el sistema le asigne automáticamente el primer médico con disponibilidad.
 - **Cancelación**: los pacientes pueden cancelar sus propias citas.
