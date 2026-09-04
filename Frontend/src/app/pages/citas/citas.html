@@ -53,16 +53,12 @@
             <span class="filtro-ic"><i class="bi bi-funnel"></i></span>
           </th>
           <th>
-            <select
+            <app-buscador-paciente
               *ngIf="puedeFiltrarPorPaciente"
-              class="form-select form-select-sm"
+              [pacientes]="pacientes"
               [(ngModel)]="pacienteFiltro"
-            >
-              <option value="">Paciente</option>
-              <option *ngFor="let p of pacientes" [value]="p._id">
-                {{ p.Nombre || p.nombre }}
-              </option>
-            </select>
+              placeholder="Buscar paciente..."
+            ></app-buscador-paciente>
           </th>
           <th>
             <select
@@ -248,12 +244,11 @@
 
           <div class="mb-3" *ngIf="rolUsuario !== 'paciente'">
             <label class="form-label">Paciente</label>
-            <select class="form-select" [(ngModel)]="nuevaCita.paciente" name="paciente" required>
-              <option value="">Seleccione un paciente</option>
-              <option *ngFor="let p of pacientes" [value]="p._id">
-                {{ p.Nombre || p.nombre || p.nombres }}
-              </option>
-            </select>
+            <app-buscador-paciente
+              [pacientes]="pacientes"
+              [(ngModel)]="nuevaCita.paciente"
+              placeholder="Buscar por nombre o documento..."
+            ></app-buscador-paciente>
           </div>
 
           <div class="mb-3" *ngIf="rolUsuario !== 'medico'">
@@ -406,17 +401,11 @@
         <div class="modal-body">
           <div *ngIf="esAdmin" class="mb-3">
             <label class="form-label">Paciente</label>
-            <select
-              class="form-select"
+            <app-buscador-paciente
+              [pacientes]="pacientes"
               [(ngModel)]="citaEditando.paciente"
-              name="editPaciente"
-              required
-            >
-              <option value="">Seleccione un paciente</option>
-              <option *ngFor="let p of pacientes" [value]="p._id">
-                {{ p.Nombre || p.nombre || p.nombres }}
-              </option>
-            </select>
+              placeholder="Buscar por nombre o documento..."
+            ></app-buscador-paciente>
           </div>
 
           <div *ngIf="esAdmin" class="mb-3">

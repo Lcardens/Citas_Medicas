@@ -1,0 +1,30 @@
+<div class="buscador-paciente">
+  <input
+    type="text"
+    class="form-control form-control-sm"
+    [placeholder]="placeholder"
+    [value]="textoBusqueda"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (blur)="cerrar()"
+    autocomplete="off"
+  />
+  <ul
+    *ngIf="abierto && opcionesFiltradas.length > 0"
+    class="buscador-paciente-lista"
+  >
+    <li
+      *ngFor="let p of opcionesFiltradas"
+      (mousedown)="seleccionar(p)"
+      class="buscador-paciente-item"
+    >
+      {{ etiqueta(p) }}
+    </li>
+  </ul>
+  <div
+    *ngIf="abierto && opcionesFiltradas.length === 0"
+    class="buscador-paciente-vacio"
+  >
+    Sin resultados
+  </div>
+</div>

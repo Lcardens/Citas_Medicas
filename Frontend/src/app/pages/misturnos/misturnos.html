@@ -197,20 +197,11 @@
       <div class="modal-body">
         <div class="mb-3">
           <label class="form-label fw-semibold">Paciente</label>
-          <select
-            class="form-select"
+          <app-buscador-paciente
+            [pacientes]="pacientes"
             [(ngModel)]="nuevaCita.paciente"
-            name="asigPaciente"
-            required
-          >
-            <option value="" disabled>Seleccione un paciente</option>
-            <option
-              *ngFor="let p of pacientes"
-              [value]="p._id"
-            >
-              {{ p.Nombre || p.nombre || p.nombres }}
-            </option>
-          </select>
+            placeholder="Buscar por nombre o documento..."
+          ></app-buscador-paciente>
         </div>
         <div class="mb-3">
           <label class="form-label fw-semibold">Fecha</label>

@@ -8,11 +8,12 @@ import { PacienteService } from '../../core/services/paciente.service';
 import { MedicoService } from '../../core/services/medico.service';
 import { rolDesdeToken, normalizarRol } from '../../core/utils/auth.util';
 import { DialogService } from '../../core/services/dialog.service';
+import { BuscadorPacienteComponent } from '../../shared/buscador-paciente/buscador-paciente.component';
 
 @Component({
   selector: 'app-citas',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, BuscadorPacienteComponent],
   templateUrl: './citas.html',
   styleUrls: ['./citas.css'],
 })
@@ -191,12 +192,18 @@ export class CitasComponent implements OnInit {
           (typeof cita.medico === 'string' ? cita.medico : '') ||
           ''
         ).toLowerCase();
+        const documentoPaciente = (
+          cita.paciente?.Documento ||
+          cita.paciente?.documento ||
+          ''
+        ).toLowerCase();
         const motivo = (cita.motivo || '').toLowerCase();
         const estado = (cita.estado || '').toLowerCase();
         const fecha = String(cita.fecha || '').toLowerCase();
         const hora = (cita.hora || '').toLowerCase();
         return (
           paciente.includes(q) ||
+          documentoPaciente.includes(q) ||
           medico.includes(q) ||
           motivo.includes(q) ||
           estado.includes(q) ||

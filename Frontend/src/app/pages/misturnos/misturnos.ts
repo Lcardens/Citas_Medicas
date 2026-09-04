@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { CitaService } from '../../core/services/cita.service';
 import { PacienteService } from '../../core/services/paciente.service';
 import { DialogService } from '../../core/services/dialog.service';
+import { BuscadorPacienteComponent } from '../../shared/buscador-paciente/buscador-paciente.component';
 
 @Component({
   selector: 'app-misturnos',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, BuscadorPacienteComponent],
   templateUrl: './misturnos.html',
   styleUrls: ['./misturnos.css'],
 })
