@@ -51,7 +51,7 @@
                 title="Configurar disponibilidad"
                 (click)="abrirDisponibilidad(medico)"
               >
-                <i class="bi bi-sliders me-1"></i>Disponibilidad
+                Disponibilidad
               </button>
               <button
                 class="btn btn-outline-danger btn-sm"
@@ -188,64 +188,40 @@
 
         <div class="mb-4">
           <label class="form-label fw-semibold">Días bloqueados (sin atención)</label>
+
           <div class="d-flex flex-wrap gap-2 mb-2">
             <button
               *ngFor="let tp of tiposBloqueo"
               type="button"
               class="btn btn-sm"
-              [class.btn-danger]="tipoBloqueo === tp.valor"
-              [class.btn-outline-danger]="tipoBloqueo !== tp.valor"
+              [class.btn-primary]="tipoBloqueo === tp.valor && tp.valor === 'vacaciones'"
+              [class.btn-warning]="tipoBloqueo === tp.valor && tp.valor === 'licencia'"
+              [class.btn-danger]="tipoBloqueo === tp.valor && tp.valor === 'puntual'"
+              [class.btn-outline-secondary]="tipoBloqueo !== tp.valor"
               (click)="tipoBloqueo = tp.valor"
             >
-              <i
-                [class.bi-calendar-x]="tp.valor === 'puntual'"
-                [class.bi-heart-pulse]="tp.valor === 'licencia'"
-                [class.bi-palette]="tp.valor === 'vacaciones'"
-                class="bi me-1"
-              ></i>
               {{ tp.nombre }}
             </button>
           </div>
-          <div class="card">
-            <div class="card-body py-2">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong class="small">{{ tituloMes }}</strong>
-                <div>
-                  <button type="button" class="btn btn-outline-secondary btn-sm me-1" (click)="cambiarMesCalendario(-1)">&laquo;</button>
-                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cambiarMesCalendario(1)">&raquo;</button>
-                </div>
-              </div>
-              <div class="row text-center small text-secondary mb-1 g-0">
-                <div class="col" *ngFor="let n of nombresDiasSemana">{{ n }}</div>
-              </div>
-              <div class="row text-center g-0">
-                <div class="col p-0" *ngFor="let d of diasCalendario">
-                  <button
-                    *ngIf="d.fecha"
-                    type="button"
-                    class="btn btn-sm calendario-bloqueo"
-                    [class.seleccionado]="d.seleccion"
-                    [class.bloqueado]="d.bloqueado && !d.seleccion"
-                    [class.hoy]="d.esHoy"
-                    [class.deshabilitado]="d.pasada"
-                    [disabled]="d.pasada"
-                    (click)="toggleDiaCalendario(d.fecha)"
-                  >
-                    {{ d.dia }}
-                  </button>
-                </div>
-              </div>
-              <button
-                type="button"
-                class="btn btn-danger btn-sm mt-2 w-100"
-                [disabled]="seleccionCalendario.length === 0"
-                (click)="bloquearSeleccion()"
-              >
-                <i class="bi bi-lock-fill me-1"></i>Bloquear {{ seleccionCalendario.length === 0 ? '' : seleccionCalendario.length }} día(s)
-              </button>
-            </div>
+
+          <div class="input-group mb-2">
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="nuevaFechaBloqueo"
+              name="nuevaFechaBloqueo"
+            />
+            <button
+              type="button"
+              class="btn btn-danger"
+              [disabled]="!nuevaFechaBloqueo"
+              (click)="agregarFechaBloqueo()"
+            >
+              Agregar día
+            </button>
           </div>
-          <div *ngIf="disponibilidad.diasBloqueados.length === 0" class="text-muted small mt-2">
+
+          <div *ngIf="disponibilidad.diasBloqueados.length === 0" class="text-muted small">
             No hay días bloqueados.
           </div>
           <span

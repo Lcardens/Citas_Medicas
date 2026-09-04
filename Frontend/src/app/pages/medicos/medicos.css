@@ -46,38 +46,3 @@
     white-space: nowrap;
   }
 }
-
-.calendario-bloqueo {
-  width: 100%;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-  font-size: 0.8rem;
-}
-
-.calendario-bloqueo.deshabilitado {
-  color: #adb5bd;
-  background: #e9ecef;
-  cursor: not-allowed;
-  opacity: 1;
-}
-
-.calendario-bloqueo.hoy {
-  border-color: #6c757d;
-}
-
-.calendario-bloqueo.seleccionado {
-  background: #dc3545;
-  color: #fff;
-  border-color: #dc3545;
-}
-
-.calendario-bloqueo.bloqueado {
-  background: #e2d9f3;
-  color: #5f3dc4;
-  border-color: #d0bfff;
-}
-
-.calendario-bloqueo:not(.deshabilitado):not(.seleccionado):hover {
-  background: #f1f3f5;
-  border-color: #ced4da;
-}
