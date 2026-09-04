@@ -76,6 +76,7 @@ export class CitasComponent implements OnInit {
     fecha: '',
     hora: '',
     motivo: '',
+    motivoOtro: '',
   };
 
   citaEditando: any = {
@@ -588,6 +589,10 @@ export class CitasComponent implements OnInit {
 
   guardarCita(): void {
     const datosEnviar: any = { ...this.nuevaCita };
+    if (datosEnviar.motivo === 'Otro') {
+      datosEnviar.motivo = (this.nuevaCita.motivoOtro || '').trim();
+    }
+    delete datosEnviar.motivoOtro;
     if (this.rolUsuario === 'paciente') {
       delete datosEnviar.paciente;
     }
@@ -728,7 +733,13 @@ export class CitasComponent implements OnInit {
       hora: cita.hora,
       paciente: idPaciente || '',
       medico: idMedico || '',
+      motivoOtro: '',
     };
+
+    if (cita.motivo && !this.motivosCita.includes(cita.motivo)) {
+      this.citaEditando.motivoOtro = cita.motivo;
+      this.citaEditando.motivo = 'Otro';
+    }
 
     if (this.esAdmin) {
       if (cita.fecha) {
@@ -790,13 +801,17 @@ export class CitasComponent implements OnInit {
       hora: '',
       paciente: '',
       medico: '',
+      motivoOtro: '',
     };
   }
 
   actualizarCita(): void {
     if (!this.citaEditando._id) return;
 
-    const { _id, ...datosAActualizar } = this.citaEditando;
+    const { _id, motivoOtro, ...datosAActualizar } = this.citaEditando;
+    if (datosAActualizar.motivo === 'Otro') {
+      datosAActualizar.motivo = (motivoOtro || '').trim();
+    }
 
     this.citaService.actualizarCita(_id, datosAActualizar).subscribe({
       next: () => {
@@ -895,13 +910,14 @@ export class CitasComponent implements OnInit {
       });
   }
 
-  limpiarFormulario(): void {
+limpiarFormulario(): void {
     this.nuevaCita = {
       paciente: '',
       medico: '',
       fecha: '',
       hora: '',
       motivo: '',
+      motivoOtro: '',
     };
   }
 }

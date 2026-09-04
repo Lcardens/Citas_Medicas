@@ -257,6 +257,14 @@
             <option value="" disabled>Seleccione un motivo</option>
             <option *ngFor="let m of motivosCita" [value]="m">{{ m }}</option>
           </select>
+          <input
+            *ngIf="nuevaCita.motivo === 'Otro'"
+            type="text"
+            class="form-control mt-2"
+            placeholder="Especifique el motivo"
+            [(ngModel)]="nuevaCita.motivoOtro"
+            name="asigMotivoOtro"
+          />
         </div>
       </div>
       <div class="modal-footer">

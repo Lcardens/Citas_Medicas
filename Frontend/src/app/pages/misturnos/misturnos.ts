@@ -55,6 +55,7 @@ export class MisturnosComponent implements OnInit {
     fecha: '',
     hora: '',
     motivo: '',
+    motivoOtro: '',
   };
   horasDisponibles: string[] = [];
   horariosAtencion: string[] = [
@@ -154,6 +155,7 @@ export class MisturnosComponent implements OnInit {
       fecha: '',
       hora: '',
       motivo: '',
+      motivoOtro: '',
     };
     this.horasDisponibles = [];
     this.mostrarModalAsignar = true;
@@ -228,7 +230,10 @@ export class MisturnosComponent implements OnInit {
       medico: this.medicoId,
       fecha: this.nuevaCita.fecha,
       hora: this.nuevaCita.hora,
-      motivo: this.nuevaCita.motivo,
+      motivo:
+        this.nuevaCita.motivo === 'Otro'
+          ? (this.nuevaCita.motivoOtro || '').trim()
+          : this.nuevaCita.motivo,
     };
 
     this.guardando = true;
