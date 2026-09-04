@@ -193,11 +193,9 @@
             <button
               *ngFor="let tp of tiposBloqueo"
               type="button"
-              class="btn btn-sm"
-              [class.btn-primary]="tipoBloqueo === tp.valor && tp.valor === 'vacaciones'"
-              [class.btn-warning]="tipoBloqueo === tp.valor && tp.valor === 'licencia'"
-              [class.btn-danger]="tipoBloqueo === tp.valor && tp.valor === 'puntual'"
-              [class.btn-outline-secondary]="tipoBloqueo !== tp.valor"
+              class="btn btn-sm tipo-bloqueo"
+              [class.activo-vacaciones]="tipoBloqueo === tp.valor && tp.valor === 'vacaciones'"
+              [class.activo-licencia]="tipoBloqueo === tp.valor && tp.valor === 'licencia'"
               (click)="tipoBloqueo = tp.valor"
             >
               {{ tp.nombre }}
@@ -221,7 +219,7 @@
             />
             <button
               type="button"
-              class="btn btn-danger"
+              class="btn btn-sm btn-agregar-rango"
               [disabled]="!fechaDesdeBloqueo || !fechaHastaBloqueo"
               (click)="agregarFechaBloqueo()"
             >
@@ -242,7 +240,8 @@
             {{ formatearFecha(b.fecha) }} · {{ nombreTipo(b.tipo) }}
             <button
               type="button"
-              class="btn-close btn-close-white ms-1"
+              class="btn-close ms-1"
+              [class.btn-close-white]="b.tipo !== 'licencia'"
               style="width: 0.5rem; height: 0.5rem"
               title="Quitar bloqueo"
               (click)="quitarFechaBloqueo(b.fecha)"

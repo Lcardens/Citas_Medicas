@@ -46,3 +46,47 @@
     white-space: nowrap;
   }
 }
+
+.tipo-bloqueo {
+  border: 1px solid #e5e7eb;
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.tipo-bloqueo:hover {
+  border-color: #c9c4f0;
+  color: #5f3dc4;
+}
+
+.tipo-bloqueo.activo-vacaciones {
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.tipo-bloqueo.activo-licencia {
+  background: linear-gradient(135deg, #93c5fd 0%, #bfdbfe 100%);
+  color: #1e3a5f;
+  border-color: transparent;
+}
+
+.btn-agregar-rango {
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-agregar-rango:disabled {
+  background: #e9ecef;
+  color: #adb5bd;
+}
+
+.badge-vacaciones {
+  background: linear-gradient(135deg, #8f7bd8 0%, #b8a6de 100%);
+  color: #ffffff;
+}
+
+.badge-licencia {
+  background: #dbeafe;
+  color: #1e3a5f;
+}

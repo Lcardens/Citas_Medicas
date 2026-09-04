@@ -77,7 +77,6 @@ export class MedicosComponent implements OnInit {
   tiposBloqueo = [
     { valor: 'vacaciones', nombre: 'Vacaciones' },
     { valor: 'licencia', nombre: 'Licencia' },
-    { valor: 'puntual', nombre: 'Puntual' },
   ];
 
   fechaDesdeBloqueo: string = '';
@@ -261,9 +260,8 @@ export class MedicosComponent implements OnInit {
   }
 
   claseTipo(tipo: string): string {
-    if (tipo === 'licencia') return 'text-bg-warning';
-    if (tipo === 'vacaciones') return 'text-bg-primary';
-    return 'text-bg-danger';
+    if (tipo === 'licencia') return 'badge-licencia';
+    return 'badge-vacaciones';
   }
 
   formatearFecha(fecha: string): string {
