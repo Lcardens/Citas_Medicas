@@ -7,6 +7,7 @@ const {
   registrar,
   login,
   obtenerUsuarios,
+  editarUsuario,
   obtenerMiPerfil,
   actualizarMiPerfil,
   eliminarUsuario,
@@ -23,6 +24,13 @@ router.get(
   proteger,
   autorizar("admin", "administrador"),
   obtenerUsuarios,
+);
+
+router.put(
+  "/usuarios/:id",
+  proteger,
+  autorizar("admin", "administrador"),
+  editarUsuario,
 );
 
 router.delete(

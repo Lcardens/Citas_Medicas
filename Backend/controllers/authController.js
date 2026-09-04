@@ -347,6 +347,89 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
+// PUT /api/auth/usuarios/:id
+exports.editarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, email, rol } = req.body;
+
+    const usuario = await User.findById(id);
+    if (!usuario) {
+      return res.status(404).json({
+        exitoso: false,
+        mensaje: "Usuario no encontrado",
+      });
+    }
+
+    const campos = {};
+
+    if (nombre && nombre.trim()) {
+      campos.nombre = nombre.trim();
+    }
+
+    if (email && email.trim()) {
+      const emailLower = email.trim().toLowerCase();
+      if (emailLower !== usuario.email) {
+        const existe = await User.findOne({ email: emailLower, _id: { $ne: id } });
+        if (existe) {
+          return res.status(400).json({
+            exitoso: false,
+            mensaje: "Este correo electrónico ya está registrado por otro usuario",
+          });
+        }
+      }
+      campos.email = emailLower;
+    }
+
+    if (rol) {
+      let rolNormalizado = rol.toLowerCase().trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+      if (rolNormalizado === "administrador") rolNormalizado = "admin";
+      campos.rol = rolNormalizado;
+    }
+
+    const usuarioActualizado = await User.findByIdAndUpdate(id, { $set: campos }, { new: true }).select("-password");
+
+    const nombreFinal = campos.nombre || usuario.nombre;
+    const emailFinal = campos.email || usuario.email;
+
+    const rolFinal = (usuarioActualizado.rol || "").toLowerCase().trim();
+    if (rolFinal === "paciente" || rolFinal === "usuario") {
+      await Paciente.updateOne(
+        { Correo: usuario.email },
+        { $set: { Nombre: nombreFinal, Correo: emailFinal } },
+      ).exec();
+    } else if (rolFinal === "medico" || rolFinal === "admin" || rolFinal === "administrador") {
+      await Medico.updateOne(
+        { email: usuario.email },
+        { $set: { Nombre: nombreFinal, email: emailFinal } },
+      ).exec();
+    }
+
+    await registrarEvento({
+      req,
+      usuario: req.usuario,
+      accion: "actualizar_perfil",
+      entidad: "usuario",
+      entidadId: id,
+      detalles: { campos: Object.keys(campos) },
+    });
+
+    res.status(200).json({
+      exitoso: true,
+      mensaje: "Usuario actualizado correctamente",
+      datos: usuarioActualizado,
+    });
+  } catch (error) {
+    res.status(400).json({
+      exitoso: false,
+      mensaje: "Error al actualizar el usuario",
+      error: error.message,
+    });
+  }
+};
+
 // GET /api/auth/me
 exports.obtenerMiPerfil = async (req, res) => {
   try {

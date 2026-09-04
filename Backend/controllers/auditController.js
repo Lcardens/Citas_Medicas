@@ -41,10 +41,7 @@ exports.listarLogs = async (req, res) => {
   try {
     const {
       accion,
-      entidad,
-      email,
-      fechaInicio,
-      fechaFin,
+      usuario: usuarioBusqueda,
       pagina = 1,
       limite = 20,
     } = req.query;
@@ -52,16 +49,22 @@ exports.listarLogs = async (req, res) => {
     const filtro = {};
 
     if (accion) filtro.accion = accion;
-    if (entidad) filtro.entidad = entidad;
-    if (email) filtro.email = { $regex: email, $options: "i" };
 
-    if (fechaInicio || fechaFin) {
-      filtro.createdAt = {};
-      if (fechaInicio) filtro.createdAt.$gte = new Date(fechaInicio);
-      if (fechaFin) {
-        const fin = new Date(fechaFin);
-        fin.setHours(23, 59, 59, 999);
-        filtro.createdAt.$lte = fin;
+    if (usuarioBusqueda) {
+      const usuariosEncontrados = await User.find({
+        $or: [
+          { nombre: { $regex: usuarioBusqueda, $options: "i" } },
+          { email: { $regex: usuarioBusqueda, $options: "i" } },
+        ],
+      }).select("_id email");
+      if (usuariosEncontrados.length > 0) {
+        const ids = usuariosEncontrados.map((u) => u._id);
+        filtro.$or = [
+          { usuario: { $in: ids } },
+          { email: { $regex: usuarioBusqueda, $options: "i" } },
+        ];
+      } else {
+        filtro.email = { $regex: usuarioBusqueda, $options: "i" };
       }
     }
 
