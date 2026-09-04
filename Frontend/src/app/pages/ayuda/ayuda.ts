@@ -69,7 +69,9 @@ export class AyudaComponent implements OnInit {
             'Ingresa a "Médicos" desde el menú.',
             'Filtra por nombre o registro médico con el buscador.',
             'Haz clic en "Nuevo Médico" para registrar.',
-            'Carga nombre, teléfono, registro médico y disponibilidad.',
+            'Configura su disponibilidad con el botón "Disponibilidad".',
+            'Selecciona los días de la semana y las horas de atención.',
+            'Puedes bloquear días puntuales como Licencia o Vacaciones.',
             'Para editar o eliminar, usa los botones de la tabla.',
           ],
         },
@@ -122,6 +124,12 @@ export class AyudaComponent implements OnInit {
           color: '#6fbf8f',
           pregunta: '¿Qué es la Auditoría?',
           respuesta: 'La Auditoría registra todas las acciones realizadas en el sistema (creaciones, ediciones, eliminaciones). Puedes filtrar por usuario y fecha para revisar movimientos.',
+        },
+        {
+          icono: 'bi-sliders',
+          color: '#27b7f5',
+          pregunta: '¿Cómo configuro la disponibilidad de un médico?',
+          respuesta: 'En "Médicos", haz clic en "Disponibilidad". Puedes marcar los días de la semana y las horas de atención. Además puedes bloquear días puntuales marcándolos como Vacaciones, Licencia o Puntual; en esos días no se generarán citas.',
         },
         {
           icono: 'bi-bar-chart-line',

@@ -49,19 +49,18 @@ export class MedicosComponent implements OnInit {
       '05:00 PM',
       '06:00 PM',
     ],
-    diasBloqueados: [] as string[],
+    diasBloqueados: [] as { fecha: string; tipo: string }[],
   };
 
   medicoEnDisponibilidad: any = null;
-  nuevaFechaBloqueo: string = '';
   diasDisponibles = [
     { valor: 1, nombre: 'Lun' },
     { valor: 2, nombre: 'Mar' },
     { valor: 3, nombre: 'Mié' },
     { valor: 4, nombre: 'Jue' },
     { valor: 5, nombre: 'Vie' },
-    { valor: 0, nombre: 'Dom' },
     { valor: 6, nombre: 'Sáb' },
+    { valor: 0, nombre: 'Dom' },
   ];
   horasPosibles = [
     '08:00 AM',
@@ -75,6 +74,16 @@ export class MedicosComponent implements OnInit {
     '05:00 PM',
     '06:00 PM',
   ];
+  tiposBloqueo = [
+    { valor: 'puntual', nombre: 'Puntual' },
+    { valor: 'licencia', nombre: 'Licencia' },
+    { valor: 'vacaciones', nombre: 'Vacaciones' },
+  ];
+  nombresDiasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+  mesCalendario: Date = new Date();
+  seleccionCalendario: string[] = [];
+  tipoBloqueo = 'puntual';
   mensajeDisponibilidad = '';
   guardandoDisponibilidad = false;
 
@@ -174,9 +183,16 @@ export class MedicosComponent implements OnInit {
       ? [...medico.horasAtencion]
       : [...this.horasPosibles];
     this.disponibilidad.diasBloqueados = Array.isArray(medico.diasBloqueados)
-      ? medico.diasBloqueados.map((d: any) => String(d).slice(0, 10))
+      ? medico.diasBloqueados
+          .map((d: any) => ({
+            fecha: typeof d === 'string' ? String(d).slice(0, 10) : String(d?.fecha || '').slice(0, 10),
+            tipo: typeof d === 'string' ? 'puntual' : d?.tipo || 'puntual',
+          }))
+          .filter((x: any) => x.fecha)
       : [];
-    this.nuevaFechaBloqueo = '';
+    this.mesCalendario = new Date();
+    this.seleccionCalendario = [];
+    this.tipoBloqueo = 'puntual';
     this.mensajeDisponibilidad = '';
     this.mostrarModalDisponibilidad = true;
   }
@@ -204,18 +220,84 @@ export class MedicosComponent implements OnInit {
     }
   }
 
-  agregarFechaBloqueo(): void {
-    const fecha = this.nuevaFechaBloqueo;
-    if (!fecha) return;
-    const normalizada = String(fecha).slice(0, 10);
-    if (!this.disponibilidad.diasBloqueados.includes(normalizada)) {
-      this.disponibilidad.diasBloqueados.push(normalizada);
+  get tituloMes(): string {
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${meses[this.mesCalendario.getMonth()]} ${this.mesCalendario.getFullYear()}`;
+  }
+
+  get diasCalendario(): any[] {
+    const anio = this.mesCalendario.getFullYear();
+    const mes = this.mesCalendario.getMonth();
+    const primerDia = new Date(anio, mes, 1);
+    const ultimoDia = new Date(anio, mes + 1, 0);
+    const ajusteInicio = (primerDia.getDay() + 6) % 7;
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const dias: any[] = [];
+    for (let i = 0; i < ajusteInicio; i++) {
+      dias.push({ fecha: '', dia: '' });
     }
-    this.nuevaFechaBloqueo = '';
+    for (let d = 1; d <= ultimoDia.getDate(); d++) {
+      const fecha = new Date(anio, mes, d);
+      const fechaStr = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      dias.push({
+        fecha: fechaStr,
+        dia: d,
+        esHoy: fecha.getTime() === hoy.getTime(),
+        pasada: fecha < hoy,
+        seleccion: this.seleccionCalendario.includes(fechaStr),
+        bloqueado: this.disponibilidad.diasBloqueados.some((b) => b.fecha === fechaStr),
+      });
+    }
+    return dias;
+  }
+
+  cambiarMesCalendario(dir: number): void {
+    this.mesCalendario = new Date(
+      this.mesCalendario.getFullYear(),
+      this.mesCalendario.getMonth() + dir,
+      1,
+    );
+    this.seleccionCalendario = [];
+  }
+
+  toggleDiaCalendario(fecha: string): void {
+    if (!fecha) return;
+    const idx = this.seleccionCalendario.indexOf(fecha);
+    if (idx >= 0) {
+      this.seleccionCalendario.splice(idx, 1);
+    } else {
+      this.seleccionCalendario.push(fecha);
+    }
+  }
+
+  bloquearSeleccion(): void {
+    if (this.seleccionCalendario.length === 0) return;
+    for (const fecha of this.seleccionCalendario) {
+      const existente = this.disponibilidad.diasBloqueados.find((x) => x.fecha === fecha);
+      if (existente) {
+        existente.tipo = this.tipoBloqueo;
+      } else {
+        this.disponibilidad.diasBloqueados.push({ fecha, tipo: this.tipoBloqueo });
+      }
+    }
+    this.seleccionCalendario = [];
   }
 
   quitarFechaBloqueo(fecha: string): void {
-    this.disponibilidad.diasBloqueados = this.disponibilidad.diasBloqueados.filter((f) => f !== fecha);
+    this.disponibilidad.diasBloqueados = this.disponibilidad.diasBloqueados.filter((x) => x.fecha !== fecha);
+    this.seleccionCalendario = this.seleccionCalendario.filter((f) => f !== fecha);
+  }
+
+  nombreTipo(tipo: string): string {
+    const t = this.tiposBloqueo.find((x) => x.valor === tipo);
+    return t ? t.nombre : 'Puntual';
+  }
+
+  claseTipo(tipo: string): string {
+    if (tipo === 'licencia') return 'text-bg-warning';
+    if (tipo === 'vacaciones') return 'text-bg-primary';
+    return 'text-bg-danger';
   }
 
   formatearFecha(fecha: string): string {
