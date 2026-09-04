@@ -28,6 +28,9 @@
           <div>
             <span class="badge role-badge mt-2">{{ rolLegible }}</span>
           </div>
+          <div *ngIf="rol === 'admin'">
+            <small class="text-muted">Cargo: Administrador de Sistema</small>
+          </div>
         </div>
 
         <form (ngSubmit)="guardarPerfil()" #perfilForm="ngForm">
