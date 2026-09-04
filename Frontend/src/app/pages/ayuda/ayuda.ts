@@ -67,9 +67,9 @@ export class AyudaComponent implements OnInit {
           titulo: 'Gestionar Médicos',
           pasos: [
             'Entrá a "Médicos" desde el menú.',
-            'Filtrá por nombre o especialidad con el buscador.',
+            'Filtrá por nombre o registro médico con el buscador.',
             'Hacé clic en "Nuevo Médico" para registrar.',
-            'Cargá nombre, especialidad, teléfono, registro médico y disponibilidad.',
+            'Cargá nombre, teléfono, registro médico y disponibilidad.',
             'Para editar o eliminar, usá los botones de la tabla.',
           ],
         },
@@ -161,7 +161,7 @@ export class AyudaComponent implements OnInit {
           pasos: [
             'Accedé a "Mi Perfil" desde el menú.',
             'Podés actualizar tu nombre.',
-            'Tu registro médico, especialidad y teléfono son de solo lectura.',
+            'Tu registro médico y teléfono son de solo lectura.',
             'Para cambiar tu contraseña, hacé clic en "Cambiar contraseña".',
           ],
         },
@@ -214,7 +214,7 @@ export class AyudaComponent implements OnInit {
           pasos: [
             'En el menú, seleccioná "Mis Turnos".',
             'Verás tus citas con su estado: Pendiente, Confirmada o Atendida.',
-            'Podés buscar por nombre del médico o especialidad.',
+            'Podés buscar por nombre del médico.',
             'Si necesitás cancelar, hacé clic en "Cancelar".',
           ],
         },
@@ -258,7 +258,7 @@ export class AyudaComponent implements OnInit {
           icono: 'bi-search',
           color: '#8f7bd8',
           pregunta: '¿Cómo busco un médico específico?',
-          respuesta: 'Al agendar una cita, usá el buscador que aparece en la parte superior. Podés escribir el nombre del médico o su especialidad.',
+          respuesta: 'Al agendar una cita, usá el buscador que aparece en la parte superior. Podés escribir el nombre del médico.',
         },
         {
           icono: 'bi-shield-lock',
