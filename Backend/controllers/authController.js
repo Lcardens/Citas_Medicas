@@ -52,11 +52,34 @@ exports.registrar = async (req, res) => {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
+    // Detecta si quien crea el usuario es un admin autenticado
+    let solicitanteAdmin = false;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      try {
+        const token = req.headers.authorization.split(" ")[1];
+        const decodificado = jwt.verify(token, process.env.JWT_SECRET);
+        if (decodificado && decodificado.id) {
+          const solicitante = await User.findById(decodificado.id);
+          const rolSolicitante = (solicitante?.rol || "")
+            .toLowerCase()
+            .trim();
+          solicitanteAdmin = rolSolicitante === "admin" || rolSolicitante === "administrador";
+        }
+      } catch {
+        solicitanteAdmin = false;
+      }
+    }
+
     if (rolNormalizado === "admin" || rolNormalizado === "administrador") {
-      return res.status(403).json({
-        exitoso: false,
-        mensaje: "No puedes auto-registrarte como administrador",
-      });
+      if (!solicitanteAdmin) {
+        return res.status(403).json({
+          exitoso: false,
+          mensaje: "No puedes auto-registrarte como administrador",
+        });
+      }
     }
 
     // El médico debe existir previamente en el sistema
